@@ -21,4 +21,4 @@ read_verilog -sv $sv_files
 
 synth_design -top arbitation -part xc7k480tffg1156-2
 report_utilization
-report_timing_summary
+report_timing -max_paths 1

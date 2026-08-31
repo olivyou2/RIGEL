@@ -16,7 +16,6 @@ module skid#(
     logic skid_valid;
     logic [DATA_WIDTH-1:0] skid_data;
 
-
     always @(posedge clk) begin
         if (!rst_n) begin
             skid_valid <= 0;

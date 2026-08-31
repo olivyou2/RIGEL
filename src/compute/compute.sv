@@ -111,19 +111,33 @@ module compute#(
     logic [ADDR_WIDTH-1: 0] dma_fire_dst_addr;
     logic [ADDR_WIDTH-1: 0] dma_fire_len;
 
-    logic [3:0] dma_fsm;
+    logic [ADDR_WIDTH-1: 0] dma_fire_counter;
+
+    // dma data path
+    logic [ADDR_WIDTH+DATA_WIDTH-1: 0] dma_arbitor_in;
+    logic dma_arbitor_in_valid;
+    logic dma_arbitor_in_ready;
+
+    logic [1:0] dma_fsm;
 
     // output registers
     logic dma_decerr;
 
-    // DMA FSM
+    // DMA Loader FSM
     always @(posedge clk) begin
         if (!rst_n) begin
             dma_fsm <= 0;
+            dma_fire_counter <= 0;
         end else begin case (dma_fsm)
-                4'd0: begin
+                2'd0: begin
                     if (dma_fire) begin
+                        dma_fire_counter <= 0;
+                        dma_fsm <= 1;
                     end
+                end
+
+                2'd1: begin
+                    
                 end
             endcase
         end
