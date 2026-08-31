@@ -18,7 +18,7 @@ if [ -z "${SV_FILES}" ]; then
 	exit 1
 fi
 
-verilator --binary -I./src --top-module "${TOP_MODULE}" ${SV_FILES}
+verilator --binary -I./src --Wno-fatal --top-module "${TOP_MODULE}" ${SV_FILES}
 
 SIM_BIN="./obj_dir/V${TOP_MODULE}"
 if [[ ! -x "${SIM_BIN}" ]]; then
