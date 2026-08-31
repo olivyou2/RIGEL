@@ -13,6 +13,7 @@ module mesh_router#(
     input logic clk,
     input logic rst_n,
 
+    // External Router
     input logic [ADDR_WIDTH-1: 0] north_addr_in[CHANNELS],
     input logic [DATA_WIDTH-1: 0] north_data_in[CHANNELS],
     input logic north_data_valid[CHANNELS],
@@ -31,9 +32,25 @@ module mesh_router#(
     output logic [ADDR_WIDTH-1: 0] south_addr_out[CHANNELS],
     output logic [DATA_WIDTH-1: 0] south_data_out[CHANNELS],
     output logic south_data_valid[CHANNELS],
-    input logic south_data_ready[CHANNELS]
+    input logic south_data_ready[CHANNELS],
+
+    // Local In/Out
+    input logic [ADDR_WIDTH-1: 0] local_addr_in,
+    input logic [DATA_WIDTH-1: 0] local_data_in,
+    input logic local_data_in_valid,
+    output logic local_data_in_ready,
+
+    output logic [ADDR_WIDTH-1: 0] local_addr_out,
+    output logic [DATA_WIDTH-1: 0] local_data_out,
+    output logic local_data_out_valid,
+    input logic local_data_out_ready
 );
 
-    
+    genvar channel;
+    generate
+        for (channel=0; channel<CHANNELS; channel++) begin
+            
+        end
+    endgenerate
 
 endmodule;
