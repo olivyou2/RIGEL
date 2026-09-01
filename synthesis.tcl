@@ -19,6 +19,6 @@ set sv_files [find_files ./src {*.sv}]
 
 read_verilog -sv $sv_files
 
-synth_design -top arbitation -part xc7k480tffg1156-2
+synth_design -top mesh_router -part xc7k480tffg1156-2
 report_utilization
-report_timing -from [all_registers] -to [all_registers] -max_paths 1
+report_timing -from [all_registers] -to [all_registers] -max_paths 5

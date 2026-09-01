@@ -47,31 +47,72 @@ module mesh_router#(
 );
     // Parameter Definition
     localparam TOTAL_CHANNEL = CHANNELS*2+1;
-    localparam CHANNEL_WIDTH = $clog2(CHANNELS)+2;
+    localparam CHANNEL_WIDTH = $clog2(CHANNELS);
 
     // -----------------------------
-    // - Control Definition        -
+    // - Controlpath               -
     // -----------------------------
-    //
-    // 1. 각 output 별로 valid mask 만듬
-    // 2. valid mask 쉬프트
-    // 3. 우선순위 인코더로 sel 설정
-    // 4. 아웃풋 포트에 valid 올림
-    //
 
     function automatic [X_BITS-1:0] get_x_addr(input logic [ADDR_WIDTH-1: 0] addr_in);
         get_x_addr = addr_in[ADDR_WIDTH-1 -: X_BITS];
     endfunction
 
-    function automatic [X_BITS-1:0] get_y_addr(input logic [ADDR_WIDTH-1: 0] addr_in);
+    function automatic [Y_BITS-1:0] get_y_addr(input logic [ADDR_WIDTH-1: 0] addr_in);
         get_y_addr = addr_in[ADDR_WIDTH-1-X_BITS -: Y_BITS];
     endfunction
 
+    function automatic logic mask_valid(input logic [TOTAL_CHANNEL-1: 0] mask, input logic [CHANNEL_WIDTH-1: 0] th);
+        logic [CHANNEL_WIDTH-1: 0] cont_count;
+        
+        cont_count = 0;
+        mask_valid = 0;
+
+        for (int i=0; i<TOTAL_CHANNEL; i++) begin
+            if (mask[i]) begin
+                if (cont_count != th) begin
+                    cont_count = cont_count + 1;
+                    continue;
+                end
+                mask_valid = 1;
+                break;
+            end
+        end
+    endfunction
+
+    function automatic [CHANNEL_WIDTH-1: 0] mask_idx(input logic [TOTAL_CHANNEL-1: 0] mask, input logic [CHANNEL_WIDTH-1: 0] th);
+        logic [CHANNEL_WIDTH-1: 0] cont_count;
+        
+        cont_count = 0;
+        mask_idx = 0;
+
+        for (logic [CHANNEL_WIDTH-1: 0] i=0; i<TOTAL_CHANNEL; i++) begin
+            if (mask[i]) begin
+                if (cont_count != th) begin
+                    cont_count = cont_count + 1;
+                    continue;
+                end
+                mask_idx = i;
+                break;
+            end
+        end
+    endfunction
+
     always@(*) begin
+        // mask
+        
         logic [TOTAL_CHANNEL-1: 0] east_valid_chan = 0;
         logic [TOTAL_CHANNEL-1: 0] south_valid_chan = 0;
         logic [TOTAL_CHANNEL-1: 0] local_valid_chan = 0;
+        
+        // select
 
+        logic [$clog2(CHANNELS): 0] east_channel_count = 0;
+        logic [$clog2(CHANNELS): 0] south_channel_count = 0;
+        logic [1:0] local_channel_count = 0;
+
+        // logic
+
+            // masking logic
         for (int i=0; i<CHANNELS; i++) begin
             if (north_data_valid[i]) begin
                 logic [X_BITS-1: 0] north_x = get_x_addr(north_addr_in[i]);
@@ -79,7 +120,7 @@ module mesh_router#(
 
                 if (X == north_x) begin
                     south_valid_chan[i] = 1;
-                end else if (Y != north_y) begin
+                end else if (Y == north_y) begin
                     east_valid_chan[i] = 1;
                 end else begin
                     local_valid_chan[i] = 1;
@@ -92,12 +133,93 @@ module mesh_router#(
 
                 if (X == west_x) begin
                     south_valid_chan[CHANNELS+i] = 1;
-                end if (Y != west_y) begin
+                end else if (Y == west_y) begin
                     east_valid_chan[CHANNELS+i] = 1;
                 end else begin
                     local_valid_chan[CHANNELS+i] = 1;
                 end
             end
+        end
+
+        if (local_data_in) begin
+            logic [X_BITS-1: 0] west_x = get_x_addr(local_addr_in);
+            logic [Y_BITS-1: 0] west_y = get_y_addr(local_addr_in);
+
+            if (X == west_x) begin
+                south_valid_chan[CHANNELS*2] = 1;
+            end else if (Y == west_y) begin
+                east_valid_chan[CHANNELS*2] = 1;
+            end else begin
+                local_valid_chan[CHANNELS*2] = 1;
+            end
+        end
+
+            // priority indexing && valid on
+        for (int i=0; i<TOTAL_CHANNEL; i++) begin
+            logic channel_selected = 0;
+
+            north_data_ready[i] = 0;
+            west_data_ready[i] = 0;
+            local_data_in_ready = 0;
+            
+            if (east_valid_chan[i] && (east_channel_count < CHANNELS)) begin
+                east_sel[east_channel_count] = i;
+                east_data_valid[east_channel_count] = 1;
+                east_channel_count ++;
+
+                channel_selected = 1;
+            end
+            
+            if (south_valid_chan[i] && (south_channel_count < CHANNELS)) begin
+                south_sel[south_channel_count] = i;
+                south_data_valid[south_channel_count] = 1;
+                south_channel_count ++;
+
+                channel_selected = 1;
+            end
+
+            if (local_valid_chan[i] && (local_channel_count == 0)) begin
+                local_sel = i;
+                local_data_out_valid = 1;
+                local_channel_count ++;
+
+                channel_selected = 1;
+            end
+
+            if (channel_selected) begin
+                if (channel_selected < CHANNELS) begin
+                    north_data_ready[i] = 1;
+                end else if (channel_selected < CHANNELS * 2) begin
+                    west_data_ready[i - CHANNELS] = 1;
+                end else begin
+                    local_data_in_ready = 1;
+                end
+            end
+        end
+    end
+
+    always @(posedge clk) begin
+        if (!rst_n) begin
+            // Ready/Valid Initialize
+            for (int i=0; i<CHANNELS; i++) begin
+                // north_data_ready[i] <= 1;
+                // west_data_ready[i]  <= 1;
+
+                // south_data_valid[i] <= 0;
+                // east_data_valid[i]  <= 0;
+            end 
+
+            // local_data_in_ready     <= 1;
+            // local_data_out_valid    <= 0;
+        end else begin
+            // Output consume
+            // for (int i=0; i<CHANNELS; i++) begin
+            //     if (south_data_valid[i] && south_data_ready[i]) south_data_valid[i] <= 0;
+            //     if (east_data_valid[i] && east_data_ready[i]) east_data_valid[i] <= 0;
+            // end
+            // if (local_data_out_valid && local_data_out_ready) local_data_out_valid <= 0;
+
+            // Output provide
         end
     end
 
@@ -106,29 +228,21 @@ module mesh_router#(
     // -----------------------------
 
     function automatic [DATA_WIDTH-1: 0] input_data_select(input logic [CHANNEL_WIDTH-1:0] select);
-        if (select[CHANNEL_WIDTH-1 -: 2] == 2) begin // North
-            input_data_select = north_data_in[
-                select[CHANNEL_WIDTH-3:0]
-            ];
-        end else if (select[CHANNEL_WIDTH-1 -: 2] == 1) begin // West
-            input_data_select = west_data_in[
-                select[CHANNEL_WIDTH-3:0]
-            ];
-        end else if (select[CHANNEL_WIDTH-1 -: 2] == 0) begin // Local
+        if (select < CHANNELS) begin
+            input_data_select = north_data_in[select];
+        end else if (select < CHANNELS*2) begin
+            input_data_select = west_data_in[select - CHANNELS];
+        end else begin
             input_data_select = local_data_in;
         end
     endfunction
 
     function automatic [ADDR_WIDTH-1: 0] input_addr_select(input logic [CHANNEL_WIDTH-1:0] select);
-        if (select[CHANNEL_WIDTH-1 -: 2] == 2) begin // North
-            input_addr_select = north_addr_in[
-                select[CHANNEL_WIDTH-3:0]
-            ];
-        end else if (select[CHANNEL_WIDTH-1 -: 2] == 1) begin // West
-            input_addr_select = west_addr_in[
-                select[CHANNEL_WIDTH-3:0]
-            ];
-        end else if (select[CHANNEL_WIDTH-1 -: 2] == 0) begin // Local
+        if (select < CHANNELS) begin
+            input_addr_select = north_addr_in[select];
+        end else if (select < CHANNELS*2) begin
+            input_addr_select = west_addr_in[select - CHANNELS];
+        end else begin
             input_addr_select = local_addr_in;
         end
     endfunction
