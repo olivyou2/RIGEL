@@ -1,6 +1,8 @@
 module compute#(
     parameter X_BITS=2,
     parameter Y_BITS=2,
+    parameter OPCODE_BITS=4,
+    parameter TAG_BITS=4,
     parameter ADDR_WIDTH=32,
     parameter DATA_WIDTH=64
 )(
@@ -9,11 +11,15 @@ module compute#(
 
     input logic [ADDR_WIDTH-1: 0] addr_in,
     input logic [DATA_WIDTH-1: 0] data_in,
+    input logic [OPCODE_BITS-1: 0] opcode_in,
+    input logic [TAG_BITS-1: 0] tag_in,
     input logic in_valid,
     output logic in_ready,
 
     output logic [ADDR_WIDTH-1: 0] addr_out,
     output logic [DATA_WIDTH-1: 0] data_out,
+    output logic [OPCODE_BITS-1: 0] opcode_out,
+    output logic [TAG_BITS-1: 0] tag_out,
     output logic out_valid,
     input logic out_ready
 );
@@ -39,6 +45,7 @@ module compute#(
     //  +00     src
     //  +08     dst
     //  +10     len
+    //  +18     mode (0=burst, 1=scalar)
     //  +F8     fire
 
     // 0x0004_0000 ~ 0004_FFFF Registers
@@ -110,6 +117,7 @@ module compute#(
     logic [ADDR_WIDTH-1: 0] dma_fire_src_addr;
     logic [ADDR_WIDTH-1: 0] dma_fire_dst_addr;
     logic [ADDR_WIDTH-1: 0] dma_fire_len;
+    logic dma_dev; // 0=scratchpad C, 1=regs
 
     logic [ADDR_WIDTH-1: 0] dma_fire_counter;
 
@@ -137,7 +145,19 @@ module compute#(
                 end
 
                 2'd1: begin
-                    
+                    if (dma_src_addr[UNIT_ADDR_WIDTH-1: DATASPACE_WIDTH] == 2) begin
+                        // scratchpad C
+                        dma_fire_src_addr <= dma_fire_src_addr[DATASPACE_WIDTH-1: 0];
+                        dma_fsm <= 2;
+                    end
+
+                    else if (dma_src_addr[UNIT_ADDR_WIDTH-1: DATASPACE_WIDTH] == 4) begin
+                        
+                    end
+
+                    else begin
+                        dma_fsm <= 0;
+                    end
                 end
             endcase
         end

@@ -17,9 +17,6 @@ module stream_loader#(
     output logic loader_data_out_valid,
     input logic loader_data_out_ready
 );
-
-    
-
     always @(posedge clk) begin
         if (!rst_n) begin
 

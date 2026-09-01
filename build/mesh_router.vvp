@@ -1,0 +1,495 @@
+#! /opt/homebrew/Cellar/icarus-verilog/13.0/bin/vvp
+:ivl_version "13.0 (stable)" "(v13_0)";
+:ivl_delay_selection "TYPICAL";
+:vpi_time_precision + 0;
+:vpi_module "/opt/homebrew/Cellar/icarus-verilog/13.0/lib/ivl/system.vpi";
+:vpi_module "/opt/homebrew/Cellar/icarus-verilog/13.0/lib/ivl/vhdl_sys.vpi";
+:vpi_module "/opt/homebrew/Cellar/icarus-verilog/13.0/lib/ivl/vhdl_textio.vpi";
+:vpi_module "/opt/homebrew/Cellar/icarus-verilog/13.0/lib/ivl/v2005_math.vpi";
+:vpi_module "/opt/homebrew/Cellar/icarus-verilog/13.0/lib/ivl/va_math.vpi";
+:vpi_module "/opt/homebrew/Cellar/icarus-verilog/13.0/lib/ivl/v2009.vpi";
+S_0x154e2d940 .scope package, "$unit" "$unit" 2 1;
+ .timescale 0 0;
+S_0x154e2dab0 .scope module, "mesh_router" "mesh_router" 3 1;
+ .timescale 0 0;
+    .port_info 0 /INPUT 1 "clk";
+    .port_info 1 /INPUT 1 "rst_n";
+    .port_info 2 /INPUT 64 "north_addr_in";
+    .port_info 3 /INPUT 128 "north_data_in";
+    .port_info 4 /INPUT 2 "north_data_valid";
+    .port_info 5 /OUTPUT 2 "north_data_ready";
+    .port_info 6 /INPUT 64 "west_addr_in";
+    .port_info 7 /INPUT 128 "west_data_in";
+    .port_info 8 /INPUT 2 "west_data_valid";
+    .port_info 9 /OUTPUT 2 "west_data_ready";
+    .port_info 10 /OUTPUT 64 "east_addr_out";
+    .port_info 11 /OUTPUT 128 "east_data_out";
+    .port_info 12 /OUTPUT 2 "east_data_valid";
+    .port_info 13 /INPUT 2 "east_data_ready";
+    .port_info 14 /OUTPUT 64 "south_addr_out";
+    .port_info 15 /OUTPUT 128 "south_data_out";
+    .port_info 16 /OUTPUT 2 "south_data_valid";
+    .port_info 17 /INPUT 2 "south_data_ready";
+    .port_info 18 /INPUT 32 "local_addr_in";
+    .port_info 19 /INPUT 64 "local_data_in";
+    .port_info 20 /INPUT 1 "local_data_in_valid";
+    .port_info 21 /OUTPUT 1 "local_data_in_ready";
+    .port_info 22 /OUTPUT 32 "local_addr_out";
+    .port_info 23 /OUTPUT 64 "local_data_out";
+    .port_info 24 /OUTPUT 1 "local_data_out_valid";
+    .port_info 25 /INPUT 1 "local_data_out_ready";
+P_0x154e4aba0 .param/l "ADDR_WIDTH" 0 3 2, +C4<00000000000000000000000000100000>;
+P_0x154e4abe0 .param/l "CHANNELS" 0 3 4, +C4<00000000000000000000000000000010>;
+P_0x154e4ac20 .param/l "CHANNEL_WIDTH" 1 3 50, +C4<000000000000000000000000000000011>;
+P_0x154e4ac60 .param/l "DATA_WIDTH" 0 3 3, +C4<00000000000000000000000001000000>;
+P_0x154e4aca0 .param/l "FIFO_DEPTH" 0 3 11, +C4<00000000000000000000000000001000>;
+P_0x154e4ace0 .param/l "TOTAL_CHANNEL" 1 3 49, +C4<00000000000000000000000000000000000000000000000000000000000000101>;
+P_0x154e4ad20 .param/l "X" 0 3 8, +C4<00000000000000000000000000000000>;
+P_0x154e4ad60 .param/l "X_BITS" 0 3 6, +C4<00000000000000000000000000000010>;
+P_0x154e4ada0 .param/l "Y" 0 3 9, +C4<00000000000000000000000000000000>;
+P_0x154e4ade0 .param/l "Y_BITS" 0 3 7, +C4<00000000000000000000000000000010>;
+o0x158050340 .functor BUFZ 1, c4<z>; HiZ drive
+v0x154e7b120_0 .net "clk", 0 0, o0x158050340;  0 drivers
+v0x154e7b1d0 .array "east_addr_out", 1 0, 31 0;
+v0x154e7b270 .array "east_data_out", 1 0, 63 0;
+o0x158050370 .functor BUFZ 1, c4<z>; HiZ drive
+v0x154e7b320 .array "east_data_ready", 1 0;
+v0x154e7b320_0 .net v0x154e7b320 0, 0 0, o0x158050370; 0 drivers
+o0x1580503a0 .functor BUFZ 1, c4<z>; HiZ drive
+v0x154e7b320_1 .net v0x154e7b320 1, 0 0, o0x1580503a0; 0 drivers
+v0x154e7b3e0 .array "east_data_valid", 1 0, 0 0;
+v0x154e7b4b0 .array "east_en", 1 0, 0 0;
+v0x154e7b540 .array "east_sel", 1 0, 2 0;
+o0x1580503d0 .functor BUFZ 32, c4<zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz>; HiZ drive
+v0x154e7b5e0_0 .net "local_addr_in", 31 0, o0x1580503d0;  0 drivers
+v0x154e7b690_0 .var "local_addr_out", 31 0;
+o0x158050430 .functor BUFZ 64, c4<zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz>; HiZ drive
+v0x154e7b7a0_0 .net "local_data_in", 63 0, o0x158050430;  0 drivers
+v0x154e7b850_0 .var "local_data_in_ready", 0 0;
+o0x158050490 .functor BUFZ 1, c4<z>; HiZ drive
+v0x154e7b8f0_0 .net "local_data_in_valid", 0 0, o0x158050490;  0 drivers
+v0x154e7b990_0 .var "local_data_out", 63 0;
+o0x1580504f0 .functor BUFZ 1, c4<z>; HiZ drive
+v0x154e7ba40_0 .net "local_data_out_ready", 0 0, o0x1580504f0;  0 drivers
+v0x154e7bae0_0 .var "local_data_out_valid", 0 0;
+v0x154e7bb80_0 .var "local_en", 0 0;
+v0x154e7bc20_0 .var "local_sel", 2 0;
+o0x1580505b0 .functor BUFZ 32, c4<zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz>; HiZ drive
+v0x154e7bdb0 .array "north_addr_in", 1 0;
+v0x154e7bdb0_0 .net v0x154e7bdb0 0, 31 0, o0x1580505b0; 0 drivers
+o0x1580505e0 .functor BUFZ 32, c4<zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz>; HiZ drive
+v0x154e7bdb0_1 .net v0x154e7bdb0 1, 31 0, o0x1580505e0; 0 drivers
+o0x158050610 .functor BUFZ 64, c4<zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz>; HiZ drive
+v0x154e7be60 .array "north_data_in", 1 0;
+v0x154e7be60_0 .net v0x154e7be60 0, 63 0, o0x158050610; 0 drivers
+o0x158050640 .functor BUFZ 64, c4<zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz>; HiZ drive
+v0x154e7be60_1 .net v0x154e7be60 1, 63 0, o0x158050640; 0 drivers
+v0x154e7bf30 .array "north_data_ready", 1 0, 0 0;
+o0x158050670 .functor BUFZ 1, c4<z>; HiZ drive
+v0x154e7bfc0 .array "north_data_valid", 1 0;
+v0x154e7bfc0_0 .net v0x154e7bfc0 0, 0 0, o0x158050670; 0 drivers
+o0x1580506a0 .functor BUFZ 1, c4<z>; HiZ drive
+v0x154e7bfc0_1 .net v0x154e7bfc0 1, 0 0, o0x1580506a0; 0 drivers
+o0x1580506d0 .functor BUFZ 1, c4<z>; HiZ drive
+v0x154e7c080_0 .net "rst_n", 0 0, o0x1580506d0;  0 drivers
+v0x154e7c120 .array "south_addr_out", 1 0, 31 0;
+v0x154e7c1c0 .array "south_data_out", 1 0, 63 0;
+o0x158050700 .functor BUFZ 1, c4<z>; HiZ drive
+v0x154e7c260 .array "south_data_ready", 1 0;
+v0x154e7c260_0 .net v0x154e7c260 0, 0 0, o0x158050700; 0 drivers
+o0x158050730 .functor BUFZ 1, c4<z>; HiZ drive
+v0x154e7c260_1 .net v0x154e7c260 1, 0 0, o0x158050730; 0 drivers
+v0x154e7c320 .array "south_data_valid", 1 0, 0 0;
+v0x154e7c3b0 .array "south_en", 1 0, 0 0;
+v0x154e7c440 .array "south_sel", 1 0, 2 0;
+o0x158050760 .functor BUFZ 32, c4<zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz>; HiZ drive
+v0x154e7c4e0 .array "west_addr_in", 1 0;
+v0x154e7c4e0_0 .net v0x154e7c4e0 0, 31 0, o0x158050760; 0 drivers
+o0x158050790 .functor BUFZ 32, c4<zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz>; HiZ drive
+v0x154e7c4e0_1 .net v0x154e7c4e0 1, 31 0, o0x158050790; 0 drivers
+o0x1580507c0 .functor BUFZ 64, c4<zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz>; HiZ drive
+v0x154e7c5b0 .array "west_data_in", 1 0;
+v0x154e7c5b0_0 .net v0x154e7c5b0 0, 63 0, o0x1580507c0; 0 drivers
+o0x1580507f0 .functor BUFZ 64, c4<zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz>; HiZ drive
+v0x154e7c5b0_1 .net v0x154e7c5b0 1, 63 0, o0x1580507f0; 0 drivers
+v0x154e7c680 .array "west_data_ready", 1 0, 0 0;
+o0x158050820 .functor BUFZ 1, c4<z>; HiZ drive
+v0x154e7c710 .array "west_data_valid", 1 0;
+v0x154e7c710_0 .net v0x154e7c710 0, 0 0, o0x158050820; 0 drivers
+o0x158050850 .functor BUFZ 1, c4<z>; HiZ drive
+v0x154e7c710_1 .net v0x154e7c710 1, 0 0, o0x158050850; 0 drivers
+E_0x154e4ba20 .event posedge, v0x154e7b120_0;
+E_0x154e4c2b0/0 .event anyedge, v0x154e7bfc0_0, v0x154e7bfc0_1, v0x154e79cb0_0, v0x154e79d60_0;
+E_0x154e4c2b0/1 .event anyedge, v0x154e7c710_0, v0x154e7c710_1, v0x154e79fe0_0, v0x154e7a090_0;
+E_0x154e4c2b0 .event/or E_0x154e4c2b0/0, E_0x154e4c2b0/1;
+S_0x154e08410 .scope begin, "$ivl_for_loop1" "$ivl_for_loop1" 3 145, 3 145 0, S_0x154e2dab0;
+ .timescale 0 0;
+v0x154e2b5f0_0 .var/2s "i", 31 0;
+S_0x154e79760 .scope begin, "$unm_blk_1" "$unm_blk_1" 3 70, 3 70 0, S_0x154e2dab0;
+ .timescale 0 0;
+v0x154e7a200_0 .var "east_valid_chan", 4 0;
+v0x154e7a2c0_0 .var "local_valid_chan", 4 0;
+v0x154e7a370_0 .var "south_valid_chan", 4 0;
+S_0x154e79930 .scope begin, "$ivl_for_loop0" "$ivl_for_loop0" 3 75, 3 75 0, S_0x154e79760;
+ .timescale 0 0;
+v0x154e7a140_0 .var/2s "i", 31 0;
+S_0x154e79af0 .scope begin, "$unm_blk_3" "$unm_blk_3" 3 76, 3 76 0, S_0x154e79930;
+ .timescale 0 0;
+v0x154e79cb0_0 .var "north_x", 1 0;
+v0x154e79d60_0 .var "north_y", 1 0;
+S_0x154e79e10 .scope begin, "$unm_blk_7" "$unm_blk_7" 3 89, 3 89 0, S_0x154e79930;
+ .timescale 0 0;
+v0x154e79fe0_0 .var "west_x", 1 0;
+v0x154e7a090_0 .var "west_y", 1 0;
+S_0x154e7a430 .scope autofunction.vec4.s2, "get_x_addr" "get_x_addr" 3 62, 3 62 0, S_0x154e2dab0;
+ .timescale 0 0;
+v0x154e7a610_0 .var "addr_in", 31 0;
+; Variable get_x_addr is vec4 return value of scope S_0x154e7a430
+TD_mesh_router.get_x_addr ;
+    %load/vec4 v0x154e7a610_0;
+    %parti/s 2, 30, 6;
+    %ret/vec4 0, 0, 2;  Assign to get_x_addr (store_vec4_to_lval)
+    %end;
+S_0x154e7a770 .scope autofunction.vec4.s2, "get_y_addr" "get_y_addr" 3 66, 3 66 0, S_0x154e2dab0;
+ .timescale 0 0;
+v0x154e7a930_0 .var "addr_in", 31 0;
+; Variable get_y_addr is vec4 return value of scope S_0x154e7a770
+TD_mesh_router.get_y_addr ;
+    %load/vec4 v0x154e7a930_0;
+    %parti/s 2, 28, 6;
+    %ret/vec4 0, 0, 2;  Assign to get_y_addr (store_vec4_to_lval)
+    %end;
+S_0x154e7aaa0 .scope autofunction.vec4.s32, "input_addr_select" "input_addr_select" 3 122, 3 122 0, S_0x154e2dab0;
+ .timescale 0 0;
+; Variable input_addr_select is vec4 return value of scope S_0x154e7aaa0
+v0x154e7ad60_0 .var "select", 2 0;
+TD_mesh_router.input_addr_select ;
+    %load/vec4 v0x154e7ad60_0;
+    %parti/s 2, 1, 2;
+    %pad/u 32;
+    %cmpi/e 2, 0, 32;
+    %jmp/0xz  T_2.0, 4;
+    %load/vec4 v0x154e7ad60_0;
+    %parti/s 1, 0, 2;
+    %pad/u 3;
+    %ix/vec4 4;
+    %load/vec4a v0x154e7bdb0, 4;
+    %ret/vec4 0, 0, 32;  Assign to input_addr_select (store_vec4_to_lval)
+    %jmp T_2.1;
+T_2.0 ;
+    %load/vec4 v0x154e7ad60_0;
+    %parti/s 2, 1, 2;
+    %pad/u 32;
+    %cmpi/e 1, 0, 32;
+    %jmp/0xz  T_2.2, 4;
+    %load/vec4 v0x154e7ad60_0;
+    %parti/s 1, 0, 2;
+    %pad/u 3;
+    %ix/vec4 4;
+    %load/vec4a v0x154e7c4e0, 4;
+    %ret/vec4 0, 0, 32;  Assign to input_addr_select (store_vec4_to_lval)
+    %jmp T_2.3;
+T_2.2 ;
+    %load/vec4 v0x154e7ad60_0;
+    %parti/s 2, 1, 2;
+    %pad/u 32;
+    %cmpi/e 0, 0, 32;
+    %jmp/0xz  T_2.4, 4;
+    %load/vec4 v0x154e7b5e0_0;
+    %ret/vec4 0, 0, 32;  Assign to input_addr_select (store_vec4_to_lval)
+T_2.4 ;
+T_2.3 ;
+T_2.1 ;
+    %end;
+S_0x154e7ae00 .scope autofunction.vec4.s64, "input_data_select" "input_data_select" 3 108, 3 108 0, S_0x154e2dab0;
+ .timescale 0 0;
+; Variable input_data_select is vec4 return value of scope S_0x154e7ae00
+v0x154e7b070_0 .var "select", 2 0;
+TD_mesh_router.input_data_select ;
+    %load/vec4 v0x154e7b070_0;
+    %parti/s 2, 1, 2;
+    %pad/u 32;
+    %cmpi/e 2, 0, 32;
+    %jmp/0xz  T_3.6, 4;
+    %load/vec4 v0x154e7b070_0;
+    %parti/s 1, 0, 2;
+    %pad/u 3;
+    %ix/vec4 4;
+    %load/vec4a v0x154e7be60, 4;
+    %ret/vec4 0, 0, 64;  Assign to input_data_select (store_vec4_to_lval)
+    %jmp T_3.7;
+T_3.6 ;
+    %load/vec4 v0x154e7b070_0;
+    %parti/s 2, 1, 2;
+    %pad/u 32;
+    %cmpi/e 1, 0, 32;
+    %jmp/0xz  T_3.8, 4;
+    %load/vec4 v0x154e7b070_0;
+    %parti/s 1, 0, 2;
+    %pad/u 3;
+    %ix/vec4 4;
+    %load/vec4a v0x154e7c5b0, 4;
+    %ret/vec4 0, 0, 64;  Assign to input_data_select (store_vec4_to_lval)
+    %jmp T_3.9;
+T_3.8 ;
+    %load/vec4 v0x154e7b070_0;
+    %parti/s 2, 1, 2;
+    %pad/u 32;
+    %cmpi/e 0, 0, 32;
+    %jmp/0xz  T_3.10, 4;
+    %load/vec4 v0x154e7b7a0_0;
+    %ret/vec4 0, 0, 64;  Assign to input_data_select (store_vec4_to_lval)
+T_3.10 ;
+T_3.9 ;
+T_3.7 ;
+    %end;
+    .scope S_0x154e79760;
+T_4 ;
+    %pushi/vec4 0, 0, 5;
+    %store/vec4 v0x154e7a200_0, 0, 5;
+    %pushi/vec4 0, 0, 5;
+    %store/vec4 v0x154e7a370_0, 0, 5;
+    %pushi/vec4 0, 0, 5;
+    %store/vec4 v0x154e7a2c0_0, 0, 5;
+    %end;
+    .thread T_4, $init;
+    .scope S_0x154e79af0;
+T_5 ;
+    %alloc S_0x154e7a430;
+    %ix/getv/s 4, v0x154e7a140_0;
+    %load/vec4a v0x154e7bdb0, 4;
+    %store/vec4 v0x154e7a610_0, 0, 32;
+    %callf/vec4 TD_mesh_router.get_x_addr, S_0x154e7a430;
+    %free S_0x154e7a430;
+    %store/vec4 v0x154e79cb0_0, 0, 2;
+    %alloc S_0x154e7a770;
+    %ix/getv/s 4, v0x154e7a140_0;
+    %load/vec4a v0x154e7bdb0, 4;
+    %store/vec4 v0x154e7a930_0, 0, 32;
+    %callf/vec4 TD_mesh_router.get_y_addr, S_0x154e7a770;
+    %free S_0x154e7a770;
+    %store/vec4 v0x154e79d60_0, 0, 2;
+    %end;
+    .thread T_5, $init;
+    .scope S_0x154e79e10;
+T_6 ;
+    %alloc S_0x154e7a430;
+    %ix/getv/s 4, v0x154e7a140_0;
+    %load/vec4a v0x154e7c4e0, 4;
+    %store/vec4 v0x154e7a610_0, 0, 32;
+    %callf/vec4 TD_mesh_router.get_x_addr, S_0x154e7a430;
+    %free S_0x154e7a430;
+    %store/vec4 v0x154e79fe0_0, 0, 2;
+    %alloc S_0x154e7a770;
+    %ix/getv/s 4, v0x154e7a140_0;
+    %load/vec4a v0x154e7c4e0, 4;
+    %store/vec4 v0x154e7a930_0, 0, 32;
+    %callf/vec4 TD_mesh_router.get_y_addr, S_0x154e7a770;
+    %free S_0x154e7a770;
+    %store/vec4 v0x154e7a090_0, 0, 2;
+    %end;
+    .thread T_6, $init;
+    .scope S_0x154e2dab0;
+T_7 ;
+    %wait E_0x154e4c2b0;
+    %fork t_1, S_0x154e79760;
+    %jmp t_0;
+    .scope S_0x154e79760;
+t_1 ;
+    %fork t_3, S_0x154e79930;
+    %jmp t_2;
+    .scope S_0x154e79930;
+t_3 ;
+    %pushi/vec4 0, 0, 32;
+    %store/vec4 v0x154e7a140_0, 0, 32;
+T_7.0 ; Top of for-loop
+    %load/vec4 v0x154e7a140_0;
+    %cmpi/s 2, 0, 32;
+	  %jmp/0xz T_7.1, 5;
+    %ix/getv/s 4, v0x154e7a140_0;
+    %load/vec4a v0x154e7bfc0, 4;
+    %flag_set/vec4 8;
+    %jmp/0xz  T_7.3, 8;
+    %fork t_5, S_0x154e79af0;
+    %jmp t_4;
+    .scope S_0x154e79af0;
+t_5 ;
+    %load/vec4 v0x154e79cb0_0;
+    %pad/u 32;
+    %cmpi/e 0, 0, 32;
+    %jmp/0xz  T_7.5, 4;
+    %pushi/vec4 1, 0, 1;
+    %ix/getv/s 4, v0x154e7a140_0;
+    %store/vec4 v0x154e7a370_0, 4, 1;
+T_7.5 ;
+    %load/vec4 v0x154e79d60_0;
+    %pad/u 32;
+    %cmpi/ne 0, 0, 32;
+    %jmp/0xz  T_7.7, 4;
+    %pushi/vec4 1, 0, 1;
+    %ix/getv/s 4, v0x154e7a140_0;
+    %store/vec4 v0x154e7a200_0, 4, 1;
+    %jmp T_7.8;
+T_7.7 ;
+    %pushi/vec4 1, 0, 1;
+    %ix/getv/s 4, v0x154e7a140_0;
+    %store/vec4 v0x154e7a2c0_0, 4, 1;
+T_7.8 ;
+    %end;
+    .scope S_0x154e79930;
+t_4 %join;
+T_7.3 ;
+    %ix/getv/s 4, v0x154e7a140_0;
+    %load/vec4a v0x154e7c710, 4;
+    %flag_set/vec4 8;
+    %jmp/0xz  T_7.9, 8;
+    %fork t_7, S_0x154e79e10;
+    %jmp t_6;
+    .scope S_0x154e79e10;
+t_7 ;
+    %load/vec4 v0x154e79fe0_0;
+    %pad/u 32;
+    %cmpi/e 0, 0, 32;
+    %jmp/0xz  T_7.11, 4;
+    %pushi/vec4 1, 0, 1;
+    %pushi/vec4 2, 0, 32;
+    %load/vec4 v0x154e7a140_0;
+    %add;
+    %ix/vec4/s 4;
+    %store/vec4 v0x154e7a370_0, 4, 1;
+T_7.11 ;
+    %load/vec4 v0x154e7a090_0;
+    %pad/u 32;
+    %cmpi/ne 0, 0, 32;
+    %jmp/0xz  T_7.13, 4;
+    %pushi/vec4 1, 0, 1;
+    %pushi/vec4 2, 0, 32;
+    %load/vec4 v0x154e7a140_0;
+    %add;
+    %ix/vec4/s 4;
+    %store/vec4 v0x154e7a200_0, 4, 1;
+    %jmp T_7.14;
+T_7.13 ;
+    %pushi/vec4 1, 0, 1;
+    %pushi/vec4 2, 0, 32;
+    %load/vec4 v0x154e7a140_0;
+    %add;
+    %ix/vec4/s 4;
+    %store/vec4 v0x154e7a2c0_0, 4, 1;
+T_7.14 ;
+    %end;
+    .scope S_0x154e79930;
+t_6 %join;
+T_7.9 ;
+T_7.2 ; for-loop step statement
+    ; show_stmt_assign_vector: Get l-value for compressed += operand
+    %load/vec4 v0x154e7a140_0;
+    %pushi/vec4 1, 0, 32;
+    %add;
+    %cast2;
+    %store/vec4 v0x154e7a140_0, 0, 32;
+    %jmp T_7.0;
+T_7.1 ; for-loop exit label
+    %end;
+    .scope S_0x154e79760;
+t_2 %join;
+    %end;
+    .scope S_0x154e2dab0;
+t_0 %join;
+    %jmp T_7;
+    .thread T_7, $push;
+    .scope S_0x154e2dab0;
+T_8 ;
+    %wait E_0x154e4ba20;
+    %fork t_9, S_0x154e08410;
+    %jmp t_8;
+    .scope S_0x154e08410;
+t_9 ;
+    %pushi/vec4 0, 0, 32;
+    %store/vec4 v0x154e2b5f0_0, 0, 32;
+T_8.0 ; Top of for-loop
+    %load/vec4 v0x154e2b5f0_0;
+    %cmpi/s 2, 0, 32;
+	  %jmp/0xz T_8.1, 5;
+    %ix/getv/s 4, v0x154e2b5f0_0;
+    %load/vec4a v0x154e7b4b0, 4;
+    %flag_set/vec4 8;
+    %jmp/0xz  T_8.3, 8;
+    %alloc S_0x154e7ae00;
+    %ix/getv/s 4, v0x154e2b5f0_0;
+    %load/vec4a v0x154e7b540, 4;
+    %store/vec4 v0x154e7b070_0, 0, 3;
+    %callf/vec4 TD_mesh_router.input_data_select, S_0x154e7ae00;
+    %free S_0x154e7ae00;
+    %ix/getv/s 3, v0x154e2b5f0_0;
+    %ix/load 4, 0, 0; Constant delay
+    %assign/vec4/a/d v0x154e7b270, 0, 4;
+    %alloc S_0x154e7aaa0;
+    %ix/getv/s 4, v0x154e2b5f0_0;
+    %load/vec4a v0x154e7b540, 4;
+    %store/vec4 v0x154e7ad60_0, 0, 3;
+    %callf/vec4 TD_mesh_router.input_addr_select, S_0x154e7aaa0;
+    %free S_0x154e7aaa0;
+    %ix/getv/s 3, v0x154e2b5f0_0;
+    %ix/load 4, 0, 0; Constant delay
+    %assign/vec4/a/d v0x154e7b1d0, 0, 4;
+T_8.3 ;
+    %ix/getv/s 4, v0x154e2b5f0_0;
+    %load/vec4a v0x154e7c3b0, 4;
+    %flag_set/vec4 8;
+    %jmp/0xz  T_8.5, 8;
+    %alloc S_0x154e7ae00;
+    %ix/getv/s 4, v0x154e2b5f0_0;
+    %load/vec4a v0x154e7c440, 4;
+    %store/vec4 v0x154e7b070_0, 0, 3;
+    %callf/vec4 TD_mesh_router.input_data_select, S_0x154e7ae00;
+    %free S_0x154e7ae00;
+    %ix/getv/s 3, v0x154e2b5f0_0;
+    %ix/load 4, 0, 0; Constant delay
+    %assign/vec4/a/d v0x154e7c1c0, 0, 4;
+    %alloc S_0x154e7aaa0;
+    %ix/getv/s 4, v0x154e2b5f0_0;
+    %load/vec4a v0x154e7c440, 4;
+    %store/vec4 v0x154e7ad60_0, 0, 3;
+    %callf/vec4 TD_mesh_router.input_addr_select, S_0x154e7aaa0;
+    %free S_0x154e7aaa0;
+    %ix/getv/s 3, v0x154e2b5f0_0;
+    %ix/load 4, 0, 0; Constant delay
+    %assign/vec4/a/d v0x154e7c120, 0, 4;
+T_8.5 ;
+T_8.2 ; for-loop step statement
+    ; show_stmt_assign_vector: Get l-value for compressed += operand
+    %load/vec4 v0x154e2b5f0_0;
+    %pushi/vec4 1, 0, 32;
+    %add;
+    %cast2;
+    %store/vec4 v0x154e2b5f0_0, 0, 32;
+    %jmp T_8.0;
+T_8.1 ; for-loop exit label
+    %end;
+    .scope S_0x154e2dab0;
+t_8 %join;
+    %load/vec4 v0x154e7bb80_0;
+    %flag_set/vec4 8;
+    %jmp/0xz  T_8.7, 8;
+    %alloc S_0x154e7ae00;
+    %load/vec4 v0x154e7bc20_0;
+    %store/vec4 v0x154e7b070_0, 0, 3;
+    %callf/vec4 TD_mesh_router.input_data_select, S_0x154e7ae00;
+    %free S_0x154e7ae00;
+    %assign/vec4 v0x154e7b990_0, 0;
+    %alloc S_0x154e7aaa0;
+    %load/vec4 v0x154e7bc20_0;
+    %store/vec4 v0x154e7ad60_0, 0, 3;
+    %callf/vec4 TD_mesh_router.input_addr_select, S_0x154e7aaa0;
+    %free S_0x154e7aaa0;
+    %assign/vec4 v0x154e7b690_0, 0;
+T_8.7 ;
+    %jmp T_8;
+    .thread T_8;
+# The file index is used to find the file name in the following table.
+:file_names 4;
+    "N/A";
+    "<interactive>";
+    "-";
+    "/Users/bag-wonho/Desktop/rigel2/RIGEL/src/mesh/mesh_router.sv";
