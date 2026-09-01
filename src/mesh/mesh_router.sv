@@ -112,15 +112,18 @@ module mesh_router#(
 
         // logic
 
+        logic [X_BITS-1: 0] addr_x = 0;
+        logic [Y_BITS-1: 0] addr_y = 0;
+            
             // masking logic
         for (int i=0; i<CHANNELS; i++) begin
             if (north_data_valid[i]) begin
-                logic [X_BITS-1: 0] north_x = get_x_addr(north_addr_in[i]);
-                logic [Y_BITS-1: 0] north_y = get_y_addr(north_addr_in[i]);
+                addr_x = get_x_addr(north_addr_in[i]);
+                addr_y = get_y_addr(north_addr_in[i]);
 
-                if (X == north_x) begin
+                if (X == addr_x) begin
                     south_valid_chan[i] = 1;
-                end else if (Y == north_y) begin
+                end else if (Y == addr_y) begin
                     east_valid_chan[i] = 1;
                 end else begin
                     local_valid_chan[i] = 1;
@@ -128,12 +131,12 @@ module mesh_router#(
             end
 
             if (west_data_valid[i]) begin
-                logic [X_BITS-1: 0] west_x = get_x_addr(west_addr_in[i]);
-                logic [Y_BITS-1: 0] west_y = get_y_addr(west_addr_in[i]);
+                addr_x = get_x_addr(west_addr_in[i]);
+                addr_y = get_y_addr(west_addr_in[i]);
 
-                if (X == west_x) begin
+                if (X == addr_x) begin
                     south_valid_chan[CHANNELS+i] = 1;
-                end else if (Y == west_y) begin
+                end else if (Y == addr_y) begin
                     east_valid_chan[CHANNELS+i] = 1;
                 end else begin
                     local_valid_chan[CHANNELS+i] = 1;
@@ -142,16 +145,25 @@ module mesh_router#(
         end
 
         if (local_data_in) begin
-            logic [X_BITS-1: 0] west_x = get_x_addr(local_addr_in);
-            logic [Y_BITS-1: 0] west_y = get_y_addr(local_addr_in);
+            addr_x = get_x_addr(local_addr_in);
+            addr_y = get_y_addr(local_addr_in);
 
-            if (X == west_x) begin
+            if (X == addr_x) begin
                 south_valid_chan[CHANNELS*2] = 1;
-            end else if (Y == west_y) begin
+            end else if (Y == addr_y) begin
                 east_valid_chan[CHANNELS*2] = 1;
             end else begin
                 local_valid_chan[CHANNELS*2] = 1;
             end
+        end
+
+        for (int i=0; i<CHANNELS; i++) begin
+            east_sel[i] = 0;
+            south_sel[i] = 0;
+            local_sel = 0;
+            east_data_valid[i] = 0;
+            south_data_valid[i] = 0;
+            local_data_out_valid = 0;
         end
 
             // priority indexing && valid on
