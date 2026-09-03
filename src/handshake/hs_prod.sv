@@ -1,4 +1,4 @@
-module hs_prod(
+module hs_prod#(BASE_NUM=0, VALID_COUNTER_START=0, VALID_COUNTER_NUM=60)(
     input logic clk,
 
     output logic [31:0] data,
@@ -10,8 +10,8 @@ module hs_prod(
     logic handshaked;
     logic update;
 
-    logic [31:0] counter = 1;
-    logic [31:0] valid_counter = 0;
+    logic [31:0] counter = BASE_NUM;
+    logic [31:0] valid_counter = VALID_COUNTER_START;
 
     initial begin
         desire = 1;
@@ -21,11 +21,9 @@ module hs_prod(
     assign handshaked = valid && ready;
     assign update = desire && (handshaked || !valid);
 
-    localparam valid_counter_num = 60;
-
     always @(posedge clk) begin
         valid_counter <= valid_counter + 1;
-        if (valid_counter >= valid_counter_num) begin
+        if (valid_counter >= VALID_COUNTER_NUM) begin
             valid_counter <= 0;
 
             desire = !desire;

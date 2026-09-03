@@ -23,3 +23,4 @@ src/tb/fifo/fifo_tb.sv
 src/tb/bram/bram_stream_tb.sv
 src/top.sv
 src/utils/skid.sv
+src/arbiter/arbiter.sv
