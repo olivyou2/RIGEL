@@ -1,0 +1,25 @@
+-I src
+src/bram/arbitation.sv
+src/bram/bram.sv
+src/bram/bram_stream.sv
+src/bram/fifo.sv
+src/bram/stream_loader.sv
+src/compute/compute.sv
+src/compute/dma/dma.sv
+src/compute/dma/dma_src_addr.sv
+src/compute/dma/dma_dst_addr.sv
+src/compute/dma/dma_control.sv
+src/handshake/hs_bridge.sv
+src/handshake/hs_cons.sv
+src/handshake/hs_prod.sv
+src/handshake/hs_top.sv
+src/mesh/mesh.sv
+src/mesh/mesh_router.sv
+src/tb/compute/compute_tb.sv
+src/tb/compute/dma/dma_addr_src_tb.sv
+src/tb/compute/dma/dma_addr_tb.sv
+src/tb/compute/dma/dma_tb.sv
+src/tb/fifo/fifo_tb.sv
+src/tb/bram/bram_stream_tb.sv
+src/top.sv
+src/utils/skid.sv

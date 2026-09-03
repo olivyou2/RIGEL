@@ -1,0 +1,15 @@
+{
+  "index": [
+    {
+      "dirs": ["src"],
+      "excludeDirs": ["build", "obj_dir"]
+    }
+  ],
+  "flags": "-I src",
+  "build": ".slang/rigel.f",
+  "inlayHints": {
+    "portTypes": true,
+    "orderedInstanceNames": true,
+    "wildcardNames": true
+  }
+}

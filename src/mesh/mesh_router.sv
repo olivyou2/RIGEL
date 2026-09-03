@@ -97,23 +97,44 @@ module mesh_router#(
         end
     endfunction
 
-    always@(*) begin
-        // mask
-        
+    logic [CHANNEL_WIDTH-1: 0] east_grant[CHANNELS];
+    logic east_grant_valid[CHANNELS];
+
+    logic [CHANNEL_WIDTH-1: 0] south_grant[CHANNELS];
+    logic south_grant_valid[CHANNELS];
+
+    logic [CHANNEL_WIDTH-1: 0] local_grant;
+    logic local_grant_valid;
+
+    always @(*) begin
+        // Combinational Output Select
         logic [TOTAL_CHANNEL-1: 0] east_valid_chan = 0;
         logic [TOTAL_CHANNEL-1: 0] south_valid_chan = 0;
         logic [TOTAL_CHANNEL-1: 0] local_valid_chan = 0;
-        
-        // select
 
         logic [$clog2(CHANNELS): 0] east_channel_count = 0;
         logic [$clog2(CHANNELS): 0] south_channel_count = 0;
         logic [1:0] local_channel_count = 0;
 
-        // logic
+        logic east_valid[CHANNELS];
+        logic south_valid[CHANNELS];
+        logic local_valid;
+
+        logic [$clog2(CHANNELS)-1: 0] east_idx[CHANNELS];
+        logic [$clog2(CHANNELS)-1: 0] south_idx[CHANNELS];
+        logic [$clog2(CHANNELS)-1: 0] local_idx;
 
         logic [X_BITS-1: 0] addr_x = 0;
         logic [Y_BITS-1: 0] addr_y = 0;
+
+        for (int i=0; i<CHANNELS; i++) begin
+            east_idx[i] = 0;
+            east_valid[i] = 0;
+            south_idx[i] = 0;
+            south_valid[i] = 0;
+        end
+        local_idx = 0;
+        local_valid = 0;
             
             // masking logic
         for (int i=0; i<CHANNELS; i++) begin
@@ -157,82 +178,26 @@ module mesh_router#(
             end
         end
 
-        for (int i=0; i<CHANNELS; i++) begin
-            east_sel[i] = 0;
-            south_sel[i] = 0;
-            local_sel = 0;
-            east_data_valid[i] = 0;
-            south_data_valid[i] = 0;
-            local_data_out_valid = 0;
-        end
-
             // priority indexing && valid on
         for (int i=0; i<TOTAL_CHANNEL; i++) begin
-            logic channel_selected = 0;
-
-            north_data_ready[i] = 0;
-            west_data_ready[i] = 0;
-            local_data_in_ready = 0;
-            
             if (east_valid_chan[i] && (east_channel_count < CHANNELS)) begin
                 east_sel[east_channel_count] = i;
-                east_data_valid[east_channel_count] = 1;
+                
                 east_channel_count ++;
-
-                channel_selected = 1;
             end
             
             if (south_valid_chan[i] && (south_channel_count < CHANNELS)) begin
                 south_sel[south_channel_count] = i;
-                south_data_valid[south_channel_count] = 1;
                 south_channel_count ++;
-
-                channel_selected = 1;
             end
 
             if (local_valid_chan[i] && (local_channel_count == 0)) begin
                 local_sel = i;
-                local_data_out_valid = 1;
                 local_channel_count ++;
-
-                channel_selected = 1;
-            end
-
-            if (channel_selected) begin
-                if (channel_selected < CHANNELS) begin
-                    north_data_ready[i] = 1;
-                end else if (channel_selected < CHANNELS * 2) begin
-                    west_data_ready[i - CHANNELS] = 1;
-                end else begin
-                    local_data_in_ready = 1;
-                end
             end
         end
-    end
 
-    always @(posedge clk) begin
-        if (!rst_n) begin
-            // Ready/Valid Initialize
-            for (int i=0; i<CHANNELS; i++) begin
-                // north_data_ready[i] <= 1;
-                // west_data_ready[i]  <= 1;
-
-                // south_data_valid[i] <= 0;
-                // east_data_valid[i]  <= 0;
-            end 
-
-            // local_data_in_ready     <= 1;
-            // local_data_out_valid    <= 0;
-        end else begin
-            // Output consume
-            // for (int i=0; i<CHANNELS; i++) begin
-            //     if (south_data_valid[i] && south_data_ready[i]) south_data_valid[i] <= 0;
-            //     if (east_data_valid[i] && east_data_ready[i]) east_data_valid[i] <= 0;
-            // end
-            // if (local_data_out_valid && local_data_out_ready) local_data_out_valid <= 0;
-
-            // Output provide
-        end
+        
     end
 
     // -----------------------------
@@ -286,4 +251,4 @@ module mesh_router#(
         end
     end
 
-endmodule;
+endmodule; 

@@ -7,8 +7,8 @@ module hs_top();
     logic ptb_ready;
 
     logic [31:0] btc_data;
-    logic btc_valid;
-    logic btc_ready;
+    logic btc_out_valid;
+    logic btc_out_ready;
 
     hs_prod prod(
         .clk(clk),

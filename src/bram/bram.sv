@@ -2,9 +2,7 @@ module bram#(
     localparam ADDR_WIDTH=32,
     localparam DATA_WIDTH=64,
 
-    localparam DATA_DEPTH=4096,
-
-    localparam ADDR_CONTAINS_WORD_BYTES=1
+    localparam DATA_DEPTH=4096
 )(
     input logic clk,
     
