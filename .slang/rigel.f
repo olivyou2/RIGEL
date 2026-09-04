@@ -3,7 +3,6 @@ src/bram/arbitation.sv
 src/bram/bram.sv
 src/bram/bram_stream.sv
 src/bram/fifo.sv
-src/bram/stream_loader.sv
 src/compute/compute.sv
 src/compute/dma/dma.sv
 src/compute/dma/dma_src_addr.sv
@@ -24,3 +23,4 @@ src/tb/bram/bram_stream_tb.sv
 src/top.sv
 src/utils/skid.sv
 src/arbiter/arbiter.sv
+src/arbiter/arbiter_skid.sv

@@ -16,7 +16,7 @@ module arbiter_tb();
     logic data_out_valid;
     logic data_out_ready;
 
-    arbiter #(
+    arbiter_skid #(
         .DATA_WIDTH(DATA_WIDTH /* default 64 */),
         .N         (N /* default 2 */)
      ) arbiter (

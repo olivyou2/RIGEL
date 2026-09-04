@@ -71,7 +71,6 @@ module arbiter#(
                 data_out <= data_in[select];
 
                 robin_idx <= select + 1;
-                // robin_idx <= robin_idx+1;
             end
         end
     end
