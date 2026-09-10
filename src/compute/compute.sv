@@ -1,8 +1,6 @@
 module compute#(
     parameter X_BITS=2,
     parameter Y_BITS=2,
-    parameter OPCODE_BITS=4,
-    parameter TAG_BITS=4,
     parameter ADDR_WIDTH=32,
     parameter DATA_WIDTH=64
 )(
@@ -11,223 +9,223 @@ module compute#(
 
     input logic [ADDR_WIDTH-1: 0] addr_in,
     input logic [DATA_WIDTH-1: 0] data_in,
-    input logic [OPCODE_BITS-1: 0] opcode_in,
-    input logic [TAG_BITS-1: 0] tag_in,
     input logic in_valid,
     output logic in_ready,
 
     output logic [ADDR_WIDTH-1: 0] addr_out,
     output logic [DATA_WIDTH-1: 0] data_out,
-    output logic [OPCODE_BITS-1: 0] opcode_out,
-    output logic [TAG_BITS-1: 0] tag_out,
     output logic out_valid,
     input logic out_ready
 );
-    localparam UNIT_ADDR_WIDTH = ADDR_WIDTH-X_BITS-Y_BITS;
-    localparam DATASPACE_WIDTH = 16;
-    localparam SEPERATOR_WIDTH = UNIT_ADDR_WIDTH - DATASPACE_WIDTH;
+    localparam DATA_OUT_N = 4;
 
-    logic [UNIT_ADDR_WIDTH-1: 0] addr_in_unitaddr;
-    logic [SEPERATOR_WIDTH-1: 0] addr_in_seperator;
-    logic [DATASPACE_WIDTH-1: 0] addr_in_dataspace;
+    /**
+        N   description
+        0   Main FSM Response
+        1   DMA Response
+        2   Reserved
+        3   Reserved
+    **/
 
-    assign addr_in_unitaddr = addr_in[UNIT_ADDR_WIDTH-1: 0];
-    assign addr_in_dataspace = addr_in_unitaddr[DATASPACE_WIDTH-1: 0];
-    assign addr_in_seperator = addr_in_unitaddr[UNIT_ADDR_WIDTH-1: DATASPACE_WIDTH];
+    localparam POS_HEADER_SIZE = X_BITS + Y_BITS;
+    localparam PAYLOAD_ADDR_SIZE = ADDR_WIDTH-POS_HEADER_SIZE;
 
-    // compute MMIO, 28bit = 0x0000_0000 ~ 0x0FFF_FFFF
+    logic [PAYLOAD_ADDR_SIZE-1 :0] payload_addr;
 
-    // 0x0000_0000 ~ 0000_7FFF  scratchpad A (W)
-    // 0x0001_0000 ~ 0001_7FFF  scratchpad B (W)
-    // 0X0002_0000 ~ 0002_7FFF  scratchpad C (R)
+    assign payload_addr = addr_in[PAYLOAD_ADDR_SIZE-1: 0];
 
-    // 0x0003_0000 ~ 0003_FFFF  DMA
-    //  +00     src
-    //  +08     dst
-    //  +10     len
-    //  +18     mode (0=burst, 1=scalar)
-    //  +F8     fire
+    logic [ADDR_WIDTH-1: 0]     n_addr_out[DATA_OUT_N];
+    logic [DATA_WIDTH-1: 0]     n_data_out[DATA_OUT_N];
+    logic                       n_out_valid[DATA_OUT_N];
+    logic                       n_out_ready[DATA_OUT_N];
 
-    // 0x0004_0000 ~ 0004_FFFF Registers
-    //  +00     Compute status register
-    //  +08     DMA status register
-    //          [DECERR, RESERVATION]
+    logic [ADDR_WIDTH+DATA_WIDTH-1: 0]
+                                n_struct_out[DATA_OUT_N];
 
-    // registers
-    logic decerr;
+    always @(*) begin
+        for (int i=0; i<DATA_OUT_N; i++) begin
+            n_struct_out[i] = {n_data_out[i], n_addr_out[i]};
+        end
 
-    // scratchpad A implement
-    logic [ADDR_WIDTH-1: 0] spad_a_read_addr;
-    logic [DATA_WIDTH-1: 0] spad_a_read_data;
-    
-    logic [ADDR_WIDTH-1: 0] spad_a_write_addr;
-    logic [DATA_WIDTH-1: 0] spad_a_write_data;
-    logic spad_a_write_enable;
+    end
 
-    bram scratchpad_a(
-        .clk(clk),
-        .read_addr(spad_a_read_addr),
-        .read_data(spad_a_read_data),
-        .write_addr(spad_a_write_addr),
-        .write_data(spad_a_write_data),
-        .write_enable(spad_a_write_enable)
+    arbiter #(
+        .DATA_WIDTH(DATA_WIDTH + ADDR_WIDTH /* default 64 */),
+        .N         (DATA_OUT_N /* default 2 */)
+     ) arbiter (
+        .clk           (clk),
+        .rst_n         (rst_n),
+        .data_in       (n_struct_out),
+        .data_valid    (n_out_valid),
+        .data_ready    (n_out_ready),
+        .data_out      ({data_out, addr_out}),
+        .data_out_valid(out_valid),
+        .data_out_ready(out_ready)
     );
 
-    // scratchpad B implement
-    logic [ADDR_WIDTH-1: 0] spad_b_read_addr;
-    logic [DATA_WIDTH-1: 0] spad_b_read_data;
-    
-    logic [ADDR_WIDTH-1: 0] spad_b_write_addr;
-    logic [DATA_WIDTH-1: 0] spad_b_write_data;
-    logic spad_b_write_enable;
+    // BRAM
+    logic [ADDR_WIDTH-1: 0] read_addr_in;
+    logic read_addr_in_valid;
+    logic read_addr_in_ready;
 
-    bram scratchpad_b(
-        .clk(clk),
-        .read_addr(spad_b_read_addr),
-        .read_data(spad_b_read_data),
-        .write_addr(spad_b_write_addr),
-        .write_data(spad_b_write_data),
-        .write_enable(spad_b_write_enable)
-    );
+    logic [DATA_WIDTH-1: 0] read_data_out;
+    logic read_data_out_valid;
+    logic read_data_out_ready;
 
-    // scratchpad C implement
-    logic [ADDR_WIDTH-1: 0] spad_c_read_addr;
-    logic [DATA_WIDTH-1: 0] spad_c_read_data;
-    
-    logic [ADDR_WIDTH-1: 0] spad_c_write_addr;
-    logic [DATA_WIDTH-1: 0] spad_c_write_data;
-    logic spad_c_write_enable;
-
-    bram scratchpad_c(
-        .clk(clk),
-        .read_addr(spad_c_read_addr),
-        .read_data(spad_c_read_data),
-        .write_addr(spad_c_write_addr),
-        .write_data(spad_c_write_data),
-        .write_enable(spad_c_write_enable)
+    bram_stream #(
+        .ADDR_WIDTH(ADDR_WIDTH /* default 32 */),
+        .DATA_WIDTH(DATA_WIDTH /* default 64 */)
+     ) bram_stream (
+        .clk                (clk),
+        .rst_n              (rst_n),
+        .read_addr_in       (read_addr_in),
+        .read_addr_in_valid (read_addr_in_valid),
+        .read_addr_in_ready (read_addr_in_ready),
+        .read_data_out      (read_data_out),
+        .read_data_out_valid(read_data_out_valid),
+        .read_data_out_ready(read_data_out_ready),
+        .write_addr_in      (write_addr_in),
+        .write_data_in      (write_data_in),
+        .write_data_valid   (write_data_valid),
+        .write_data_ready   (write_data_ready)
     );
 
     // DMA
-    logic [ADDR_WIDTH-1: 0] dma_src_addr;
-    logic [ADDR_WIDTH-1: 0] dma_dst_addr;
-    logic [ADDR_WIDTH-1: 0] dma_len;
+    logic fire_valid;
+    logic fire_ready;
 
-    // fire registers
-    logic dma_fire;
-    logic [ADDR_WIDTH-1: 0] dma_fire_src_addr;
-    logic [ADDR_WIDTH-1: 0] dma_fire_dst_addr;
-    logic [ADDR_WIDTH-1: 0] dma_fire_len;
-    logic dma_dev; // 0=scratchpad C, 1=regs
+    logic [ADDR_WIDTH-1: 0] fire_length;
+    logic [ADDR_WIDTH-1: 0] fire_step;
+    logic [ADDR_WIDTH-1: 0] fire_addr_src;
+    logic [ADDR_WIDTH-1: 0] fire_addr_dst;
 
-    logic [ADDR_WIDTH-1: 0] dma_fire_counter;
+    dma #(
+        .ADDR_WIDTH(ADDR_WIDTH /* default 32 */),
+        .DATA_WIDTH(DATA_WIDTH /* default 64 */)
+     ) dma (
+        .clk               (clk),
+        .rst_n             (rst_n),
+        .addr_out          (read_addr_in),
+        .addr_out_valid    (read_addr_in_valid),
+        .addr_out_ready    (read_addr_in_ready),
+        .data_in           (read_data_out),
+        .data_in_valid     (read_data_out_valid),
+        .data_in_ready     (read_data_out_ready),
+        .dma_addr_out      (n_addr_out[1]),
+        .dma_data_out      (n_data_out[1]),
+        .dma_data_out_valid(n_out_valid[1]),
+        .dma_data_out_ready(n_out_ready[1]),
+        .fire_valid        (fire_valid),
+        .fire_ready        (fire_ready),
+        .fire_length       (fire_length),
+        .fire_step         (fire_step),
+        .fire_addr_src     (fire_addr_src),
+        .fire_addr_dst     (fire_addr_dst)
+    );
 
-    // dma data path
-    logic [ADDR_WIDTH+DATA_WIDTH-1: 0] dma_arbitor_in;
-    logic dma_arbitor_in_valid;
-    logic dma_arbitor_in_ready;
+    // Control
+    task automatic send(input logic [ADDR_WIDTH-1: 0] addr, input logic [DATA_WIDTH-1:0] data);
+        n_data_out[0] <= data;
+        n_addr_out[0] <= addr;
+        n_out_valid[0] <= 1;
+    endtask
 
-    logic [1:0] dma_fsm;
+    task automatic callback(input logic [PAYLOAD_ADDR_SIZE-1: 0] addr, input logic [DATA_WIDTH-1:0] data);
+        logic [1:0] dst_x;
+        logic [1:0] dst_y;
 
-    // output registers
-    logic dma_decerr;
+        dst_x = data_in[X_BITS-1: 0];
+        dst_y = data_in[X_BITS+Y_BITS-1: X_BITS];
 
-    // DMA Loader FSM
+        send({dst_x, dst_y, addr}, data);
+    endtask: callback
+
+    logic [2:0] compute_main_fsm;
+
+    localparam [PAYLOAD_ADDR_SIZE-1:0] REQ_GRANT = 'h0;
+    localparam [PAYLOAD_ADDR_SIZE-1:0] DMA_LENGTH = 'h8;
+    localparam [PAYLOAD_ADDR_SIZE-1:0] DMA_STEP = 'h10;
+    localparam [PAYLOAD_ADDR_SIZE-1:0] DMA_ADDR_SRC = 'h18;
+    localparam [PAYLOAD_ADDR_SIZE-1:0] DMA_ADDR_DST = 'h20;
+    localparam [PAYLOAD_ADDR_SIZE-1:0] DMA_FIRE = 'h28;
+
+    localparam [2:0] FSM_IDLE = 0;
+    localparam [2:0] FSM_WAIT_OUT_READY = 1;
+    localparam [2:0] FSM_WAIT_DMA_READY = 2;
+
     always @(posedge clk) begin
         if (!rst_n) begin
-            dma_fsm <= 0;
-            dma_fire_counter <= 0;
-        end else begin case (dma_fsm)
-                2'd0: begin
-                    if (dma_fire) begin
-                        dma_fire_counter <= 0;
-                        dma_fsm <= 1;
-                    end
-                end
+            n_out_valid[0] <= 0;
 
-                2'd1: begin
-                    if (dma_src_addr[UNIT_ADDR_WIDTH-1: DATASPACE_WIDTH] == 2) begin
-                        // scratchpad C
-                        dma_fire_src_addr <= dma_fire_src_addr[DATASPACE_WIDTH-1: 0];
-                        dma_fsm <= 2;
-                    end
-
-                    else if (dma_src_addr[UNIT_ADDR_WIDTH-1: DATASPACE_WIDTH] == 4) begin
-                        
-                    end
-
-                    else begin
-                        dma_fsm <= 0;
-                    end
-                end
-            endcase
-        end
-    end
-
-    // Bus control FSM
-    always @(posedge clk) begin
-        // Reset Procedure
-        if (!rst_n) begin
+            compute_main_fsm <= 0;
             in_ready <= 1;
-            out_valid <= 0;
-
-            decerr <= 0;
         end else begin
-            spad_a_write_enable <= 0;
-            spad_b_write_enable <= 0;
+            case (compute_main_fsm) 
+                FSM_IDLE: begin
+                    if (in_ready && in_valid) begin
+                        // $display("[core] data arrival=%0d, addr=%0d", data_in, payload_addr);
+                        
+                        case (payload_addr)
+                            REQ_GRANT: begin
+                                $display("[core] n_out_valid rise");
+                                callback('h8, 'hAC7);
 
-            decerr <= 0;
-            
-            if (in_valid && in_ready) begin
-                case (addr_in_seperator) 
-                    // Write at spad_a
-                    12'h0: begin
-                        spad_a_write_addr <= {16'b0, addr_in_dataspace};
-                        spad_a_write_data <= data_in;
+                                compute_main_fsm <= FSM_WAIT_OUT_READY; // Wait for Request done
+                            end
 
-                        spad_a_write_enable <= 1;
+                            DMA_LENGTH: begin
+                                $display("[core_dma] dma_length set to %0d", data_in[31:0]);
+                                fire_length <= data_in[31:0];
+                            end
+
+                            DMA_STEP: begin
+                                $display("[core_dma] dma_step set to %0d", data_in[31:0]);
+                                fire_step <= data_in[31:0];
+                            end
+
+                            DMA_ADDR_SRC: begin
+                                $display("[core_dma] dma_addr_src set to %0h", data_in[31:0]);
+                                fire_addr_src <= data_in[31:0];
+                            end
+
+                            DMA_ADDR_DST: begin
+                                $display("[core_dma] dma_addr_dst set to %0h", data_in[31:0]);
+                                fire_addr_dst <= data_in[31:0];
+                            end
+
+                            DMA_FIRE: begin
+                                $display("[core_dma] trying to dma fire");
+                                fire_valid <= 1;
+
+                                compute_main_fsm <= FSM_WAIT_DMA_READY;
+                            end
+
+                            default: begin end
+                        endcase
                     end
+                end
 
-                    // Write at spad_b
-                    12'h1: begin
-                        spad_b_write_addr <= {16'b0, addr_in_dataspace};
-                        spad_b_write_data <= data_in;
+                FSM_WAIT_OUT_READY: begin
+                    if (n_out_valid[0] && n_out_ready[0]) begin
+                        $display("[core] n_out_ready rise, handshaked");
+                            
+                        n_out_valid[0] <= 0;
 
-                        spad_b_write_enable <= 1;
+                        compute_main_fsm <= FSM_IDLE;
                     end
+                end
 
-                    // Access at spad_c (Can't write)
-                    12'h2: begin
+                FSM_WAIT_DMA_READY: begin
+                    if (fire_valid && fire_ready) begin
+                        $display("[core_dma] DMA launched");
+
+                        fire_valid <= 0;
+                        compute_main_fsm <= FSM_IDLE;
                     end
+                end
 
-                    // Write at DMA
-                    12'h3: begin
-                        dma_decerr <= 0;
-
-                        if (addr_in_dataspace[15:0] == 16'h0) begin
-                            dma_src_addr <= data_in[ADDR_WIDTH-1: 0];
-                        end else if (addr_in_dataspace[15:0] == 16'h8) begin
-                            dma_dst_addr <= data_in[ADDR_WIDTH-1: 0];
-                        end else if (addr_in_dataspace[15:0] == 16'h10) begin
-                            dma_len <= data_in[ADDR_WIDTH-1: 0];
-                        end else if (addr_in_dataspace[15:0] == 16'hF8) begin
-                            // DMA fire
-                            $display("[COMPUTE_DMA] dma fired %8x -> %8x [LEN: %d]", dma_src_addr, dma_dst_addr, dma_len);
-                            dma_fire_src_addr <= dma_src_addr;
-                            dma_fire_dst_addr <= dma_dst_addr;
-                            dma_fire_len <= dma_len;
-
-                            dma_fire <= 1;
-                        end else begin
-                            dma_decerr <= 1;
-                        end
-                    end
-
-                    default: begin
-                        $display("COMPUTE decerr, %0x", addr_in_unitaddr);
-                        decerr <= 1;
-                    end
-                endcase
-            end
+                default: compute_main_fsm <= 0;
+            endcase
         end
     end
 

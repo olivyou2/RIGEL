@@ -13,12 +13,14 @@ module arbiter_skid#(
 
     output logic [DATA_WIDTH-1: 0] data_out,
     output logic data_out_valid,
-    input logic data_out_ready
+    input logic data_out_ready,
+    output logic [$clog2(N)-1: 0] data_out_sel
 );
-
+    localparam N_WIDTH = $clog2(N);
     logic [DATA_WIDTH-1:0] skid_data_in;
     logic skid_data_in_valid;
     logic skid_data_in_ready;
+    logic [N_WIDTH-1: 0] skid_data_sel;
 
     arbiter #(
         .DATA_WIDTH(DATA_WIDTH /* default 64 */),
@@ -31,18 +33,19 @@ module arbiter_skid#(
         .data_ready    (data_ready),
         .data_out      (skid_data_in),
         .data_out_valid(skid_data_in_valid),
-        .data_out_ready(skid_data_in_ready)
+        .data_out_ready(skid_data_in_ready),
+        .data_out_sel(skid_data_sel)
     );
 
     skid #(
-        .DATA_WIDTH(DATA_WIDTH /* default 64 */)
+        .DATA_WIDTH(DATA_WIDTH+N_WIDTH /* default 64 */)
      ) skid (
         .clk           (clk),
         .rst_n          (rst_n),
-        .data_in       (skid_data_in),
+        .data_in       ({skid_data_in, skid_data_sel}),
         .data_in_valid (skid_data_in_valid),
         .data_in_ready (skid_data_in_ready),
-        .data_out      (data_out),
+        .data_out      ({data_out, data_out_sel}),
         .data_out_valid(data_out_valid),
         .data_out_ready(data_out_ready)
     );

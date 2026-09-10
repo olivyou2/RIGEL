@@ -13,7 +13,8 @@ module arbiter#(
 
     output logic [DATA_WIDTH-1: 0] data_out,
     output logic data_out_valid,
-    input logic data_out_ready
+    input logic data_out_ready,
+    output logic [$clog2(N)-1: 0] data_out_sel
 );
 
     localparam N_WIDTH = $clog2(N);
@@ -68,6 +69,7 @@ module arbiter#(
 
             if (select_valid && writable) begin
                 data_out_valid <= 1;
+                data_out_sel <= select;
                 data_out <= data_in[select];
 
                 robin_idx <= select + 1;
