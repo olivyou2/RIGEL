@@ -24,3 +24,5 @@ src/top.sv
 src/utils/skid.sv
 src/arbiter/arbiter.sv
 src/arbiter/arbiter_skid.sv
+src/ixc/ixc.sv
+src/ixc/ixc_control.sv
