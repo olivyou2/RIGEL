@@ -3,6 +3,11 @@
 module compute_tb;
     localparam ADDR_WIDTH = 32;
     localparam DATA_WIDTH = 128;
+    localparam DMA_INDEX = 0;
+    localparam DMA_BYTES = 2048;
+
+    longint unsigned cycle_count = 0;
+    always @(posedge clk) cycle_count <= cycle_count + 1;
 
     logic clk = 0;
     logic rst_n;
@@ -73,17 +78,17 @@ module compute_tb;
 
         do begin
             @(posedge clk);
-        end while (!read_data_valid);
+        end while (!(read_data_valid && read_data_ready));
 
-        @(negedge clk);
+        // FIFO가 pop되는 posedge에서 현재 응답을 먼저 저장
         data = read_data_out;
+        @(negedge clk);
     endtask
 
     task automatic read_request_print(input logic [ADDR_WIDTH-1:0] addr);
-        read_request(addr);
-
-        wait (read_data_valid);
-        $display("[%0d] read_data = %032h @ %0h", $time, read_data_out, addr);
+        logic [DATA_WIDTH-1:0] data;
+        read_request_wait(addr, data);
+        $display("[%0d] read_data = %032h @ %0h", $time, data, addr);
     endtask
 
     assign read_data_ready = rst_n;
@@ -108,9 +113,15 @@ module compute_tb;
         write_data({23'd0, 3'(dma_idx), 3'd3, 3'b0}, dst_addr);     // DST
         write_data({23'd0, 3'(dma_idx), 3'd4, 3'b0}, 1);            // FIRE
 
+        // IXC가 FIRE 쓰기를 버퍼링하므로 실제 DMA 시작까지 기다림
+        do @(posedge clk);
+        while (!(dut.dma_fire_valid[dma_idx] && dut.dma_fire_ready[dma_idx]));
+        @(negedge clk);
+
     endtask
 
-    logic dma_ready;
+    logic [DATA_WIDTH-1:0] dma_status;
+    longint unsigned timer_t;
 
     task automatic run_test();
         // TODO: 테스트 내용 구현 또는 task 호출
@@ -120,18 +131,17 @@ module compute_tb;
         write_data(32'h0000_1020, {32'hDEADBEEF, 64'h0});
         write_data(32'h0000_1030, {32'hDEADBEEF, 96'h0});
         
-        run_dma(32'h0000_1000, 32'h0000_1040, 16, 64, 0);
-        run_dma(32'h0000_1000, 32'h0000_1080, 16, 64, 1);
-        run_dma(32'h0000_1000, 32'h0000_10B0, 16, 64,2);
+        // 설정 전부터 완료 확인까지 측정: 설정/상태 폴링 지연 포함
+        timer_t = cycle_count;
+        run_dma(32'h0000_1000, 32'h0000_5000, DATA_WIDTH/8, DMA_BYTES, DMA_INDEX);
+        
+        do read_request_wait({23'd0, 3'(DMA_INDEX), 3'd5, 3'b0}, dma_status);
+        while (dma_status[0] !== 1'b1);
+        
+        timer_t = cycle_count - timer_t;
 
-        do read_request_wait({23'd0, 3'(0), 3'd5, 3'b0}, dma_ready);
-        while (dma_ready == 0);
-
-        do read_request_wait({23'd0, 3'(1), 3'd5, 3'b0}, dma_ready);
-        while (dma_ready == 0);
-
-        do read_request_wait({23'd0, 3'(2), 3'd5, 3'b0}, dma_ready);
-        while (dma_ready == 0);
+        $display("DMA Transfer rate (setup + polling) = %0.3f bytes/clock (%0d bytes / %0d clocks)",
+                 real'(DMA_BYTES) / real'(timer_t), DMA_BYTES, timer_t);
 
         // read_request({23'd0, 3'(0), 3'd5, 3'b0});            // FIRE
 
@@ -139,10 +149,10 @@ module compute_tb;
         // read_request(32'h0000_1010);
         // read_request(32'h0000_1020);
         // read_request(32'h0000_1030);
-        read_request_print(32'h0000_1040);
-        read_request_print(32'h0000_1050);
-        read_request_print(32'h0000_1080);
-        read_request_print(32'h0000_10B0);
+        read_request_print(32'h0000_5000);
+        read_request_print(32'h0000_5010);
+        read_request_print(32'h0000_5020);
+        read_request_print(32'h0000_5030);
 
         #1000;
         // 필요한 읽기 응답을 모두 받은 후 task 종료
