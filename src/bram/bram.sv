@@ -1,8 +1,8 @@
 module bram#(
-    localparam ADDR_WIDTH=32,
-    localparam DATA_WIDTH=64,
+    parameter ADDR_WIDTH=32,
+    parameter DATA_WIDTH=64,
 
-    localparam DATA_DEPTH=4096
+    parameter DATA_DEPTH=4096
 )(
     input logic clk,
     

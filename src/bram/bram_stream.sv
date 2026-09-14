@@ -1,6 +1,7 @@
 module bram_stream#(
     parameter ADDR_WIDTH=32,
-    parameter DATA_WIDTH=64
+    parameter DATA_WIDTH=64,
+    parameter DATA_DEPTH=1024 // 1024words = 1024 * 64 bits = 8KB
 )(
     input logic clk,
     input logic rst_n,
@@ -29,6 +30,9 @@ module bram_stream#(
     logic write_enable;
 
     bram #(
+        .ADDR_WIDTH(ADDR_WIDTH),
+        .DATA_WIDTH(DATA_WIDTH),
+        .DATA_DEPTH(DATA_DEPTH)
     ) bram_dut (
         .clk         (clk),
         .read_addr   (read_addr),

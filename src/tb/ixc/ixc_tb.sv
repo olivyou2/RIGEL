@@ -1,6 +1,6 @@
 `timescale 1ns/1ps
 module ixc_tb;
-    parameter MASTER_N=2, SLAVE_N=2, ZERO_LATENCY=0;
+    parameter MASTER_N=2, SLAVE_N=2, ZERO_LATENCY=0, READ_FIFO_DEPTH=4, READ_OUTSTANDING=8, TARGET_RUN=8;
     localparam ADDR_WIDTH=32, DATA_WIDTH=64;
     localparam SEL_WIDTH=$clog2(SLAVE_N+1);
     logic clk;
@@ -31,7 +31,7 @@ module ixc_tb;
     logic [DATA_WIDTH-1: 0] slave_write_data_out[SLAVE_N];
     logic slave_write_data_valid[SLAVE_N];
     logic slave_write_data_ready[SLAVE_N];
-    ixc #(.MASTER_N(MASTER_N), .SLAVE_N(SLAVE_N), .SEL_WIDTH(SEL_WIDTH)) dut (
+    ixc #(.MASTER_N(MASTER_N), .SLAVE_N(SLAVE_N), .SEL_WIDTH(SEL_WIDTH), .READ_FIFO_DEPTH(READ_FIFO_DEPTH), .READ_OUTSTANDING(READ_OUTSTANDING)) dut (
         .clk(clk),
         .rst_n(rst_n),
         .read_addr_in(read_addr_in),
@@ -62,11 +62,10 @@ module ixc_tb;
     initial clk=0;
     always #5 clk=~clk;
     int read_seq[MASTER_N], write_seq[MASTER_N], write_seen[MASTER_N];
-    logic [63:0] expected[MASTER_N];
-    bit outstanding[MASTER_N];
-    bit mem_busy[SLAVE_N];
-    int delay_left[SLAVE_N];
-    logic [63:0] mem_data[SLAVE_N];
+    int read_seen[MASTER_N];
+    logic [63:0] mem_data[SLAVE_N][16];
+    int mem_due[SLAVE_N][16];
+    int mem_head[SLAVE_N], mem_tail[SLAVE_N], mem_count[SLAVE_N];
     int accepted_reads, returned_reads, accepted_writes, completed_writes;
     int simultaneous;
     logic [31:0] held_ra[SLAVE_N], held_wa[SLAVE_N];
@@ -75,6 +74,10 @@ module ixc_tb;
 
     function automatic logic [63:0] response(input logic [31:0] addr);
         return 64'hfedcba9800000000 ^ {32'b0, addr};
+    endfunction
+
+    function automatic logic [31:0] read_address(input int seq, m);
+        return 32'(seq*SLAVE_N*MASTER_N + ((seq/TARGET_RUN)%SLAVE_N)*MASTER_N + m);
     endfunction
 
     for (genvar m=0; m<MASTER_N; m++) begin
@@ -96,10 +99,10 @@ module ixc_tb;
         for (int cycle=0; cycle<4500; cycle++) begin
             // Drivers update away from the active edge and hold stalled payloads.
             for (int m=0; m<MASTER_N; m++) begin
-                read_data_ready[m]=(cycle>=3500) || ($urandom_range(0,3)==0);
+                read_data_ready[m]=(cycle>=20) && ((cycle>=3500) || ($urandom_range(0,3)==0));
                 if (!read_addr_valid[m] && cycle<3500) begin
                     read_addr_valid[m]=1;
-                    read_addr_in[m]=32'(read_seq[m]*MASTER_N+m);
+                    read_addr_in[m]=read_address(read_seq[m],m);
                 end
                 if (!write_data_valid[m] && cycle<3500) begin
                     write_data_valid[m]=1;
@@ -108,27 +111,32 @@ module ixc_tb;
                 end
             end
             for (int s=0; s<SLAVE_N; s++) begin
-                slave_read_addr_ready[s]=(cycle>=3500) || ($urandom_range(0,3)!=0);
+                slave_read_addr_ready[s]=(mem_count[s]<16) && (cycle>=20) && ((cycle>=3500) || ($urandom_range(0,3)!=0));
                 slave_write_data_ready[s]=(cycle>=3500) || ($urandom_range(0,2)==0);
-                if (delay_left[s]>0) delay_left[s]--;
-                slave_read_data_valid[s]=ZERO_LATENCY ? slave_read_addr_valid[s] : (mem_busy[s] && delay_left[s]==0);
-                slave_read_data_in[s]=ZERO_LATENCY ? response(slave_read_addr_out[s]) : mem_data[s];
+                slave_read_data_valid[s]=ZERO_LATENCY ?
+                    (slave_read_addr_valid[s] && slave_read_addr_ready[s]) :
+                    (mem_count[s]!=0 && cycle>=mem_due[s][mem_head[s]]);
+                slave_read_data_in[s]=ZERO_LATENCY ? response(slave_read_addr_out[s]) : mem_data[s][mem_head[s]];
             end
             @(posedge clk);
             for (int m=0; m<MASTER_N; m++) begin
+                // No response is possible during the initial FIFO fill.
+                if (cycle<READ_FIFO_DEPTH && !read_addr_ready[m])
+                    $fatal(1,"AR burst stalled before FIFO filled");
+                if (cycle==19 && read_addr_ready[m])
+                    $fatal(1,"full AR FIFO failed to backpressure");
                 if (rd_stall[m] && (!read_data_valid[m] || read_data_out[m]!==held_rd[m]))
                     $fatal(1,"unstable master response");
                 rd_stall[m]=read_data_valid[m] && !read_data_ready[m];
                 held_rd[m]=read_data_out[m];
                 if (read_addr_valid[m] && read_addr_ready[m]) begin
-                    if (outstanding[m]) $fatal(1,"multiple master requests");
-                    outstanding[m]=1; expected[m]=response(read_addr_in[m]);
                     accepted_reads++; read_seq[m]++;
                 end
                 if (read_data_valid[m] && read_data_ready[m]) begin
-                    if (!outstanding[m] || read_data_out[m]!==expected[m])
+                    if (read_seen[m]>=read_seq[m] ||
+                        read_data_out[m]!==response(read_address(read_seen[m],m)))
                         $fatal(1,"read mismatch master %0d",m);
-                    outstanding[m]=0; returned_reads++;
+                    read_seen[m]++; returned_reads++;
                 end
                 if (write_data_valid[m] && write_data_ready[m]) begin
                     accepted_writes++; write_seq[m]++;
@@ -145,12 +153,21 @@ module ixc_tb;
                     ra_stall[s]=slave_read_addr_valid[s] && !slave_read_addr_ready[s];
                     wr_stall[s]=slave_write_data_valid[s] && !slave_write_data_ready[s];
                     held_ra[s]=slave_read_addr_out[s]; held_wa[s]=slave_write_addr_out[s]; held_wd[s]=slave_write_data_out[s];
-                    if (slave_read_data_valid[s] && slave_read_data_ready[s]) mem_busy[s]=0;
+                    if (!ZERO_LATENCY && slave_read_data_valid[s] && slave_read_data_ready[s]) begin
+                        if (mem_count[s]==0) $fatal(1,"response without request");
+                        mem_head[s]=(mem_head[s]+1)%16;
+                        mem_count[s]--;
+                    end
                     if (slave_read_addr_valid[s] && slave_read_addr_ready[s]) begin
-                        if (mem_busy[s] || (slave_read_addr_out[s]/MASTER_N)%SLAVE_N != s)
-                            $fatal(1,"read slave routing/overrun");
-                        mem_busy[s]=!ZERO_LATENCY; delay_left[s]=$urandom_range(0,12);
-                        mem_data[s]=response(slave_read_addr_out[s]);
+                        if ((slave_read_addr_out[s]/MASTER_N)%SLAVE_N != s)
+                            $fatal(1,"read slave routing mismatch");
+                        if (!ZERO_LATENCY) begin
+                            if (mem_count[s]>=16) $fatal(1,"slave model overrun");
+                            mem_data[s][mem_tail[s]]=response(slave_read_addr_out[s]);
+                            mem_due[s][mem_tail[s]]=cycle+int'($urandom_range(1,12));
+                            mem_tail[s]=(mem_tail[s]+1)%16;
+                            mem_count[s]++;
+                        end
                     end
                     if (slave_write_data_valid[s] && slave_write_data_ready[s]) begin
                         int m, seq;
@@ -177,6 +194,7 @@ module ixc_tb;
                 end
             end
         end
+        $display("PASS AR FIFO depth=%0d: burst acceptance, full stall, ordered drain", READ_FIFO_DEPTH);
         if (accepted_reads!=returned_reads || accepted_writes!=completed_writes || returned_reads<50 || completed_writes<50)
             $fatal(1,"lost transactions R %0d/%0d W %0d/%0d",returned_reads,accepted_reads,completed_writes,accepted_writes);
         if (MASTER_N>1 && SLAVE_N>1 && simultaneous==0) $fatal(1,"no parallel transfers");
@@ -199,7 +217,7 @@ module ixc_tb;
             slave_read_addr_ready[s]=0; slave_write_data_ready[s]=0;
             slave_read_data_valid[s]=0;
         end
-        repeat (5) @(negedge clk);
+        repeat (30) @(negedge clk);
         rst_n=0;
         for (int m=0; m<MASTER_N; m++) begin
             read_addr_valid[m]=0; write_data_valid[m]=0;
@@ -254,6 +272,28 @@ module ixc_tb;
                     $fatal(1,"write master queue overflow");
             for (int s=0; s<SLAVE_N; s++)
                 if (dut.control.write_output_count[s]>2) $fatal(1,"write slave queue overflow");
+        end
+    end
+    for (genvar m=0; m<MASTER_N; m++) begin: check_read_master
+        always @(posedge clk) if (rst_n) begin
+            if (int'(dut.read_path.master_queue[m].ar_count)>READ_FIFO_DEPTH ||
+                int'(dut.read_path.inflight[m])>READ_OUTSTANDING ||
+                dut.read_path.master_queue[m].response_count>dut.read_path.inflight[m])
+                $fatal(1,"read master credit/queue overflow");
+            begin
+                int pushes;
+                pushes=0;
+                for (int s=0; s<SLAVE_N; s++)
+                    if (dut.read_path.response_take[s] && int'(dut.read_path.owner[s])==m) pushes++;
+                if (pushes>1) $fatal(1,"multiple responses to one master in a cycle");
+            end
+        end
+    end
+    for (genvar s=0; s<SLAVE_N; s++) begin: check_read_slave
+        always @(posedge clk) if (rst_n) begin
+            if (int'(dut.read_path.slave_queue[s].count)>READ_OUTSTANDING ||
+                dut.read_path.slave_queue[s].unsent_count>dut.read_path.slave_queue[s].count)
+                $fatal(1,"read slave owner/AR queue overflow");
         end
     end
     initial begin #100000; $fatal(1,"timeout"); end

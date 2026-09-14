@@ -89,7 +89,9 @@ module dma#(
     logic fifo_data_out_ready;
     logic [DATA_WIDTH-1: 0] fifo_data_out;
 
-    fifo fifo_dut(
+    fifo #(
+        .DATA_WIDTH(DATA_WIDTH)
+    ) fifo_dut (
         .clk(clk),
         .rst_n(rst_n),
         
