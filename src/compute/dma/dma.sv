@@ -5,21 +5,21 @@ module dma#(
     input logic clk,
     input logic rst_n,
 
-    // DMA -> ADDRES
-    output logic [ADDR_WIDTH-1: 0] addr_out,
-    output logic addr_out_valid,
-    input logic addr_out_ready,
+    // DMA -> read request
+    output logic [ADDR_WIDTH-1: 0] read_req_addr,
+    output logic read_req_valid,
+    input logic read_req_ready,
 
-    // DATA -> DMA
-    input logic [DATA_WIDTH-1: 0] data_in,
-    input logic data_in_valid,
-    output logic data_in_ready,
+    // read response -> DMA
+    input logic [DATA_WIDTH-1: 0] read_rsp_data,
+    input logic read_rsp_valid,
+    output logic read_rsp_ready,
 
-    // DMA -> BUS
-    output logic [ADDR_WIDTH-1: 0] dma_addr_out,
-    output logic [DATA_WIDTH-1: 0] dma_data_out,
-    output logic dma_data_out_valid,
-    input logic dma_data_out_ready,
+    // DMA -> write request
+    output logic [ADDR_WIDTH-1: 0] write_req_addr,
+    output logic [DATA_WIDTH-1: 0] write_req_data,
+    output logic write_req_valid,
+    input logic write_req_ready,
 
     // control interface
     input logic fire_valid,
@@ -65,7 +65,7 @@ module dma#(
         .addr_rst_step (addr_rst_step),
         .addr_src_valid(addr_src_valid),
         .addr_src_ready(addr_src_ready),
-        .dma_dataout_handshake(dma_data_out_valid && dma_data_out_ready)
+        .dma_dataout_handshake(write_req_valid && write_req_ready)
     );
 
     // Datapath connect
@@ -79,9 +79,9 @@ module dma#(
         .addr_rst_step (addr_rst_step),
         .fire_in_valid (addr_src_valid),
         .fire_in_ready (addr_src_ready),
-        .addr_out      (addr_out),
-        .addr_out_valid(addr_out_valid),
-        .addr_out_ready(addr_out_ready)
+        .read_req_addr (read_req_addr),
+        .read_req_valid(read_req_valid),
+        .read_req_ready(read_req_ready)
     );
 
     // FIFO Instantiate
@@ -95,9 +95,9 @@ module dma#(
         .clk(clk),
         .rst_n(rst_n),
         
-        .data_in(data_in),
-        .data_in_valid(data_in_valid),
-        .data_in_ready(data_in_ready),
+        .data_in(read_rsp_data),
+        .data_in_valid(read_rsp_valid),
+        .data_in_ready(read_rsp_ready),
 
         .data_out(fifo_data_out),
         .data_out_valid(fifo_data_out_valid),
@@ -118,10 +118,10 @@ module dma#(
         .data_in       (fifo_data_out),
         .data_in_valid (fifo_data_out_valid),
         .data_in_ready (fifo_data_out_ready),
-        .data_out      (dma_data_out),
-        .addr_out      (dma_addr_out),
-        .data_out_valid(dma_data_out_valid),
-        .data_out_ready(dma_data_out_ready)
+        .write_req_data (write_req_data),
+        .write_req_addr (write_req_addr),
+        .write_req_valid(write_req_valid),
+        .write_req_ready(write_req_ready)
     );
 
 endmodule

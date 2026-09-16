@@ -12,38 +12,38 @@ module ixc#(
     input logic rst_n,
 
     // Master Side
-    input logic [ADDR_WIDTH-1: 0] read_addr_in[MASTER_N],
-    input logic read_addr_valid[MASTER_N],
-    output logic read_addr_ready[MASTER_N],
+    input logic [ADDR_WIDTH-1: 0] read_req_addr[MASTER_N],
+    input logic read_req_valid[MASTER_N],
+    output logic read_req_ready[MASTER_N],
 
-    output logic [ADDR_WIDTH-1: 0] ixc_addr_out[MASTER_N],
-    input logic [SEL_WIDTH-1: 0] ixc_slave_sel[MASTER_N],
+    output logic [ADDR_WIDTH-1: 0] read_decode_addr[MASTER_N],
+    input logic [SEL_WIDTH-1: 0] read_decode_sel[MASTER_N],
 
-    output logic [DATA_WIDTH-1: 0] read_data_out[MASTER_N],
-    output logic read_data_valid[MASTER_N],
-    input logic read_data_ready[MASTER_N],
+    output logic [DATA_WIDTH-1: 0] read_rsp_data[MASTER_N],
+    output logic read_rsp_valid[MASTER_N],
+    input logic read_rsp_ready[MASTER_N],
 
-    input logic [ADDR_WIDTH-1: 0] write_addr_in[MASTER_N],
-    input logic [DATA_WIDTH-1: 0] write_data_in[MASTER_N],
-    input logic write_data_valid[MASTER_N],
-    output logic write_data_ready[MASTER_N],
+    input logic [ADDR_WIDTH-1: 0] write_req_addr[MASTER_N],
+    input logic [DATA_WIDTH-1: 0] write_req_data[MASTER_N],
+    input logic write_req_valid[MASTER_N],
+    output logic write_req_ready[MASTER_N],
 
-    output logic [ADDR_WIDTH-1: 0] ixc_write_addr_out[MASTER_N],
-    input logic [SEL_WIDTH-1: 0] ixc_write_slave_sel[MASTER_N],
+    output logic [ADDR_WIDTH-1: 0] write_decode_addr[MASTER_N],
+    input logic [SEL_WIDTH-1: 0] write_decode_sel[MASTER_N],
 
     // Slave Side
-    output logic [ADDR_WIDTH-1: 0] slave_read_addr_out[SLAVE_N],
-    output logic slave_read_addr_valid[SLAVE_N],
-    input logic slave_read_addr_ready[SLAVE_N],
+    output logic [ADDR_WIDTH-1: 0] slave_read_req_addr[SLAVE_N],
+    output logic slave_read_req_valid[SLAVE_N],
+    input logic slave_read_req_ready[SLAVE_N],
 
-    input logic [DATA_WIDTH-1: 0] slave_read_data_in[SLAVE_N],
-    input logic slave_read_data_valid[SLAVE_N],
-    output logic slave_read_data_ready[SLAVE_N],
+    input logic [DATA_WIDTH-1: 0] slave_read_rsp_data[SLAVE_N],
+    input logic slave_read_rsp_valid[SLAVE_N],
+    output logic slave_read_rsp_ready[SLAVE_N],
 
-    output logic [ADDR_WIDTH-1 :0] slave_write_addr_out[SLAVE_N],
-    output logic [DATA_WIDTH-1: 0] slave_write_data_out[SLAVE_N],
-    output logic slave_write_data_valid[SLAVE_N],
-    input logic slave_write_data_ready[SLAVE_N]
+    output logic [ADDR_WIDTH-1 :0] slave_write_req_addr[SLAVE_N],
+    output logic [DATA_WIDTH-1: 0] slave_write_req_data[SLAVE_N],
+    output logic slave_write_req_valid[SLAVE_N],
+    input logic slave_write_req_ready[SLAVE_N]
 );
 
     localparam MASTER_WIDTH = (MASTER_N > 1) ? $clog2(MASTER_N) : 1;
@@ -74,28 +74,28 @@ module ixc#(
         .READ_FIFO_DEPTH(READ_FIFO_DEPTH), .READ_OUTSTANDING(READ_OUTSTANDING)
     ) read_path (
         .clk(clk), .rst_n(rst_n),
-        .read_addr_in(read_addr_in), .read_addr_valid(read_addr_valid),
-        .read_addr_ready(read_addr_ready), .read_sel(ixc_slave_sel),
-        .read_data_out(read_data_out), .read_data_valid(read_data_valid),
-        .read_data_ready(read_data_ready),
-        .slave_read_addr_out(slave_read_addr_out),
-        .slave_read_addr_valid(slave_read_addr_valid),
-        .slave_read_addr_ready(slave_read_addr_ready),
-        .slave_read_data_in(slave_read_data_in),
-        .slave_read_data_valid(slave_read_data_valid),
-        .slave_read_data_ready(slave_read_data_ready)
+        .read_req_addr(read_req_addr), .read_req_valid(read_req_valid),
+        .read_req_ready(read_req_ready), .read_sel(read_decode_sel),
+        .read_rsp_data(read_rsp_data), .read_rsp_valid(read_rsp_valid),
+        .read_rsp_ready(read_rsp_ready),
+        .slave_read_req_addr(slave_read_req_addr),
+        .slave_read_req_valid(slave_read_req_valid),
+        .slave_read_req_ready(slave_read_req_ready),
+        .slave_read_rsp_data(slave_read_rsp_data),
+        .slave_read_rsp_valid(slave_read_rsp_valid),
+        .slave_read_rsp_ready(slave_read_rsp_ready)
     );
 
     // External decoders are combinational. Capture selection with the payload.
     for (genvar m=0; m<MASTER_N; m++) begin: master_decode
         assign write_sel_reg[m] = write_sel_buffer[m][write_input_head[m]];
-        assign ixc_addr_out[m] = read_addr_in[m];
-        assign ixc_write_addr_out[m] = write_addr_in[m];
+        assign read_decode_addr[m] = read_req_addr[m];
+        assign write_decode_addr[m] = write_req_addr[m];
     end
 
     for (genvar s=0; s<SLAVE_N; s++) begin: write_output
-        assign slave_write_addr_out[s] = write_addr_buffer[s][write_output_head[s]];
-        assign slave_write_data_out[s] = write_data_buffer[s][write_output_head[s]];
+        assign slave_write_req_addr[s] = write_addr_buffer[s][write_output_head[s]];
+        assign slave_write_req_data[s] = write_data_buffer[s][write_output_head[s]];
     end
 
     // Control
@@ -103,14 +103,14 @@ module ixc#(
         .MASTER_N(MASTER_N), .SLAVE_N(SLAVE_N), .SEL_WIDTH(SEL_WIDTH)
     ) control (
         .clk(clk), .rst_n(rst_n),
-        .write_data_valid(write_data_valid), .write_data_ready(write_data_ready),
-        .write_sel(ixc_write_slave_sel), .write_sel_reg(write_sel_reg),
+        .write_req_valid(write_req_valid), .write_req_ready(write_req_ready),
+        .write_sel(write_decode_sel), .write_sel_reg(write_sel_reg),
         .write_load(write_load), .write_pending(write_pending),
         .write_input_head(write_input_head), .write_input_tail(write_input_tail),
         .write_output_head(write_output_head), .write_output_tail(write_output_tail),
         .write_issue(write_issue), .write_grant(write_grant),
-        .slave_write_data_valid(slave_write_data_valid),
-        .slave_write_data_ready(slave_write_data_ready)
+        .slave_write_req_valid(slave_write_req_valid),
+        .slave_write_req_ready(slave_write_req_ready)
     );
 
     // Write datapath: master input and slave output queues.
@@ -119,9 +119,9 @@ module ixc#(
         if (rst_n) begin
             for (int m=0; m<MASTER_N; m++) begin
                 if (write_load[m]) begin
-                    write_addr_reg[m][write_input_tail[m]] <= write_addr_in[m];
-                    write_data_reg[m][write_input_tail[m]] <= write_data_in[m];
-                    write_sel_buffer[m][write_input_tail[m]] <= ixc_write_slave_sel[m];
+                    write_addr_reg[m][write_input_tail[m]] <= write_req_addr[m];
+                    write_data_reg[m][write_input_tail[m]] <= write_req_data[m];
+                    write_sel_buffer[m][write_input_tail[m]] <= write_decode_sel[m];
                 end
             end
             for (int s=0; s<SLAVE_N; s++) begin

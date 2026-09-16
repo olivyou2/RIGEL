@@ -7,18 +7,18 @@ module dma_ixc_control#(
     input logic clk,
     input logic rst_n,
 
-    input logic [ADDR_WIDTH-1: 0] read_addr_in,
-    input logic read_addr_valid,
-    output logic read_addr_ready,
+    input logic [ADDR_WIDTH-1: 0] read_req_addr,
+    input logic read_req_valid,
+    output logic read_req_ready,
 
-    output logic [DATA_WIDTH-1: 0] read_data_out,
-    output logic read_data_valid,
-    input logic read_data_ready,
+    output logic [DATA_WIDTH-1: 0] read_rsp_data,
+    output logic read_rsp_valid,
+    input logic read_rsp_ready,
 
-    input logic [ADDR_WIDTH-1: 0] write_addr_in,
-    input logic [DATA_WIDTH-1: 0] write_data_in,
-    input logic write_data_valid,
-    output logic write_data_ready,
+    input logic [ADDR_WIDTH-1: 0] write_req_addr,
+    input logic [DATA_WIDTH-1: 0] write_req_data,
+    input logic write_req_valid,
+    output logic write_req_ready,
 
     output logic [ADDR_WIDTH-1: 0] fire_length     [DMA_N],
     output logic [ADDR_WIDTH-1: 0] fire_step       [DMA_N],
@@ -35,14 +35,14 @@ module dma_ixc_control#(
     logic [2:0] read_reg_idx;
     logic [2:0] read_dma_idx;
 
-    assign read_reg_idx = read_addr_in[5:3];
-    assign read_dma_idx = read_addr_in[8:6];
+    assign read_reg_idx = read_req_addr[5:3];
+    assign read_dma_idx = read_req_addr[8:6];
 
     logic [2:0] write_reg_idx;
     logic [2:0] write_dma_idx;
 
-    assign write_reg_idx = write_addr_in[5:3];
-    assign write_dma_idx = write_addr_in[8:6];
+    assign write_reg_idx = write_req_addr[5:3];
+    assign write_dma_idx = write_req_addr[8:6];
 
     localparam [1:0] FSM_IDLE = 0;
     localparam [1:0] FSM_READ_WAIT = 1;
@@ -55,40 +55,40 @@ module dma_ixc_control#(
     localparam REG_FIRE         = 3'd4;
     localparam REG_IDLE         = 3'd5;
 
-    assign read_addr_ready = (read_fsm == FSM_IDLE);
+    assign read_req_ready = (read_fsm == FSM_IDLE);
 
     // Read FSM
     always @(posedge clk) begin
         if (!rst_n) begin
             read_fsm <= 0;
 
-            read_data_valid <= 0;
+            read_rsp_valid <= 0;
         end else begin
             case (read_fsm)
                 FSM_IDLE: begin
-                    if (read_addr_ready && read_addr_valid) begin
+                    if (read_req_ready && read_req_valid) begin
                         // 주소가 8B까지 확장될 여지가 있으므로
                         // ADDR_WIDTH[2:0] 는 0
                         // ADDR_WIDTH[5:3] 는 Reg Map
                         // ADDR_WIDTH[8:6] 는 DMA Index
 
                         read_fsm <= FSM_READ_WAIT;
-                        read_data_valid <= 1;
+                        read_rsp_valid <= 1;
 
                         case (read_reg_idx)
-                            REG_LENGTH:     read_data_out <= fire_length[read_dma_idx];
-                            REG_STEP:       read_data_out <= fire_step[read_dma_idx];
-                            REG_ADDR_SRC:   read_data_out <= fire_addr_src[read_dma_idx];
-                            REG_ADDR_DST:   read_data_out <= fire_addr_dst[read_dma_idx];
-                            REG_IDLE:       read_data_out <= dma_ready[read_dma_idx];
-                            default: read_data_out <= 0;
+                            REG_LENGTH:     read_rsp_data <= fire_length[read_dma_idx];
+                            REG_STEP:       read_rsp_data <= fire_step[read_dma_idx];
+                            REG_ADDR_SRC:   read_rsp_data <= fire_addr_src[read_dma_idx];
+                            REG_ADDR_DST:   read_rsp_data <= fire_addr_dst[read_dma_idx];
+                            REG_IDLE:       read_rsp_data <= dma_ready[read_dma_idx];
+                            default: read_rsp_data <= 0;
                         endcase
                     end
                 end
 
                 FSM_READ_WAIT: begin
-                    if (read_data_valid && read_data_ready) begin
-                        read_data_valid <= 0;
+                    if (read_rsp_valid && read_rsp_ready) begin
+                        read_rsp_valid <= 0;
                         read_fsm <= FSM_IDLE;
                     end
                 end
@@ -103,7 +103,7 @@ module dma_ixc_control#(
     // Write FSM
     logic [$clog2(DMA_N): 0] last_fired_dma;
 
-    assign write_data_ready = write_fsm == FSM_IDLE;
+    assign write_req_ready = write_fsm == FSM_IDLE;
 
     always @(posedge clk) begin
         if (!rst_n) begin
@@ -121,22 +121,22 @@ module dma_ixc_control#(
         end else begin
             case (write_fsm)
                 FSM_IDLE: begin
-                    if (write_data_valid && write_data_ready) begin
+                    if (write_req_valid && write_req_ready) begin
                         case (write_reg_idx)
                             REG_LENGTH: begin
-                                fire_length[write_dma_idx] <= write_data_in[ADDR_WIDTH-1: 0];
+                                fire_length[write_dma_idx] <= write_req_data[ADDR_WIDTH-1: 0];
                             end
 
                             REG_STEP: begin
-                                fire_step[write_dma_idx] <= write_data_in[ADDR_WIDTH-1: 0];
+                                fire_step[write_dma_idx] <= write_req_data[ADDR_WIDTH-1: 0];
                             end
 
                             REG_ADDR_SRC: begin
-                                fire_addr_src[write_dma_idx] <= write_data_in[ADDR_WIDTH-1: 0];
+                                fire_addr_src[write_dma_idx] <= write_req_data[ADDR_WIDTH-1: 0];
                             end
 
                             REG_ADDR_DST: begin
-                                fire_addr_dst[write_dma_idx] <= write_data_in[ADDR_WIDTH-1: 0];
+                                fire_addr_dst[write_dma_idx] <= write_req_data[ADDR_WIDTH-1: 0];
                             end
 
                             REG_FIRE: begin

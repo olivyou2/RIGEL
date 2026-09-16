@@ -12,9 +12,9 @@ module sge_control#(
     input logic sge_valid,
     output logic sge_ready,
 
-    output logic [ADDR_WIDTH-1: 0] addr_out,
-    output logic addr_valid,
-    input logic addr_ready,
+    output logic [ADDR_WIDTH-1: 0] read_req_addr,
+    output logic read_req_valid,
+    input logic read_req_ready,
 
     input logic sge_handshaked,
     input logic backend_ready
@@ -41,7 +41,7 @@ module sge_control#(
     always @(posedge clk) begin
         if (!rst_n) begin
             fsm_status <= FSM_IDLE;
-            addr_valid <= 0;
+            read_req_valid <= 0;
         end else begin
             case (fsm_status)
                 FSM_IDLE: begin
@@ -50,22 +50,22 @@ module sge_control#(
                         sge_batch_size_reg      <= REPS_PER_BATCH * sge_batch_size;
                         sge_batch_count_reg     <= 0;
 
-                        addr_valid <= 1;
-                        addr_out <= sge_base_addr;
+                        read_req_valid <= 1;
+                        read_req_addr <= sge_base_addr;
                         
                         fsm_status <= FSM_WORK;
                     end
                 end
 
                 FSM_WORK: begin
-                    if (addr_valid && addr_ready) begin
+                    if (read_req_valid && read_req_ready) begin
                         if (sge_batch_count_reg == sge_batch_size_reg - 1) begin
                             // 현재 beat가 마지막 beat
-                            addr_valid <= 0;
+                            read_req_valid <= 0;
                             fsm_status <= FSM_WAIT;
                         end else begin
                             sge_batch_count_reg <= sge_batch_count_reg + 1;
-                            addr_out <= addr_out + (DATA_WIDTH / 8);
+                            read_req_addr <= read_req_addr + (DATA_WIDTH / 8);
                         end
                     end
                 end

@@ -12,17 +12,17 @@ module compute_tb;
     logic clk = 0;
     logic rst_n;
 
-    logic [ADDR_WIDTH-1:0] read_addr_in;
-    logic read_addr_valid;
-    logic read_addr_ready;
-    logic [DATA_WIDTH-1:0] read_data_out;
-    logic read_data_valid;
-    logic read_data_ready;
+    logic [ADDR_WIDTH-1:0] read_req_addr;
+    logic read_req_valid;
+    logic read_req_ready;
+    logic [DATA_WIDTH-1:0] read_rsp_data;
+    logic read_rsp_valid;
+    logic read_rsp_ready;
 
-    logic [ADDR_WIDTH-1:0] write_addr_in;
-    logic [DATA_WIDTH-1:0] write_data_in;
-    logic write_data_valid;
-    logic write_data_ready;
+    logic [ADDR_WIDTH-1:0] write_req_addr;
+    logic [DATA_WIDTH-1:0] write_req_data;
+    logic write_req_valid;
+    logic write_req_ready;
 
     always #1 clk = ~clk;
 
@@ -32,16 +32,16 @@ module compute_tb;
     ) dut (
         .clk(clk),
         .rst_n(rst_n),
-        .read_addr_in(read_addr_in),
-        .read_addr_valid(read_addr_valid),
-        .read_addr_ready(read_addr_ready),
-        .read_data_out(read_data_out),
-        .read_data_valid(read_data_valid),
-        .read_data_ready(read_data_ready),
-        .write_addr_in(write_addr_in),
-        .write_data_in(write_data_in),
-        .write_data_valid(write_data_valid),
-        .write_data_ready(write_data_ready)
+        .read_req_addr(read_req_addr),
+        .read_req_valid(read_req_valid),
+        .read_req_ready(read_req_ready),
+        .read_rsp_data(read_rsp_data),
+        .read_rsp_valid(read_rsp_valid),
+        .read_rsp_ready(read_rsp_ready),
+        .write_req_addr(write_req_addr),
+        .write_req_data(write_req_data),
+        .write_req_valid(write_req_valid),
+        .write_req_ready(write_req_ready)
     );
 
     task automatic write_data(
@@ -49,28 +49,28 @@ module compute_tb;
         input logic [DATA_WIDTH-1:0] data
     );
         @(negedge clk);
-        write_addr_in = addr;
-        write_data_in = data;
-        write_data_valid = 1;
+        write_req_addr = addr;
+        write_req_data = data;
+        write_req_valid = 1;
 
-        do @(posedge clk); while (write_data_ready !== 1'b1);
+        do @(posedge clk); while (write_req_ready !== 1'b1);
 
         @(negedge clk);
-        write_data_valid = 0;
+        write_req_valid = 0;
     endtask
 
     // 읽기 주소만 전송하고, 응답 데이터는 아래 always에서 수신
     task automatic read_request(input logic [ADDR_WIDTH-1:0] addr);
         // @(negedge clk);
-        read_addr_in = addr;
-        read_addr_valid = 1;
+        read_req_addr = addr;
+        read_req_valid = 1;
 
         do begin 
             @(posedge clk);
-        end while (read_addr_ready !== 1'b1);
+        end while (read_req_ready !== 1'b1);
 
         @(negedge clk);
-        read_addr_valid = 0;
+        read_req_valid = 0;
     endtask
 
     task automatic read_request_wait(input logic [ADDR_WIDTH-1:0] addr, output logic [DATA_WIDTH-1: 0]data);
@@ -78,10 +78,10 @@ module compute_tb;
 
         do begin
             @(posedge clk);
-        end while (!(read_data_valid && read_data_ready));
+        end while (!(read_rsp_valid && read_rsp_ready));
 
         // FIFO가 pop되는 posedge에서 현재 응답을 먼저 저장
-        data = read_data_out;
+        data = read_rsp_data;
         @(negedge clk);
     endtask
 
@@ -91,11 +91,11 @@ module compute_tb;
         $display("[%0d] read_data = %032h @ %0h", $time, data, addr);
     endtask
 
-    assign read_data_ready = rst_n;
+    assign read_rsp_ready = rst_n;
 
     always @(posedge clk) begin
-        if (rst_n && read_data_valid && read_data_ready) begin
-            // $display("[%0d] read_data = %032h", $time, read_data_out);
+        if (rst_n && read_rsp_valid && read_rsp_ready) begin
+            // $display("[%0d] read_data = %032h", $time, read_rsp_data);
             // TODO: 수신 데이터 저장 또는 비교
         end
     end
@@ -160,11 +160,11 @@ module compute_tb;
 
     initial begin
         rst_n = 0;
-        read_addr_in = '0;
-        read_addr_valid = 0;
-        write_addr_in = '0;
-        write_data_in = '0;
-        write_data_valid = 0;
+        read_req_addr = '0;
+        read_req_valid = 0;
+        write_req_addr = '0;
+        write_req_data = '0;
+        write_req_valid = 0;
 
         repeat (5) @(negedge clk);
         rst_n = 1;

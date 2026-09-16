@@ -8,8 +8,8 @@ module arbiter#(
     input logic rst_n,
 
     input logic [DATA_WIDTH-1: 0] data_in[N],
-    input logic data_valid[N],
-    output logic data_ready[N],
+    input logic data_in_valid[N],
+    output logic data_in_ready[N],
 
     output logic [DATA_WIDTH-1: 0] data_out,
     output logic data_out_valid,
@@ -44,17 +44,17 @@ module arbiter#(
         select_valid = 0;
 
         for (logic [N_WIDTH: 0] i=0; i<N; i++) begin
-            data_ready[i] = 0;
+            data_in_ready[i] = 0;
             crop_i = i + robin_idx;
 
-            if (!select_valid && data_valid[crop_i]) begin
+            if (!select_valid && data_in_valid[crop_i]) begin
                 select = crop_i;
                 select_valid = 1;
             end
         end
 
         if (select_valid && writable) begin
-            data_ready[select] = 1;
+            data_in_ready[select] = 1;
         end
     end
 

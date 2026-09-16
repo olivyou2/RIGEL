@@ -11,9 +11,9 @@ module dma_src_addr#(
     input logic fire_in_valid,
     output logic fire_in_ready,
 
-    output logic [ADDR_WIDTH-1: 0] addr_out,
-    output logic addr_out_valid,
-    input logic addr_out_ready
+    output logic [ADDR_WIDTH-1: 0] read_req_addr,
+    output logic read_req_valid,
+    input logic read_req_ready
 );
 
     logic [ADDR_WIDTH-1: 0] addr_src;
@@ -29,15 +29,15 @@ module dma_src_addr#(
     logic write_handshaked;
 
     assign read_handshaked = (fire_in_valid && fire_in_ready);
-    assign write_handshaked = (!addr_out_valid || (addr_out_valid && addr_out_ready)) ;
+    assign write_handshaked = (!read_req_valid || (read_req_valid && read_req_ready)) ;
 
     assign fire_in_ready = !addr_skid_valid;
 
     task automatic write_addr
         (input logic [ADDR_WIDTH-1: 0] addr);
-        addr_out_valid <= 1;
+        read_req_valid <= 1;
 
-        addr_out <= addr;
+        read_req_addr <= addr;
     endtask
 
     always @(posedge clk) begin
@@ -48,14 +48,14 @@ module dma_src_addr#(
             addr_src <= 0;
             addr_step <= 0;
 
-            addr_out_valid <= 0;
+            read_req_valid <= 0;
         end else begin
             if (addr_rst) begin
                 addr_src <= addr_rst_src;
                 addr_step <= addr_rst_step;
             end else begin
                 if (write_handshaked) begin
-                    addr_out_valid <= 0;
+                    read_req_valid <= 0;
                 end
 
                 if (write_handshaked) begin
@@ -64,10 +64,10 @@ module dma_src_addr#(
                     if (addr_skid_valid) begin
                         addr_skid_valid <= 0;
                         write_addr(addr_skid);
-                        addr_out <= addr_skid;
+                        read_req_addr <= addr_skid;
                     end else if (read_handshaked) begin
                         write_addr(addr_src);
-                        addr_out <= addr_src;
+                        read_req_addr <= addr_src;
 
                         addr_src <= addr_next_src;
                     end

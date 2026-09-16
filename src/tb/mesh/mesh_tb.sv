@@ -14,15 +14,15 @@ module mesh_tb();
 
     localparam TOTAL_NODES = MESH_W * MESH_H;
 
-    logic [DATA_WIDTH-1:0] data_in[TOTAL_NODES];
-    logic [ADDR_WIDTH-1:0] addr_in[TOTAL_NODES];
-    logic data_in_valid[TOTAL_NODES];
-    logic data_in_ready[TOTAL_NODES];
+    logic [DATA_WIDTH-1:0] node_in_data[TOTAL_NODES];
+    logic [ADDR_WIDTH-1:0] node_in_addr[TOTAL_NODES];
+    logic node_in_valid[TOTAL_NODES];
+    logic node_in_ready[TOTAL_NODES];
 
-    logic [DATA_WIDTH-1:0] data_out[TOTAL_NODES];
-    logic [ADDR_WIDTH-1:0] addr_out[TOTAL_NODES];
-    logic data_out_valid[TOTAL_NODES];
-    logic data_out_ready[TOTAL_NODES];
+    logic [DATA_WIDTH-1:0] node_out_data[TOTAL_NODES];
+    logic [ADDR_WIDTH-1:0] node_out_addr[TOTAL_NODES];
+    logic node_out_valid[TOTAL_NODES];
+    logic node_out_ready[TOTAL_NODES];
 
     mesh #(
         .DATA_WIDTH(DATA_WIDTH /* default 64 */),
@@ -34,14 +34,14 @@ module mesh_tb();
      ) mesh (
         .clk           (clk),
         .rst_n         (rst_n),
-        .data_in       (data_in),
-        .addr_in       (addr_in),
-        .data_in_valid (data_in_valid),
-        .data_in_ready (data_in_ready),
-        .data_out      (data_out),
-        .addr_out      (addr_out),
-        .data_out_valid(data_out_valid),
-        .data_out_ready(data_out_ready)
+        .node_in_data       (node_in_data),
+        .node_in_addr       (node_in_addr),
+        .node_in_valid (node_in_valid),
+        .node_in_ready (node_in_ready),
+        .node_out_data      (node_out_data),
+        .node_out_addr      (node_out_addr),
+        .node_out_valid(node_out_valid),
+        .node_out_ready(node_out_ready)
     );
 
     always @(posedge clk) begin
@@ -49,9 +49,9 @@ module mesh_tb();
 
         for (int i=0; i<MESH_W; i++) begin
             for (int j=0; j<MESH_H; j++) begin
-                if (data_out_valid[i+j*MESH_W] && data_out_ready[i+j*MESH_W]) begin
+                if (node_out_valid[i+j*MESH_W] && node_out_ready[i+j*MESH_W]) begin
                     idx = i+j*MESH_W;
-                    $display("[x=%0d, y=%0d] data arrival=%0h, addr=%0h", i, j, data_out[idx], addr_out[idx]);
+                    $display("[x=%0d, y=%0d] data arrival=%0h, addr=%0h", i, j, node_out_data[idx], node_out_addr[idx]);
                 end
             end
         end
@@ -62,16 +62,16 @@ module mesh_tb();
             dst_x, dst_y, addr[ADDR_WIDTH-1-X_BITS-Y_BITS: 0]
         };
 
-        data_in_valid[0] = 1;
-        data_in[0] = data;
-        addr_in[0] = addr_packet;
+        node_in_valid[0] = 1;
+        node_in_data[0] = data;
+        node_in_addr[0] = addr_packet;
         
         do begin
             @(posedge clk);
-        end while(!data_in_ready[0]);
+        end while(!node_in_ready[0]);
 
         @(negedge clk);
-        data_in_valid[0] = 0;
+        node_in_valid[0] = 0;
 
         $display("packet sent, dst_x=%0d, dst_y=%0d, data=%0h", dst_x, dst_y, data);
     endtask
@@ -79,7 +79,7 @@ module mesh_tb();
     int idx;
     initial begin
         for (int i=0; i<TOTAL_NODES; i++) begin
-            data_out_ready[i] = 1;
+            node_out_ready[i] = 1;
         end
 
         rst_n = 0;

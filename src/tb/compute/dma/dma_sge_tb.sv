@@ -7,18 +7,18 @@ module dma_sge_tb();
     localparam ADDR_WIDTH = 32;
     localparam DATA_WIDTH = 64;
 
-    logic [ADDR_WIDTH-1: 0] read_addr_in;
-    logic read_addr_in_valid;
-    logic read_addr_in_ready;
+    logic [ADDR_WIDTH-1: 0] read_req_addr;
+    logic read_req_valid;
+    logic read_req_ready;
 
-    logic [DATA_WIDTH-1: 0] read_data_out;
-    logic read_data_out_valid;
-    logic read_data_out_ready;
+    logic [DATA_WIDTH-1: 0] read_rsp_data;
+    logic read_rsp_valid;
+    logic read_rsp_ready;
 
-    logic [ADDR_WIDTH-1:0] write_addr_in;
-    logic [DATA_WIDTH-1: 0] write_data_in;
-    logic write_data_valid;
-    logic write_data_ready;
+    logic [ADDR_WIDTH-1:0] write_req_addr;
+    logic [DATA_WIDTH-1: 0] write_req_data;
+    logic write_req_valid;
+    logic write_req_ready;
 
     logic sge_valid = 0;
     logic sge_ready;
@@ -60,16 +60,16 @@ module dma_sge_tb();
     ) bram_stream_dut (
         .clk                (clk),
         .rst_n              (rst_n),
-        .read_addr_in       (read_addr_in),
-        .read_addr_in_valid (read_addr_in_valid),
-        .read_addr_in_ready (read_addr_in_ready),
-        .read_data_out      (read_data_out),
-        .read_data_out_valid(read_data_out_valid),
-        .read_data_out_ready(read_data_out_ready),
-        .write_addr_in      (write_addr_in),
-        .write_data_in      (write_data_in),
-        .write_data_valid   (write_data_valid),
-        .write_data_ready   (write_data_ready)
+        .read_req_addr       (read_req_addr),
+        .read_req_valid (read_req_valid),
+        .read_req_ready (read_req_ready),
+        .read_rsp_data      (read_rsp_data),
+        .read_rsp_valid(read_rsp_valid),
+        .read_rsp_ready(read_rsp_ready),
+        .write_req_addr      (write_req_addr),
+        .write_req_data      (write_req_data),
+        .write_req_valid   (write_req_valid),
+        .write_req_ready   (write_req_ready)
     );
 
     localparam BRAM_ARBITER_N = 2;
@@ -89,18 +89,18 @@ module dma_sge_tb();
      ) bram_arbiter (
         .clk           (clk),
         .rst_n         (rst_n),
-        .addr_in       (arbiter_addr_in),
-        .addr_valid    (arbiter_addr_valid),
-        .addr_ready    (arbiter_addr_ready),
-        .data_out      (arbiter_data_out),
-        .data_valid    (arbiter_data_valid),
-        .data_ready    (arbiter_data_ready),
-        .addr_out      (read_addr_in),
-        .addr_out_valid(read_addr_in_valid),
-        .addr_out_ready(read_addr_in_ready),
-        .data_in       (read_data_out),
-        .data_in_valid (read_data_out_valid),
-        .data_in_ready (read_data_out_ready)
+        .client_read_req_addr (arbiter_addr_in),
+        .client_read_req_valid(arbiter_addr_valid),
+        .client_read_req_ready(arbiter_addr_ready),
+        .client_read_rsp_data (arbiter_data_out),
+        .client_read_rsp_valid(arbiter_data_valid),
+        .client_read_rsp_ready(arbiter_data_ready),
+        .memory_read_req_addr (read_req_addr),
+        .memory_read_req_valid(read_req_valid),
+        .memory_read_req_ready(read_req_ready),
+        .memory_read_rsp_data (read_rsp_data),
+        .memory_read_rsp_valid(read_rsp_valid),
+        .memory_read_rsp_ready(read_rsp_ready)
     );
 
     sge #(
@@ -116,12 +116,12 @@ module dma_sge_tb();
         .sge_batch_size(sge_batch_size),
         .sge_valid     (sge_valid),
         .sge_ready     (sge_ready),
-        .addr_out      (arbiter_addr_in[1]),
-        .addr_valid    (arbiter_addr_valid[1]),
-        .addr_ready    (arbiter_addr_ready[1]),
-        .data_in       (arbiter_data_out[1]),
-        .data_valid    (arbiter_data_valid[1]),
-        .data_ready    (arbiter_data_ready[1]),
+        .read_req_addr (arbiter_addr_in[1]),
+        .read_req_valid(arbiter_addr_valid[1]),
+        .read_req_ready(arbiter_addr_ready[1]),
+        .read_rsp_data (arbiter_data_out[1]),
+        .read_rsp_valid(arbiter_data_valid[1]),
+        .read_rsp_ready(arbiter_data_ready[1]),
         .reg_out       (sge_reg_out),
         .reg_valid     (fire_valid),
         .reg_ready     (fire_ready)
@@ -133,16 +133,16 @@ module dma_sge_tb();
     ) dma_dut (
         .clk               (clk),
         .rst_n             (rst_n),
-        .addr_out          (arbiter_addr_in[0]),
-        .addr_out_valid    (arbiter_addr_valid[0]),
-        .addr_out_ready    (arbiter_addr_ready[0]),
-        .data_in           (arbiter_data_out[0]),
-        .data_in_valid     (arbiter_data_valid[0]),
-        .data_in_ready     (arbiter_data_ready[0]),
-        .dma_addr_out      (write_addr_in),
-        .dma_data_out      (write_data_in),
-        .dma_data_out_valid(write_data_valid),
-        .dma_data_out_ready(write_data_ready),
+        .read_req_addr     (arbiter_addr_in[0]),
+        .read_req_valid    (arbiter_addr_valid[0]),
+        .read_req_ready    (arbiter_addr_ready[0]),
+        .read_rsp_data     (arbiter_data_out[0]),
+        .read_rsp_valid    (arbiter_data_valid[0]),
+        .read_rsp_ready    (arbiter_data_ready[0]),
+        .write_req_addr    (write_req_addr),
+        .write_req_data    (write_req_data),
+        .write_req_valid   (write_req_valid),
+        .write_req_ready   (write_req_ready),
         .fire_valid        (fire_valid),
         .fire_ready        (fire_ready),
         .fire_length       (fire_length),

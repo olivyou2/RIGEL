@@ -13,13 +13,13 @@ module sge#(
     input logic sge_valid,
     output logic sge_ready,
 
-    output logic [ADDR_WIDTH-1: 0] addr_out,
-    output logic addr_valid,
-    input logic addr_ready,
+    output logic [ADDR_WIDTH-1: 0] read_req_addr,
+    output logic read_req_valid,
+    input logic read_req_ready,
 
-    input logic [DATA_WIDTH-1: 0] data_in,
-    input logic data_valid,
-    output logic data_ready,
+    input logic [DATA_WIDTH-1: 0] read_rsp_data,
+    input logic read_rsp_valid,
+    output logic read_rsp_ready,
 
     output logic [REG_SIZE-1: 0] reg_out,
     output logic reg_valid,
@@ -44,9 +44,9 @@ module sge#(
         .sge_batch_size(sge_batch_size),
         .sge_valid     (sge_valid),
         .sge_ready     (sge_ready),
-        .addr_out      (addr_out),
-        .addr_valid    (addr_valid),
-        .addr_ready    (addr_ready),
+        .read_req_addr (read_req_addr),
+        .read_req_valid(read_req_valid),
+        .read_req_ready(read_req_ready),
         .sge_handshaked(reg_valid && reg_ready),
         .backend_ready (reg_ready)
     );
@@ -61,9 +61,9 @@ module sge#(
      ) sge_assemble (
         .clk       (clk),
         .rst_n     (rst_n),
-        .data_in   (data_in),
-        .data_valid(data_valid),
-        .data_ready(data_ready),
+        .data_in   (read_rsp_data),
+        .data_valid(read_rsp_valid),
+        .data_ready(read_rsp_ready),
         .reg_out   (fifo_in),
         .reg_valid (fifo_in_valid),
         .reg_ready (fifo_in_ready)

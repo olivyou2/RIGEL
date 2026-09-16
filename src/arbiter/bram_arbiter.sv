@@ -7,22 +7,22 @@ module bram_arbiter#(
     input logic rst_n,
 
     // Interface side
-    input logic [ADDR_WIDTH-1: 0] addr_in[N],
-    input logic addr_valid[N],
-    output logic addr_ready[N],
+    input logic [ADDR_WIDTH-1: 0] client_read_req_addr[N],
+    input logic client_read_req_valid[N],
+    output logic client_read_req_ready[N],
 
-    output logic [DATA_WIDTH-1: 0] data_out[N],
-    output logic data_valid[N],
-    input logic data_ready[N],
+    output logic [DATA_WIDTH-1: 0] client_read_rsp_data[N],
+    output logic client_read_rsp_valid[N],
+    input logic client_read_rsp_ready[N],
 
     // BRAM side
-    output logic [ADDR_WIDTH-1: 0] addr_out,
-    output logic addr_out_valid,
-    input logic addr_out_ready,
+    output logic [ADDR_WIDTH-1: 0] memory_read_req_addr,
+    output logic memory_read_req_valid,
+    input logic memory_read_req_ready,
 
-    input logic [DATA_WIDTH-1: 0] data_in,
-    input logic data_in_valid,
-    output logic data_in_ready
+    input logic [DATA_WIDTH-1: 0] memory_read_rsp_data,
+    input logic memory_read_rsp_valid,
+    output logic memory_read_rsp_ready
 );
 
     /**
@@ -66,9 +66,9 @@ module bram_arbiter#(
      ) arbiter (
         .clk           (clk),
         .rst_n         (rst_n),
-        .data_in       (addr_in),
-        .data_valid    (addr_valid),
-        .data_ready    (addr_ready),
+        .data_in       (client_read_req_addr),
+        .data_in_valid (client_read_req_valid),
+        .data_in_ready (client_read_req_ready),
         .data_out      (arb_addr_out),
         .data_out_valid(arb_addr_out_valid),
         .data_out_ready(arb_addr_out_ready),
@@ -76,7 +76,7 @@ module bram_arbiter#(
     );
 
     // Hold the request until both branches accept it, each exactly once.
-    assign req_out_ready[0] = addr_out_ready;
+    assign req_out_ready[0] = memory_read_req_ready;
     assign req_out_ready[1] = sel_fifo_ready;
 
     assign req_out_valid = {2{arb_addr_out_valid}} & ~req_sent;
@@ -92,8 +92,8 @@ module bram_arbiter#(
         end
     end
 
-    assign addr_out = arb_addr_out;
-    assign addr_out_valid = req_out_valid[0];
+    assign memory_read_req_addr = arb_addr_out;
+    assign memory_read_req_valid = req_out_valid[0];
 
     fifo #(
         .DATA_WIDTH(N_WIDTH /* default 64 */),
@@ -111,9 +111,9 @@ module bram_arbiter#(
 
     // Response phase joins selector and BRAM response data in lockstep.
     assign resp_join_data_in[0] = {{(DATA_WIDTH-N_WIDTH){1'b0}}, sel_out};
-    assign resp_join_data_in[1] = data_in;
+    assign resp_join_data_in[1] = memory_read_rsp_data;
     assign resp_join_valid_in[0] = sel_out_valid;
-    assign resp_join_valid_in[1] = data_in_valid;
+    assign resp_join_valid_in[1] = memory_read_rsp_valid;
 
     handshake_join #(
         .DATA_WIDTH(DATA_WIDTH /* default 64 */),
@@ -130,28 +130,28 @@ module bram_arbiter#(
     );
 
     assign sel_out_ready = resp_join_ready_in[0];
-    assign data_in_ready = resp_join_ready_in[1];
+    assign memory_read_rsp_ready = resp_join_ready_in[1];
 
     assign resp_sel = resp_join_data_out[0][N_WIDTH-1:0];
     assign resp_data = resp_join_data_out[1];
-    assign target_ready = !data_valid[resp_sel] || data_ready[resp_sel];
+    assign target_ready = !client_read_rsp_valid[resp_sel] || client_read_rsp_ready[resp_sel];
     assign resp_join_ready_out = target_ready;
 
     always @(posedge clk) begin
         if (!rst_n) begin
             for (int i=0; i<N; i++) begin
-                data_valid[i] <= 0;
+                client_read_rsp_valid[i] <= 0;
             end
         end else begin
             for (int i=0; i<N; i++) begin
-                if (data_valid[i] && data_ready[i]) begin
-                    data_valid[i] <= 0;
+                if (client_read_rsp_valid[i] && client_read_rsp_ready[i]) begin
+                    client_read_rsp_valid[i] <= 0;
                 end
             end
 
             if (resp_join_valid_out && resp_join_ready_out) begin
-                data_out[resp_sel] <= resp_data;
-                data_valid[resp_sel] <= 1'b1;
+                client_read_rsp_data[resp_sel] <= resp_data;
+                client_read_rsp_valid[resp_sel] <= 1'b1;
             end
         end
     end

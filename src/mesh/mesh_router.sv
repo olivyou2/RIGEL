@@ -11,46 +11,46 @@ module mesh_router#(
     input logic rst_n,
 
     // External Router
-    input logic [ADDR_WIDTH-1: 0] north_addr_in,
-    input logic [DATA_WIDTH-1: 0] north_data_in,
-    input logic north_data_valid,
-    output logic north_data_ready,
+    input logic [ADDR_WIDTH-1: 0] north_in_addr,
+    input logic [DATA_WIDTH-1: 0] north_in_data,
+    input logic north_in_valid,
+    output logic north_in_ready,
 
-    input logic [ADDR_WIDTH-1: 0] west_addr_in,
-    input logic [DATA_WIDTH-1: 0] west_data_in,
-    input logic west_data_valid,
-    output logic west_data_ready,
+    input logic [ADDR_WIDTH-1: 0] west_in_addr,
+    input logic [DATA_WIDTH-1: 0] west_in_data,
+    input logic west_in_valid,
+    output logic west_in_ready,
 
-    output logic [ADDR_WIDTH-1: 0] east_addr_out,
-    output logic [DATA_WIDTH-1: 0] east_data_out,
-    output logic east_data_valid,
-    input logic east_data_ready,
+    output logic [ADDR_WIDTH-1: 0] east_out_addr,
+    output logic [DATA_WIDTH-1: 0] east_out_data,
+    output logic east_out_valid,
+    input logic east_out_ready,
 
-    output logic [ADDR_WIDTH-1: 0] south_addr_out,
-    output logic [DATA_WIDTH-1: 0] south_data_out,
-    output logic south_data_valid,
-    input logic south_data_ready,
+    output logic [ADDR_WIDTH-1: 0] south_out_addr,
+    output logic [DATA_WIDTH-1: 0] south_out_data,
+    output logic south_out_valid,
+    input logic south_out_ready,
 
     // Local In/Out
-    input logic [ADDR_WIDTH-1: 0] local_addr_in,
-    input logic [DATA_WIDTH-1: 0] local_data_in,
-    input logic local_data_in_valid,
-    output logic local_data_in_ready,
+    input logic [ADDR_WIDTH-1: 0] local_in_addr,
+    input logic [DATA_WIDTH-1: 0] local_in_data,
+    input logic local_in_valid,
+    output logic local_in_ready,
 
-    output logic [ADDR_WIDTH-1: 0] local_addr_out,
-    output logic [DATA_WIDTH-1: 0] local_data_out,
-    output logic local_data_out_valid,
-    input logic local_data_out_ready
+    output logic [ADDR_WIDTH-1: 0] local_out_addr,
+    output logic [DATA_WIDTH-1: 0] local_out_data,
+    output logic local_out_valid,
+    input logic local_out_ready
 );
     logic [DATA_WIDTH+ADDR_WIDTH-1: 0] data_wires[4];
     logic [3:0] data_valid_wires;
 
-    assign data_wires[0] = {north_data_in, north_addr_in};
-    assign data_wires[1] = {west_data_in, west_addr_in};
-    assign data_wires[2] = {local_data_in, local_addr_in};
+    assign data_wires[0] = {north_in_data, north_in_addr};
+    assign data_wires[1] = {west_in_data, west_in_addr};
+    assign data_wires[2] = {local_in_data, local_in_addr};
     assign data_wires[3] = 0;
 
-    assign data_valid_wires = {1'b0, local_data_in_valid, west_data_valid, north_data_valid};
+    assign data_valid_wires = {1'b0, local_in_valid, west_in_valid, north_in_valid};
 
     logic east_arbiter_data_valid[4];
     logic east_arbiter_data_ready[4];
@@ -96,17 +96,17 @@ module mesh_router#(
             local_arbiter_data_valid[i] = 0;
         end
 
-        route_packet(north_addr_in, 0);
-        route_packet(west_addr_in, 1);
-        route_packet(local_addr_in, 2);
+        route_packet(north_in_addr, 0);
+        route_packet(west_in_addr, 1);
+        route_packet(local_in_addr, 2);
 
         arbiter_data_ready[0] = east_arbiter_data_ready[0] || south_arbiter_data_ready[0] || local_arbiter_data_ready[0];
         arbiter_data_ready[1] = east_arbiter_data_ready[1] || south_arbiter_data_ready[1] || local_arbiter_data_ready[1];
         arbiter_data_ready[2] = east_arbiter_data_ready[2] || south_arbiter_data_ready[2] || local_arbiter_data_ready[2];
 
-        north_data_ready = arbiter_data_ready[0];
-        west_data_ready = arbiter_data_ready[1];
-        local_data_in_ready = arbiter_data_ready[2];
+        north_in_ready = arbiter_data_ready[0];
+        west_in_ready = arbiter_data_ready[1];
+        local_in_ready = arbiter_data_ready[2];
     end
 
     // all -> east arbiter
@@ -117,11 +117,11 @@ module mesh_router#(
         .clk           (clk),
         .rst_n         (rst_n),
         .data_in       (data_wires),
-        .data_valid    (east_arbiter_data_valid),
-        .data_ready    (east_arbiter_data_ready),
-        .data_out      ({east_data_out, east_addr_out}),
-        .data_out_valid(east_data_valid),
-        .data_out_ready(east_data_ready)
+        .data_in_valid    (east_arbiter_data_valid),
+        .data_in_ready    (east_arbiter_data_ready),
+        .data_out      ({east_out_data, east_out_addr}),
+        .data_out_valid(east_out_valid),
+        .data_out_ready(east_out_ready)
     );
 
     // all -> south arbiter
@@ -132,11 +132,11 @@ module mesh_router#(
         .clk           (clk),
         .rst_n         (rst_n),
         .data_in       (data_wires),
-        .data_valid    (south_arbiter_data_valid),
-        .data_ready    (south_arbiter_data_ready),
-        .data_out      ({south_data_out, south_addr_out}),
-        .data_out_valid(south_data_valid),
-        .data_out_ready(south_data_ready)
+        .data_in_valid    (south_arbiter_data_valid),
+        .data_in_ready    (south_arbiter_data_ready),
+        .data_out      ({south_out_data, south_out_addr}),
+        .data_out_valid(south_out_valid),
+        .data_out_ready(south_out_ready)
     );
 
     // all -> local arbiter
@@ -147,11 +147,11 @@ module mesh_router#(
         .clk           (clk),
         .rst_n         (rst_n),
         .data_in       (data_wires),
-        .data_valid    (local_arbiter_data_valid),
-        .data_ready    (local_arbiter_data_ready),
-        .data_out      ({local_data_out, local_addr_out}),
-        .data_out_valid(local_data_out_valid),
-        .data_out_ready(local_data_out_ready)
+        .data_in_valid    (local_arbiter_data_valid),
+        .data_in_ready    (local_arbiter_data_ready),
+        .data_out      ({local_out_data, local_out_addr}),
+        .data_out_valid(local_out_valid),
+        .data_out_ready(local_out_ready)
     );
 
 endmodule; 

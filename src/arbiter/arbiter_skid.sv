@@ -8,8 +8,8 @@ module arbiter_skid#(
     input logic rst_n,
 
     input logic [DATA_WIDTH-1: 0] data_in[N],
-    input logic data_valid[N],
-    output logic data_ready[N],
+    input logic data_in_valid[N],
+    output logic data_in_ready[N],
 
     output logic [DATA_WIDTH-1: 0] data_out,
     output logic data_out_valid,
@@ -29,8 +29,8 @@ module arbiter_skid#(
         .clk           (clk),
         .rst_n         (rst_n),
         .data_in       (data_in),
-        .data_valid    (data_valid),
-        .data_ready    (data_ready),
+        .data_in_valid (data_in_valid),
+        .data_in_ready (data_in_ready),
         .data_out      (skid_data_in),
         .data_out_valid(skid_data_in_valid),
         .data_out_ready(skid_data_in_ready),

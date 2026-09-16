@@ -33,10 +33,10 @@ module dma_addr_tb ();
     .data_in       (data_in),
     .data_in_valid (data_in_valid),
     .data_in_ready (data_in_ready),
-    .data_out      (data_out),
-    .addr_out      (addr_out),
-    .data_out_valid(data_out_valid),
-    .data_out_ready(data_out_ready)
+    .write_req_data (data_out),
+    .write_req_addr (addr_out),
+    .write_req_valid(data_out_valid),
+    .write_req_ready(data_out_ready)
   );
 
   task automatic set_dst_addr(input logic [ADDR_WIDTH-1: 0] addr_dst, input logic [ADDR_WIDTH-1: 0] addr_step);
@@ -83,4 +83,3 @@ module dma_addr_tb ();
   end
 
 endmodule
-

@@ -11,19 +11,19 @@ module ixc_read #(
     parameter READ_OUTSTANDING = 8
 )(
     input logic clk, rst_n,
-    input logic [ADDR_WIDTH-1:0] read_addr_in[MASTER_N],
-    input logic read_addr_valid[MASTER_N],
-    output logic read_addr_ready[MASTER_N],
+    input logic [ADDR_WIDTH-1:0] read_req_addr[MASTER_N],
+    input logic read_req_valid[MASTER_N],
+    output logic read_req_ready[MASTER_N],
     input logic [SEL_WIDTH-1:0] read_sel[MASTER_N],
-    output logic [DATA_WIDTH-1:0] read_data_out[MASTER_N],
-    output logic read_data_valid[MASTER_N],
-    input logic read_data_ready[MASTER_N],
-    output logic [ADDR_WIDTH-1:0] slave_read_addr_out[SLAVE_N],
-    output logic slave_read_addr_valid[SLAVE_N],
-    input logic slave_read_addr_ready[SLAVE_N],
-    input logic [DATA_WIDTH-1:0] slave_read_data_in[SLAVE_N],
-    input logic slave_read_data_valid[SLAVE_N],
-    output logic slave_read_data_ready[SLAVE_N]
+    output logic [DATA_WIDTH-1:0] read_rsp_data[MASTER_N],
+    output logic read_rsp_valid[MASTER_N],
+    input logic read_rsp_ready[MASTER_N],
+    output logic [ADDR_WIDTH-1:0] slave_read_req_addr[SLAVE_N],
+    output logic slave_read_req_valid[SLAVE_N],
+    input logic slave_read_req_ready[SLAVE_N],
+    input logic [DATA_WIDTH-1:0] slave_read_rsp_data[SLAVE_N],
+    input logic slave_read_rsp_valid[SLAVE_N],
+    output logic slave_read_rsp_ready[SLAVE_N]
 );
     localparam MASTER_WIDTH = (MASTER_N > 1) ? $clog2(MASTER_N) : 1;
     localparam AR_PTR_WIDTH = (READ_FIFO_DEPTH > 1) ? $clog2(READ_FIFO_DEPTH) : 1;
@@ -60,16 +60,16 @@ module ixc_read #(
         logic response_push, response_pop;
         logic [DATA_WIDTH-1:0] response_data;
 
-        assign read_addr_ready[m] = rst_n && (int'(ar_count) < READ_FIFO_DEPTH) &&
+        assign read_req_ready[m] = rst_n && (int'(ar_count) < READ_FIFO_DEPTH) &&
             (int'(read_sel[m]) < SLAVE_N);
-        assign ar_push = read_addr_valid[m] && read_addr_ready[m];
+        assign ar_push = read_req_valid[m] && read_req_ready[m];
         assign request_valid[m] = ar_count != 0;
         assign request_addr[m] = addr_mem[ar_head];
         assign request_sel[m] = sel_mem[ar_head];
 
-        assign read_data_out[m] = response_mem[response_head];
-        assign read_data_valid[m] = rst_n && (response_count != 0);
-        assign response_pop = read_data_valid[m] && read_data_ready[m];
+        assign read_rsp_data[m] = response_mem[response_head];
+        assign read_rsp_valid[m] = rst_n && (response_count != 0);
+        assign response_pop = read_rsp_valid[m] && read_rsp_ready[m];
 
         always_comb begin
             request_take[m] = 0;
@@ -79,7 +79,7 @@ module ixc_read #(
                 if (issue[s] && int'(grant[s]) == m) request_take[m] = 1;
                 if (response_take[s] && int'(owner[s]) == m) begin
                     response_push = 1;
-                    response_data = slave_read_data_in[s];
+                    response_data = slave_read_rsp_data[s];
                 end
             end
         end
@@ -96,7 +96,7 @@ module ixc_read #(
                 target[m] <= '0;
             end else begin
                 if (ar_push) begin
-                    addr_mem[ar_tail] <= read_addr_in[m];
+                    addr_mem[ar_tail] <= read_req_addr[m];
                     sel_mem[ar_tail] <= read_sel[m];
                     ar_tail <= (int'(ar_tail) == READ_FIFO_DEPTH-1) ? '0 : ar_tail + 1'b1;
                 end
@@ -141,13 +141,13 @@ module ixc_read #(
         logic [MASTER_WIDTH-1:0] robin;
         logic addr_take;
 
-        assign slave_read_addr_out[s] = addr_mem[send_head];
-        assign slave_read_addr_valid[s] = rst_n && (unsent_count != 0);
-        assign addr_take = slave_read_addr_valid[s] && slave_read_addr_ready[s];
+        assign slave_read_req_addr[s] = addr_mem[send_head];
+        assign slave_read_req_valid[s] = rst_n && (unsent_count != 0);
+        assign addr_take = slave_read_req_valid[s] && slave_read_req_ready[s];
         assign owner[s] = owner_mem[response_head];
         // Also accept a zero-latency response on the AR handshake itself.
-        assign slave_read_data_ready[s] = rst_n && ((count > unsent_count) || addr_take);
-        assign response_take[s] = slave_read_data_valid[s] && slave_read_data_ready[s];
+        assign slave_read_rsp_ready[s] = rst_n && ((count > unsent_count) || addr_take);
+        assign response_take[s] = slave_read_rsp_valid[s] && slave_read_rsp_ready[s];
 
         always_comb begin
             issue[s] = 0;

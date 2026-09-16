@@ -17,35 +17,35 @@ module mesh_router_tb ();
   logic clk;
   logic rst_n;
 
-  logic [ADDR_WIDTH-1:0] north_addr_in;
-  logic [DATA_WIDTH-1:0] north_data_in;
-  logic                  north_data_valid;
-  logic                  north_data_ready;
+  logic [ADDR_WIDTH-1:0] north_in_addr;
+  logic [DATA_WIDTH-1:0] north_in_data;
+  logic                  north_in_valid;
+  logic                  north_in_ready;
 
-  logic [ADDR_WIDTH-1:0] west_addr_in;
-  logic [DATA_WIDTH-1:0] west_data_in;
-  logic                  west_data_valid;
-  logic                  west_data_ready;
+  logic [ADDR_WIDTH-1:0] west_in_addr;
+  logic [DATA_WIDTH-1:0] west_in_data;
+  logic                  west_in_valid;
+  logic                  west_in_ready;
 
-  logic [ADDR_WIDTH-1:0] east_addr_out;
-  logic [DATA_WIDTH-1:0] east_data_out;
-  logic                  east_data_valid;
-  logic                  east_data_ready;
+  logic [ADDR_WIDTH-1:0] east_out_addr;
+  logic [DATA_WIDTH-1:0] east_out_data;
+  logic                  east_out_valid;
+  logic                  east_out_ready;
 
-  logic [ADDR_WIDTH-1:0] south_addr_out;
-  logic [DATA_WIDTH-1:0] south_data_out;
-  logic                  south_data_valid;
-  logic                  south_data_ready;
+  logic [ADDR_WIDTH-1:0] south_out_addr;
+  logic [DATA_WIDTH-1:0] south_out_data;
+  logic                  south_out_valid;
+  logic                  south_out_ready;
 
-  logic [ADDR_WIDTH-1:0] local_addr_in;
-  logic [DATA_WIDTH-1:0] local_data_in;
-  logic                  local_data_in_valid;
-  logic                  local_data_in_ready;
+  logic [ADDR_WIDTH-1:0] local_in_addr;
+  logic [DATA_WIDTH-1:0] local_in_data;
+  logic                  local_in_valid;
+  logic                  local_in_ready;
 
-  logic [ADDR_WIDTH-1:0] local_addr_out;
-  logic [DATA_WIDTH-1:0] local_data_out;
-  logic                  local_data_out_valid;
-  logic                  local_data_out_ready;
+  logic [ADDR_WIDTH-1:0] local_out_addr;
+  logic [DATA_WIDTH-1:0] local_out_data;
+  logic                  local_out_valid;
+  logic                  local_out_ready;
 
   int pass_count;
 
@@ -59,30 +59,30 @@ module mesh_router_tb ();
   ) dut (
       .clk                 (clk),
       .rst_n               (rst_n),
-      .north_addr_in       (north_addr_in),
-      .north_data_in       (north_data_in),
-      .north_data_valid    (north_data_valid),
-      .north_data_ready    (north_data_ready),
-      .west_addr_in        (west_addr_in),
-      .west_data_in        (west_data_in),
-      .west_data_valid     (west_data_valid),
-      .west_data_ready     (west_data_ready),
-      .east_addr_out       (east_addr_out),
-      .east_data_out       (east_data_out),
-      .east_data_valid     (east_data_valid),
-      .east_data_ready     (east_data_ready),
-      .south_addr_out      (south_addr_out),
-      .south_data_out      (south_data_out),
-      .south_data_valid    (south_data_valid),
-      .south_data_ready    (south_data_ready),
-      .local_addr_in       (local_addr_in),
-      .local_data_in       (local_data_in),
-      .local_data_in_valid (local_data_in_valid),
-      .local_data_in_ready (local_data_in_ready),
-      .local_addr_out      (local_addr_out),
-      .local_data_out      (local_data_out),
-      .local_data_out_valid(local_data_out_valid),
-      .local_data_out_ready(local_data_out_ready)
+      .north_in_addr       (north_in_addr),
+      .north_in_data       (north_in_data),
+      .north_in_valid    (north_in_valid),
+      .north_in_ready    (north_in_ready),
+      .west_in_addr        (west_in_addr),
+      .west_in_data        (west_in_data),
+      .west_in_valid     (west_in_valid),
+      .west_in_ready     (west_in_ready),
+      .east_out_addr       (east_out_addr),
+      .east_out_data       (east_out_data),
+      .east_out_valid     (east_out_valid),
+      .east_out_ready     (east_out_ready),
+      .south_out_addr      (south_out_addr),
+      .south_out_data      (south_out_data),
+      .south_out_valid    (south_out_valid),
+      .south_out_ready    (south_out_ready),
+      .local_in_addr       (local_in_addr),
+      .local_in_data       (local_in_data),
+      .local_in_valid (local_in_valid),
+      .local_in_ready (local_in_ready),
+      .local_out_addr      (local_out_addr),
+      .local_out_data      (local_out_data),
+      .local_out_valid(local_out_valid),
+      .local_out_ready(local_out_ready)
   );
 
   initial clk = 0;
@@ -99,12 +99,12 @@ module mesh_router_tb ();
   task automatic reset_dut;
     @(negedge clk);
     rst_n = 0;
-    north_data_valid = 0;
-    west_data_valid = 0;
-    local_data_in_valid = 0;
-    east_data_ready = 1;
-    south_data_ready = 1;
-    local_data_out_ready = 1;
+    north_in_valid = 0;
+    west_in_valid = 0;
+    local_in_valid = 0;
+    east_out_ready = 1;
+    south_out_ready = 1;
+    local_out_ready = 1;
 
     repeat (3) @(posedge clk);
     @(negedge clk);
@@ -120,28 +120,28 @@ module mesh_router_tb ();
     @(negedge clk);
     case (source)
       NORTH: begin
-        north_addr_in = addr;
-        north_data_in = data;
-        north_data_valid = 1;
-        do @(posedge clk); while (north_data_ready !== 1'b1);
+        north_in_addr = addr;
+        north_in_data = data;
+        north_in_valid = 1;
+        do @(posedge clk); while (north_in_ready !== 1'b1);
         @(negedge clk);
-        north_data_valid = 0;
+        north_in_valid = 0;
       end
       WEST: begin
-        west_addr_in = addr;
-        west_data_in = data;
-        west_data_valid = 1;
-        do @(posedge clk); while (west_data_ready !== 1'b1);
+        west_in_addr = addr;
+        west_in_data = data;
+        west_in_valid = 1;
+        do @(posedge clk); while (west_in_ready !== 1'b1);
         @(negedge clk);
-        west_data_valid = 0;
+        west_in_valid = 0;
       end
       LOCAL: begin
-        local_addr_in = addr;
-        local_data_in = data;
-        local_data_in_valid = 1;
-        do @(posedge clk); while (local_data_in_ready !== 1'b1);
+        local_in_addr = addr;
+        local_in_data = data;
+        local_in_valid = 1;
+        do @(posedge clk); while (local_in_ready !== 1'b1);
         @(negedge clk);
-        local_data_in_valid = 0;
+        local_in_valid = 0;
       end
       default: $fatal(1, "Unknown source %0d", source);
     endcase
@@ -154,22 +154,22 @@ module mesh_router_tb ();
   );
     case (destination)
       EAST: begin
-        do @(negedge clk); while (east_data_valid !== 1'b1);
-        if (east_addr_out !== expected_addr || east_data_out !== expected_data)
+        do @(negedge clk); while (east_out_valid !== 1'b1);
+        if (east_out_addr !== expected_addr || east_out_data !== expected_data)
           $fatal(1, "EAST mismatch: addr=%h data=%h, expected addr=%h data=%h",
-                 east_addr_out, east_data_out, expected_addr, expected_data);
+                 east_out_addr, east_out_data, expected_addr, expected_data);
       end
       SOUTH: begin
-        do @(negedge clk); while (south_data_valid !== 1'b1);
-        if (south_addr_out !== expected_addr || south_data_out !== expected_data)
+        do @(negedge clk); while (south_out_valid !== 1'b1);
+        if (south_out_addr !== expected_addr || south_out_data !== expected_data)
           $fatal(1, "SOUTH mismatch: addr=%h data=%h, expected addr=%h data=%h",
-                 south_addr_out, south_data_out, expected_addr, expected_data);
+                 south_out_addr, south_out_data, expected_addr, expected_data);
       end
       LOCAL: begin
-        do @(negedge clk); while (local_data_out_valid !== 1'b1);
-        if (local_addr_out !== expected_addr || local_data_out !== expected_data)
+        do @(negedge clk); while (local_out_valid !== 1'b1);
+        if (local_out_addr !== expected_addr || local_out_data !== expected_data)
           $fatal(1, "LOCAL mismatch: addr=%h data=%h, expected addr=%h data=%h",
-                 local_addr_out, local_data_out, expected_addr, expected_data);
+                 local_out_addr, local_out_data, expected_addr, expected_data);
       end
       default: $fatal(1, "Unknown destination %0d", destination);
     endcase
@@ -196,10 +196,10 @@ module mesh_router_tb ();
   logic [DATA_WIDTH-1:0] east_seen [0:2];
 
   always @(posedge clk) begin
-    if (collect_east && east_data_valid && east_data_ready) begin
+    if (collect_east && east_out_valid && east_out_ready) begin
       if (east_count >= 3)
         $fatal(1, "EAST produced more packets than expected");
-      east_seen[east_count] = east_data_out;
+      east_seen[east_count] = east_out_data;
       east_count = east_count + 1;
     end
   end
@@ -249,22 +249,22 @@ module mesh_router_tb ();
     reset_dut();
     addr = make_addr(2, ROUTER_Y, 28'h0badc0d);
     data = 64'hfeed_face_dead_beef;
-    east_data_ready = 0;
+    east_out_ready = 0;
 
     send_packet(NORTH, addr, data);
-    do @(negedge clk); while (east_data_valid !== 1'b1);
+    do @(negedge clk); while (east_out_valid !== 1'b1);
 
     repeat (4) begin
       @(posedge clk);
-      if (east_data_valid !== 1'b1 || east_addr_out !== addr || east_data_out !== data)
+      if (east_out_valid !== 1'b1 || east_out_addr !== addr || east_out_data !== data)
         $fatal(1, "EAST output changed while backpressured");
     end
 
     @(negedge clk);
-    east_data_ready = 1;
+    east_out_ready = 1;
     @(posedge clk);
     @(negedge clk);
-    if (east_data_valid !== 1'b0)
+    if (east_out_valid !== 1'b0)
       $fatal(1, "EAST valid did not clear after handshake");
 
     pass_count = pass_count + 1;
@@ -272,18 +272,18 @@ module mesh_router_tb ();
 
   initial begin
     rst_n = 0;
-    north_addr_in = 0;
-    north_data_in = 0;
-    north_data_valid = 0;
-    west_addr_in = 0;
-    west_data_in = 0;
-    west_data_valid = 0;
-    local_addr_in = 0;
-    local_data_in = 0;
-    local_data_in_valid = 0;
-    east_data_ready = 1;
-    south_data_ready = 1;
-    local_data_out_ready = 1;
+    north_in_addr = 0;
+    north_in_data = 0;
+    north_in_valid = 0;
+    west_in_addr = 0;
+    west_in_data = 0;
+    west_in_valid = 0;
+    local_in_addr = 0;
+    local_in_data = 0;
+    local_in_valid = 0;
+    east_out_ready = 1;
+    south_out_ready = 1;
+    local_out_ready = 1;
     collect_east = 0;
     east_count = 0;
     pass_count = 0;

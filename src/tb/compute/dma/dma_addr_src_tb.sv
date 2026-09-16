@@ -32,9 +32,9 @@ module dma_addr_src_tb ();
     .fire_in_valid (fire_in_valid),
     .fire_in_ready (fire_in_ready),
 
-    .addr_out      (addr_out),
-    .addr_out_valid(addr_out_valid),
-    .addr_out_ready(addr_out_ready)
+    .read_req_addr (addr_out),
+    .read_req_valid(addr_out_valid),
+    .read_req_ready(addr_out_ready)
   );
 
   task automatic set_src_addr(input logic [ADDR_WIDTH-1: 0] addr_src, input logic [ADDR_WIDTH-1: 0] addr_step);
@@ -86,4 +86,3 @@ module dma_addr_src_tb ();
   end
 
 endmodule
-

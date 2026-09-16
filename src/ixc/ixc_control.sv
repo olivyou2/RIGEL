@@ -5,16 +5,16 @@ module ixc_control#(
     parameter MASTER_WIDTH = (MASTER_N > 1) ? $clog2(MASTER_N) : 1
 )(
     input logic clk, rst_n,
-    input logic write_data_valid[MASTER_N],
-    output logic write_data_ready[MASTER_N],
+    input logic write_req_valid[MASTER_N],
+    output logic write_req_ready[MASTER_N],
     input logic [SEL_WIDTH-1:0] write_sel[MASTER_N], write_sel_reg[MASTER_N],
     output logic write_load[MASTER_N], write_pending[MASTER_N],
     output logic write_input_head[MASTER_N], write_input_tail[MASTER_N],
     output logic write_output_head[SLAVE_N], write_output_tail[SLAVE_N],
     output logic write_issue[SLAVE_N],
     output logic [MASTER_WIDTH-1:0] write_grant[SLAVE_N],
-    output logic slave_write_data_valid[SLAVE_N],
-    input logic slave_write_data_ready[SLAVE_N]
+    output logic slave_write_req_valid[SLAVE_N],
+    input logic slave_write_req_ready[SLAVE_N]
 );
     // Write control. Pipelined read control lives in ixc_read.
     logic [MASTER_WIDTH-1:0] write_owner[SLAVE_N][2];
@@ -27,8 +27,8 @@ module ixc_control#(
 
     // Only registered state feeds input ready and request arbitration.
     for (genvar m=0; m<MASTER_N; m++) begin: master_control
-        assign write_data_ready[m] = rst_n && (write_input_count[m] < 2) && (int'(write_sel[m]) < SLAVE_N);
-        assign write_load[m] = write_data_valid[m] && write_data_ready[m];
+        assign write_req_ready[m] = rst_n && (write_input_count[m] < 2) && (int'(write_sel[m]) < SLAVE_N);
+        assign write_load[m] = write_req_valid[m] && write_req_ready[m];
     end
 
     // Keep a destination reserved until its queued writes retire. A new
@@ -72,8 +72,8 @@ module ixc_control#(
     end
 
     for (genvar s=0; s<SLAVE_N; s++) begin: slave_control
-        assign slave_write_data_valid[s] = write_output_count[s] != 0;
-        assign write_pop[s] = rst_n && slave_write_data_valid[s] && slave_write_data_ready[s];
+        assign slave_write_req_valid[s] = write_output_count[s] != 0;
+        assign write_pop[s] = rst_n && slave_write_req_valid[s] && slave_write_req_ready[s];
         always @(posedge clk) begin
             if (!rst_n) begin
                 write_output_count[s] <= 0;

@@ -11,15 +11,15 @@ module mesh#(
     input logic clk,
     input logic rst_n,
 
-    input logic [DATA_WIDTH-1: 0] data_in[MESH_W * MESH_H],
-    input logic [ADDR_WIDTH-1: 0] addr_in[MESH_W * MESH_H],
-    input logic data_in_valid[MESH_W * MESH_H],
-    output logic data_in_ready[MESH_W * MESH_H],
+    input logic [DATA_WIDTH-1: 0] node_in_data[MESH_W * MESH_H],
+    input logic [ADDR_WIDTH-1: 0] node_in_addr[MESH_W * MESH_H],
+    input logic node_in_valid[MESH_W * MESH_H],
+    output logic node_in_ready[MESH_W * MESH_H],
 
-    output logic [DATA_WIDTH-1: 0] data_out[MESH_W * MESH_H],
-    output logic [ADDR_WIDTH-1: 0] addr_out[MESH_W * MESH_H],
-    output logic data_out_valid[MESH_W * MESH_H],
-    input logic data_out_ready[MESH_W * MESH_H]
+    output logic [DATA_WIDTH-1: 0] node_out_data[MESH_W * MESH_H],
+    output logic [ADDR_WIDTH-1: 0] node_out_addr[MESH_W * MESH_H],
+    output logic node_out_valid[MESH_W * MESH_H],
+    input logic node_out_ready[MESH_W * MESH_H]
 );
 
     genvar x, y;
@@ -54,30 +54,30 @@ module mesh#(
                  ) mesh_router (
                     .clk                 (clk),
                     .rst_n               (rst_n),
-                    .north_addr_in       (vertical_addr[north_in_idx]),
-                    .north_data_in       (vertical_data[north_in_idx]),
-                    .north_data_valid    (vertical_data_valid[north_in_idx]),
-                    .north_data_ready    (vertical_data_ready[north_in_idx]),
-                    .west_addr_in        (horizontal_addr[west_in_idx]),
-                    .west_data_in        (horizontal_data[west_in_idx]),
-                    .west_data_valid     (horizontal_data_valid[west_in_idx]),
-                    .west_data_ready     (horizontal_data_ready[west_in_idx]),
-                    .east_addr_out       (horizontal_addr[out_idx]),
-                    .east_data_out       (horizontal_data[out_idx]),
-                    .east_data_valid     (horizontal_data_valid[out_idx]),
-                    .east_data_ready     (horizontal_data_ready[out_idx]),
-                    .south_addr_out      (vertical_addr[out_idx]),
-                    .south_data_out      (vertical_data[out_idx]),
-                    .south_data_valid    (vertical_data_valid[out_idx]),
-                    .south_data_ready    (vertical_data_ready[out_idx]),
-                    .local_addr_in       (addr_in[out_idx]),
-                    .local_data_in       (data_in[out_idx]),
-                    .local_data_in_valid (data_in_valid[out_idx]),
-                    .local_data_in_ready (data_in_ready[out_idx]),
-                    .local_addr_out      (addr_out[out_idx]),
-                    .local_data_out      (data_out[out_idx]),
-                    .local_data_out_valid(data_out_valid[out_idx]),
-                    .local_data_out_ready(data_out_ready[out_idx])
+                    .north_in_addr       (vertical_addr[north_in_idx]),
+                    .north_in_data       (vertical_data[north_in_idx]),
+                    .north_in_valid    (vertical_data_valid[north_in_idx]),
+                    .north_in_ready    (vertical_data_ready[north_in_idx]),
+                    .west_in_addr        (horizontal_addr[west_in_idx]),
+                    .west_in_data        (horizontal_data[west_in_idx]),
+                    .west_in_valid     (horizontal_data_valid[west_in_idx]),
+                    .west_in_ready     (horizontal_data_ready[west_in_idx]),
+                    .east_out_addr       (horizontal_addr[out_idx]),
+                    .east_out_data       (horizontal_data[out_idx]),
+                    .east_out_valid     (horizontal_data_valid[out_idx]),
+                    .east_out_ready     (horizontal_data_ready[out_idx]),
+                    .south_out_addr      (vertical_addr[out_idx]),
+                    .south_out_data      (vertical_data[out_idx]),
+                    .south_out_valid    (vertical_data_valid[out_idx]),
+                    .south_out_ready    (vertical_data_ready[out_idx]),
+                    .local_in_addr       (node_in_addr[out_idx]),
+                    .local_in_data       (node_in_data[out_idx]),
+                    .local_in_valid (node_in_valid[out_idx]),
+                    .local_in_ready (node_in_ready[out_idx]),
+                    .local_out_addr      (node_out_addr[out_idx]),
+                    .local_out_data      (node_out_data[out_idx]),
+                    .local_out_valid(node_out_valid[out_idx]),
+                    .local_out_ready(node_out_ready[out_idx])
                 );
             end
         end

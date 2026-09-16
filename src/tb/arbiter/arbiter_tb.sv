@@ -23,8 +23,8 @@ module arbiter_tb();
         .clk           (clk),
         .rst_n         (rst_n),
         .data_in       (data_in),
-        .data_valid    (data_valid),
-        .data_ready    (data_ready),
+        .data_in_valid (data_valid),
+        .data_in_ready (data_ready),
         .data_out      (data_out),
         .data_out_valid(data_out_valid),
         .data_out_ready(data_out_ready)

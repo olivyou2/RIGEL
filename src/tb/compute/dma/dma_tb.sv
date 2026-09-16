@@ -7,18 +7,18 @@ module dma_tb();
     localparam ADDR_WIDTH = 32;
     localparam DATA_WIDTH = 64;
 
-    logic [ADDR_WIDTH-1: 0] read_addr_in;
-    logic read_addr_in_valid;
-    logic read_addr_in_ready;
+    logic [ADDR_WIDTH-1: 0] read_req_addr;
+    logic read_req_valid;
+    logic read_req_ready;
 
-    logic [DATA_WIDTH-1: 0] read_data_out;
-    logic read_data_out_valid;
-    logic read_data_out_ready;
+    logic [DATA_WIDTH-1: 0] read_rsp_data;
+    logic read_rsp_valid;
+    logic read_rsp_ready;
 
-    logic [ADDR_WIDTH-1:0] write_addr_in;
-    logic [DATA_WIDTH-1: 0] write_data_in;
-    logic write_data_valid;
-    logic write_data_ready;
+    logic [ADDR_WIDTH-1:0] write_req_addr;
+    logic [DATA_WIDTH-1: 0] write_req_data;
+    logic write_req_valid;
+    logic write_req_ready;
 
     logic fire_valid;
     logic fire_ready;
@@ -33,16 +33,16 @@ module dma_tb();
     ) bram_stream_dut (
         .clk                (clk),
         .rst_n              (rst_n),
-        .read_addr_in       (read_addr_in),
-        .read_addr_in_valid (read_addr_in_valid),
-        .read_addr_in_ready (read_addr_in_ready),
-        .read_data_out      (read_data_out),
-        .read_data_out_valid(read_data_out_valid),
-        .read_data_out_ready(read_data_out_ready),
-        .write_addr_in      (write_addr_in),
-        .write_data_in      (write_data_in),
-        .write_data_valid   (write_data_valid),
-        .write_data_ready   (write_data_ready)
+        .read_req_addr       (read_req_addr),
+        .read_req_valid (read_req_valid),
+        .read_req_ready (read_req_ready),
+        .read_rsp_data      (read_rsp_data),
+        .read_rsp_valid(read_rsp_valid),
+        .read_rsp_ready(read_rsp_ready),
+        .write_req_addr      (write_req_addr),
+        .write_req_data      (write_req_data),
+        .write_req_valid   (write_req_valid),
+        .write_req_ready   (write_req_ready)
     );
 
     dma #(
@@ -51,16 +51,16 @@ module dma_tb();
     ) dma_dut (
         .clk               (clk),
         .rst_n             (rst_n),
-        .addr_out          (read_addr_in),
-        .addr_out_valid    (read_addr_in_valid),
-        .addr_out_ready    (read_addr_in_ready),
-        .data_in           (read_data_out),
-        .data_in_valid     (read_data_out_valid),
-        .data_in_ready     (read_data_out_ready),
-        .dma_addr_out      (write_addr_in),
-        .dma_data_out      (write_data_in),
-        .dma_data_out_valid(write_data_valid),
-        .dma_data_out_ready(write_data_ready),
+        .read_req_addr     (read_req_addr),
+        .read_req_valid    (read_req_valid),
+        .read_req_ready    (read_req_ready),
+        .read_rsp_data     (read_rsp_data),
+        .read_rsp_valid    (read_rsp_valid),
+        .read_rsp_ready    (read_rsp_ready),
+        .write_req_addr    (write_req_addr),
+        .write_req_data    (write_req_data),
+        .write_req_valid   (write_req_valid),
+        .write_req_ready   (write_req_ready),
         .fire_valid        (fire_valid),
         .fire_ready        (fire_ready),
         .fire_length       (fire_length),
