@@ -1,9 +1,13 @@
 -I src
+src/interfaces/rv_if.sv
+src/interfaces/dma_ctrl_if.sv
 src/bram/arbitation.sv
 src/bram/bram.sv
 src/bram/bram_stream.sv
 src/bram/fifo.sv
 src/compute/compute.sv
+src/compute/compute_ixc_sel.sv
+src/compute/dma_ixc_control.sv
 src/compute/dma/dma.sv
 src/compute/dma/dma_src_addr.sv
 src/compute/dma/dma_dst_addr.sv
@@ -26,3 +30,4 @@ src/arbiter/arbiter.sv
 src/arbiter/arbiter_skid.sv
 src/ixc/ixc.sv
 src/ixc/ixc_control.sv
+src/ixc/ixc_read.sv

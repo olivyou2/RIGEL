@@ -6,17 +6,19 @@ round-robin selection and response ownership. Reset is synchronous, active low.
 
 ## External decode
 
-- `ixc_addr_out[m]` continuously mirrors `read_addr_in[m]`. Connect it to an
+- `ixc_addr_out[m]` continuously mirrors `read_req[m].addr`. Connect it to an
   external combinational decoder and return its binary index on `ixc_slave_sel[m]`.
-- `ixc_write_addr_out[m]` similarly mirrors `write_addr_in[m]`; return the write
+- `ixc_write_addr_out[m]` similarly mirrors `write_req[m].addr`; return the write
   decoder index on `ixc_write_slave_sel[m]`. Independent decoders permit concurrent reads/writes.
 - Selection and payload are captured together on the master handshake. Hold
   valid, address, data and the corresponding selection stable until ready.
 - `SEL_WIDTH` defaults to `max(1, $clog2(SLAVE_N))`. Out-of-range selections
   deassert ready; there is no decode-error response. To encode an invalid value
   for power-of-two slave counts, override `SEL_WIDTH` with an extra bit.
-- Read response `read_data_valid` and `read_data_ready` are now arrays indexed
-  by master, matching `read_data_out`. The original stub's scalar ports changed.
+- Master ports are `read_req[MASTER_N]`, `read_rsp[MASTER_N]`, and
+  `write_req[MASTER_N]`, all using `rv_if`. Slave ports are the matching
+  `slave_read_req`, `slave_read_rsp`, and `slave_write_req` arrays.
+  Each channel contains `valid`, `ready`, `addr`, and `data`.
 - A write handshake transfers address and data atomically. There is no separate
   write-address channel, write completion response, burst or transaction ID.
 
@@ -69,7 +71,7 @@ Run from any directory:
 /path/to/RIGEL/src/tb/ixc/run.sh
 ```
 
-The script runs strict RTL lint and self-checking Verilator simulations for
+The script runs strict testbench/RTL elaboration lint and self-checking Verilator simulations for
 2x2, 3x3, 1x1, and 3x2 with zero-cycle slave responses. Scoreboards check read
 routing/data, write routing/data/order, no loss/duplication, stalled output
 stability, simultaneous independent slave transfers, invalid decode rejection,

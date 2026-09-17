@@ -14,17 +14,21 @@ module fifo_tb();
     logic data_out_valid;
     logic data_out_ready = 0;
 
+    rv_if #(.ADDR_WIDTH(1), .DATA_WIDTH(64)) in_ch();
+    rv_if #(.ADDR_WIDTH(1), .DATA_WIDTH(64)) out_ch();
+    assign in_ch.addr = '0;
+    assign in_ch.data = data_in;
+    assign in_ch.valid = data_in_valid;
+    assign data_in_ready = in_ch.ready;
+    assign data_out = out_ch.data;
+    assign data_out_valid = out_ch.valid;
+    assign out_ch.ready = data_out_ready;
+
     fifo dut(
         .clk(clk),
         .rst_n(rst_n),
-
-        .data_in(data_in),
-        .data_in_valid(data_in_valid),
-        .data_in_ready(data_in_ready),
-
-        .data_out(data_out),
-        .data_out_valid(data_out_valid),
-        .data_out_ready(data_out_ready)
+        .in_ch(in_ch),
+        .out_ch(out_ch)
     );
 
     task automatic push_data(input logic [63:0] data);

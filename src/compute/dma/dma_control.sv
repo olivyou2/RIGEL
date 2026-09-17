@@ -4,13 +4,7 @@ module dma_control#(
     input logic clk,
     input logic rst_n,
 
-    input logic fire_valid,
-    output logic fire_ready,
-
-    input logic [ADDR_WIDTH-1: 0] fire_addr_src,
-    input logic [ADDR_WIDTH-1: 0] fire_addr_dst,
-    input logic [ADDR_WIDTH-1: 0] fire_step,
-    input logic [ADDR_WIDTH-1: 0] fire_length,
+    dma_ctrl_if.sink ctrl,
 
     output logic addr_rst,
     output logic [ADDR_WIDTH-1: 0]  addr_rst_src,
@@ -41,7 +35,7 @@ module dma_control#(
     localparam [1:0] FSM_WORK = 2;
     localparam [1:0] FSM_WAIT = 3;
 
-    assign fire_ready = issue_fsm_state == FSM_IDLE && counter_fsm_state == FSM_IDLE;
+    assign ctrl.ready = issue_fsm_state == FSM_IDLE && counter_fsm_state == FSM_IDLE;
 
     // Issue FSM
     always @(posedge clk) begin
@@ -55,16 +49,16 @@ module dma_control#(
 
             case (issue_fsm_state)
                 FSM_IDLE: begin
-                    if (fire_valid && fire_ready) begin
+                    if (ctrl.valid && ctrl.ready) begin
                         issue_fsm_state <= FSM_STARTUP;
 
-                        fire_addr_src_reg <= fire_addr_src;
-                        fire_addr_dst_reg <= fire_addr_dst;
-                        fire_step_reg <= fire_step;
-                        fire_length_reg <= fire_length;
+                        fire_addr_src_reg <= ctrl.addr_src;
+                        fire_addr_dst_reg <= ctrl.addr_dst;
+                        fire_step_reg <= ctrl.step;
+                        fire_length_reg <= ctrl.length;
                         fire_counter_reg <= 0;
 
-                        if (fire_length == 0 || fire_step == 0) begin
+                        if (ctrl.length == 0 || ctrl.step == 0) begin
                             issue_fsm_state <= FSM_IDLE;
                         end
                     end
@@ -113,14 +107,14 @@ module dma_control#(
         end else begin
             case (counter_fsm_state)
                 FSM_IDLE: begin
-                    if (fire_valid && fire_ready) begin
+                    if (ctrl.valid && ctrl.ready) begin
                         counter_fsm_state <= FSM_WORK;
 
-                        counter_step_reg <= fire_step;
-                        counter_length_reg <= fire_length;
+                        counter_step_reg <= ctrl.step;
+                        counter_length_reg <= ctrl.length;
                         counter_counter_reg <= 0;
 
-                        if (fire_length == 0 || fire_step == 0) begin
+                        if (ctrl.length == 0 || ctrl.step == 0) begin
                             counter_fsm_state <= FSM_IDLE;
                         end
                     end

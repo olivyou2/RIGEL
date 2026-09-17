@@ -1,73 +1,78 @@
-module handshake_join_tb();
+module handshake_join_tb ();
 
     logic clk = 0;
     logic rst_n = 0;
 
     always #1 clk = !clk;
-    
+
     localparam DATA_WIDTH = 64;
-    
-    logic [DATA_WIDTH-1: 0] data_in[2];
+
+    logic [DATA_WIDTH-1:0] data_in[2];
     logic data_in_valid[2];
     logic data_in_ready[2];
 
-    logic [DATA_WIDTH-1: 0] data_out[2];
+    logic [DATA_WIDTH-1:0] data_out[2];
     logic data_out_valid;
     logic data_out_ready;
 
+    rv_if #(
+        .ADDR_WIDTH(1),
+        .DATA_WIDTH((DATA_WIDTH))
+    ) handshake_join_in_ch[(2)] ();
+    for (genvar ch_idx = 0; ch_idx < (2); ch_idx++) begin : connect_handshake_join_in_ch
+        assign handshake_join_in_ch[ch_idx].data = data_in[ch_idx];
+        assign handshake_join_in_ch[ch_idx].valid = data_in_valid[ch_idx];
+        assign data_in_ready[ch_idx] = handshake_join_in_ch[ch_idx].ready;
+        assign handshake_join_in_ch[ch_idx].addr = '0;
+    end
+    rv_if #(
+        .ADDR_WIDTH(1),
+        .DATA_WIDTH((DATA_WIDTH) * (2))
+    ) handshake_join_out_ch ();
+    for (genvar lane = 0; lane < (2); lane++) begin : connect_handshake_join_data_out
+        assign data_out[lane] = handshake_join_out_ch.data[lane*(DATA_WIDTH)+:(DATA_WIDTH)];
+    end
+    assign data_out_valid = handshake_join_out_ch.valid;
+    assign handshake_join_out_ch.ready = data_out_ready;
     handshake_join #(
-        .DATA_WIDTH(DATA_WIDTH /* default 64 */),
-        .N         (2 /* default 4 */)
-     ) handshake_join (
-        .clk           (clk),
-        .rst_n         (rst_n),
-        .data_in       (data_in),
-        .data_in_valid (data_in_valid),
-        .data_in_ready (data_in_ready),
-        .data_out      (data_out),
-        .data_out_valid(data_out_valid),
-        .data_out_ready(data_out_ready)
+        .DATA_WIDTH(DATA_WIDTH  /* default 64 */),
+        .N         (2  /* default 4 */)
+    ) handshake_join (
+        .clk(clk),
+        .rst_n(rst_n),
+        .in_ch(handshake_join_in_ch),
+        .out_ch(handshake_join_out_ch)
     );
 
     int pass_count = 0;
 
     task automatic clear_inputs();
-        for (int i=0; i<2; i++) begin
+        for (int i = 0; i < 2; i++) begin
             data_in[i] = '0;
             data_in_valid[i] = 1'b0;
         end
         data_out_ready = 1'b0;
     endtask
 
-    task automatic expect_bit(
-        input logic actual,
-        input logic expected,
-        input string msg
-    );
+    task automatic expect_bit(input logic actual, input logic expected, input string msg);
         if (actual !== expected) begin
             $fatal(1, "[HANDSHAKE_JOIN_TB] %s (actual=%0b expected=%0b)", msg, actual, expected);
         end
         pass_count++;
     endtask
 
-    task automatic expect_word(
-        input logic [DATA_WIDTH-1:0] actual,
-        input logic [DATA_WIDTH-1:0] expected,
-        input string msg
-    );
+    task automatic expect_word(input logic [DATA_WIDTH-1:0] actual,
+                               input logic [DATA_WIDTH-1:0] expected, input string msg);
         if (actual !== expected) begin
             $fatal(1, "[HANDSHAKE_JOIN_TB] %s (actual=%h expected=%h)", msg, actual, expected);
         end
         pass_count++;
     endtask
 
-    task automatic expect_valid_clears_within(
-        input int cycles,
-        input string msg
-    );
+    task automatic expect_valid_clears_within(input int cycles, input string msg);
         logic cleared;
         cleared = 1'b0;
-        for (int i=0; i<cycles; i++) begin
+        for (int i = 0; i < cycles; i++) begin
             @(posedge clk);
             if (data_out_valid === 1'b0) begin
                 cleared = 1'b1;

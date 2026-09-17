@@ -1,26 +1,25 @@
-module dma_src_addr#(
-    parameter int ADDR_WIDTH=32
-)(
+module dma_src_addr #(
+    parameter int ADDR_WIDTH = 32
+) (
     input logic clk,
     input logic rst_n,
 
     input logic addr_rst,
-    input logic [ADDR_WIDTH-1: 0] addr_rst_src,
-    input logic [ADDR_WIDTH-1: 0] addr_rst_step,
+    input logic [ADDR_WIDTH-1:0] addr_rst_src,
+    input logic [ADDR_WIDTH-1:0] addr_rst_step,
 
-    input logic fire_in_valid,
+    input  logic fire_in_valid,
     output logic fire_in_ready,
 
-    output logic [ADDR_WIDTH-1: 0] addr_out,
-    output logic addr_out_valid,
-    input logic addr_out_ready
+    rv_if.source read_req
 );
+    assign read_req.data = '0;
 
-    logic [ADDR_WIDTH-1: 0] addr_src;
-    logic [ADDR_WIDTH-1: 0] addr_next_src;
-    logic [ADDR_WIDTH-1: 0] addr_step;
+    logic [ADDR_WIDTH-1:0] addr_src;
+    logic [ADDR_WIDTH-1:0] addr_next_src;
+    logic [ADDR_WIDTH-1:0] addr_step;
 
-    logic [ADDR_WIDTH-1: 0] addr_skid;
+    logic [ADDR_WIDTH-1:0] addr_skid;
     logic addr_skid_valid;
 
     assign addr_next_src = addr_src + addr_step;
@@ -29,15 +28,14 @@ module dma_src_addr#(
     logic write_handshaked;
 
     assign read_handshaked = (fire_in_valid && fire_in_ready);
-    assign write_handshaked = (!addr_out_valid || (addr_out_valid && addr_out_ready)) ;
+    assign write_handshaked = (!read_req.valid || (read_req.valid && read_req.ready));
 
     assign fire_in_ready = !addr_skid_valid;
 
-    task automatic write_addr
-        (input logic [ADDR_WIDTH-1: 0] addr);
-        addr_out_valid <= 1;
+    task automatic write_addr(input logic [ADDR_WIDTH-1:0] addr);
+        read_req.valid <= 1;
 
-        addr_out <= addr;
+        read_req.addr  <= addr;
     endtask
 
     always @(posedge clk) begin
@@ -48,14 +46,14 @@ module dma_src_addr#(
             addr_src <= 0;
             addr_step <= 0;
 
-            addr_out_valid <= 0;
+            read_req.valid <= 0;
         end else begin
             if (addr_rst) begin
-                addr_src <= addr_rst_src;
+                addr_src  <= addr_rst_src;
                 addr_step <= addr_rst_step;
             end else begin
                 if (write_handshaked) begin
-                    addr_out_valid <= 0;
+                    read_req.valid <= 0;
                 end
 
                 if (write_handshaked) begin
@@ -64,10 +62,10 @@ module dma_src_addr#(
                     if (addr_skid_valid) begin
                         addr_skid_valid <= 0;
                         write_addr(addr_skid);
-                        addr_out <= addr_skid;
+                        read_req.addr <= addr_skid;
                     end else if (read_handshaked) begin
                         write_addr(addr_src);
-                        addr_out <= addr_src;
+                        read_req.addr <= addr_src;
 
                         addr_src <= addr_next_src;
                     end

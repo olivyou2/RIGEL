@@ -1,10 +1,13 @@
-module hs_prod#(BASE_NUM=0, VALID_COUNTER_START=0, VALID_COUNTER_NUM=60)(
+module hs_prod #(
+    BASE_NUM = 0,
+    VALID_COUNTER_START = 0,
+    VALID_COUNTER_NUM = 60
+) (
     input logic clk,
 
-    output logic [31:0] data,
-    output logic valid,
-    input logic ready
+    rv_if.source out_ch
 );
+    assign out_ch.addr = '0;
 
     logic desire;
     logic handshaked;
@@ -15,11 +18,11 @@ module hs_prod#(BASE_NUM=0, VALID_COUNTER_START=0, VALID_COUNTER_NUM=60)(
 
     initial begin
         desire = 1;
-        valid = 0;
+        out_ch.valid = 0;
     end
 
-    assign handshaked = valid && ready;
-    assign update = desire && (handshaked || !valid);
+    assign handshaked = out_ch.valid && out_ch.ready;
+    assign update = desire && (handshaked || !out_ch.valid);
 
     always @(posedge clk) begin
         valid_counter <= valid_counter + 1;
@@ -34,13 +37,13 @@ module hs_prod#(BASE_NUM=0, VALID_COUNTER_START=0, VALID_COUNTER_NUM=60)(
 
         // Output Consume
         if (handshaked) begin
-            valid   <= 0;
+            out_ch.valid <= 0;
         end
 
         // Data Provide
         if (update) begin
-            valid   <= 1;
-            data    <= counter;
+            out_ch.valid   <= 1;
+            out_ch.data    <= counter;
             counter <= counter + 1;
         end
     end

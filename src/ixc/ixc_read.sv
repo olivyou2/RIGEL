@@ -9,22 +9,57 @@ module ixc_read #(
     parameter SEL_WIDTH = (SLAVE_N > 1) ? $clog2(SLAVE_N) : 1,
     parameter READ_FIFO_DEPTH = 4,
     parameter READ_OUTSTANDING = 8
-)(
-    input logic clk, rst_n,
-    input logic [ADDR_WIDTH-1:0] read_addr_in[MASTER_N],
-    input logic read_addr_valid[MASTER_N],
-    output logic read_addr_ready[MASTER_N],
+) (
+    input logic clk,
+    rst_n,
+    rv_if.sink read_req[MASTER_N],
+
     input logic [SEL_WIDTH-1:0] read_sel[MASTER_N],
-    output logic [DATA_WIDTH-1:0] read_data_out[MASTER_N],
-    output logic read_data_valid[MASTER_N],
-    input logic read_data_ready[MASTER_N],
-    output logic [ADDR_WIDTH-1:0] slave_read_addr_out[SLAVE_N],
-    output logic slave_read_addr_valid[SLAVE_N],
-    input logic slave_read_addr_ready[SLAVE_N],
-    input logic [DATA_WIDTH-1:0] slave_read_data_in[SLAVE_N],
-    input logic slave_read_data_valid[SLAVE_N],
-    output logic slave_read_data_ready[SLAVE_N]
+    rv_if.source read_rsp[MASTER_N],
+
+    rv_if.source slave_read_req[SLAVE_N],
+
+    rv_if.sink slave_read_rsp[SLAVE_N]
 );
+    logic [ADDR_WIDTH-1:0] read_addr_in[MASTER_N];
+    logic read_addr_valid[MASTER_N];
+    logic read_addr_ready[MASTER_N];
+    for (genvar ch_idx = 0; ch_idx < $size(read_addr_valid); ch_idx++) begin : map_read_req
+        assign read_addr_in[ch_idx] = read_req[ch_idx].addr;
+        assign read_addr_valid[ch_idx] = read_req[ch_idx].valid;
+        assign read_req[ch_idx].ready = read_addr_ready[ch_idx];
+    end
+    logic [DATA_WIDTH-1:0] read_data_out[MASTER_N];
+    logic read_data_valid[MASTER_N];
+    logic read_data_ready[MASTER_N];
+    for (genvar ch_idx = 0; ch_idx < $size(read_data_valid); ch_idx++) begin : map_read_rsp
+        assign read_rsp[ch_idx].data   = read_data_out[ch_idx];
+        assign read_rsp[ch_idx].valid  = read_data_valid[ch_idx];
+        assign read_data_ready[ch_idx] = read_rsp[ch_idx].ready;
+        assign read_rsp[ch_idx].addr   = '0;
+    end
+    logic [ADDR_WIDTH-1:0] slave_read_addr_out[SLAVE_N];
+    logic slave_read_addr_valid[SLAVE_N];
+    logic slave_read_addr_ready[SLAVE_N];
+    for (
+        genvar ch_idx = 0; ch_idx < $size(slave_read_addr_valid); ch_idx++
+    ) begin : map_slave_read_req
+        assign slave_read_req[ch_idx].addr   = slave_read_addr_out[ch_idx];
+        assign slave_read_req[ch_idx].valid  = slave_read_addr_valid[ch_idx];
+        assign slave_read_addr_ready[ch_idx] = slave_read_req[ch_idx].ready;
+        assign slave_read_req[ch_idx].data   = '0;
+    end
+    logic [DATA_WIDTH-1:0] slave_read_data_in[SLAVE_N];
+    logic slave_read_data_valid[SLAVE_N];
+    logic slave_read_data_ready[SLAVE_N];
+    for (
+        genvar ch_idx = 0; ch_idx < $size(slave_read_data_valid); ch_idx++
+    ) begin : map_slave_read_rsp
+        assign slave_read_data_in[ch_idx] = slave_read_rsp[ch_idx].data;
+        assign slave_read_data_valid[ch_idx] = slave_read_rsp[ch_idx].valid;
+        assign slave_read_rsp[ch_idx].ready = slave_read_data_ready[ch_idx];
+    end
+
     localparam MASTER_WIDTH = (MASTER_N > 1) ? $clog2(MASTER_N) : 1;
     localparam AR_PTR_WIDTH = (READ_FIFO_DEPTH > 1) ? $clog2(READ_FIFO_DEPTH) : 1;
     localparam AR_COUNT_WIDTH = $clog2(READ_FIFO_DEPTH + 1);
@@ -44,12 +79,12 @@ module ixc_read #(
     end
 
     function automatic logic [PTR_WIDTH-1:0] next_ptr(input logic [PTR_WIDTH-1:0] ptr);
-        return (int'(ptr) == READ_OUTSTANDING-1) ? '0 : ptr + 1'b1;
+        return (int'(ptr) == READ_OUTSTANDING - 1) ? '0 : ptr + 1'b1;
     endfunction
 
-    for (genvar m=0; m<MASTER_N; m++) begin: master_queue
+    for (genvar m = 0; m < MASTER_N; m++) begin : master_queue
         logic [ADDR_WIDTH-1:0] addr_mem[READ_FIFO_DEPTH];
-        logic [SEL_WIDTH-1:0] sel_mem[READ_FIFO_DEPTH];
+        logic [ SEL_WIDTH-1:0] sel_mem [READ_FIFO_DEPTH];
         logic [AR_PTR_WIDTH-1:0] ar_head, ar_tail;
         logic [AR_COUNT_WIDTH-1:0] ar_count;
         logic ar_push;
@@ -73,9 +108,9 @@ module ixc_read #(
 
         always_comb begin
             request_take[m] = 0;
-            response_push = 0;
-            response_data = '0;
-            for (int s=0; s<SLAVE_N; s++) begin
+            response_push   = 0;
+            response_data   = '0;
+            for (int s = 0; s < SLAVE_N; s++) begin
                 if (issue[s] && int'(grant[s]) == m) request_take[m] = 1;
                 if (response_take[s] && int'(owner[s]) == m) begin
                     response_push = 1;
@@ -98,43 +133,52 @@ module ixc_read #(
                 if (ar_push) begin
                     addr_mem[ar_tail] <= read_addr_in[m];
                     sel_mem[ar_tail] <= read_sel[m];
-                    ar_tail <= (int'(ar_tail) == READ_FIFO_DEPTH-1) ? '0 : ar_tail + 1'b1;
+                    ar_tail <= (int'(ar_tail) == READ_FIFO_DEPTH - 1) ? '0 : ar_tail + 1'b1;
                 end
                 if (request_take[m]) begin
-                    ar_head <= (int'(ar_head) == READ_FIFO_DEPTH-1) ? '0 : ar_head + 1'b1;
+                    ar_head   <= (int'(ar_head) == READ_FIFO_DEPTH - 1) ? '0 : ar_head + 1'b1;
                     target[m] <= request_sel[m];
                 end
-                case ({ar_push, request_take[m]})
+                case ({
+                    ar_push, request_take[m]
+                })
                     2'b10: ar_count <= ar_count + 1'b1;
                     2'b01: ar_count <= ar_count - 1'b1;
-                    default: begin end
+                    default: begin
+                    end
                 endcase
 
                 // Reserve response space BEFORE sending AR. Even a stalled
                 // master cannot block delivery of another master's response.
-                case ({request_take[m], response_pop})
+                case ({
+                    request_take[m], response_pop
+                })
                     2'b10: inflight[m] <= inflight[m] + 1'b1;
                     2'b01: inflight[m] <= inflight[m] - 1'b1;
-                    default: begin end
+                    default: begin
+                    end
                 endcase
                 if (response_push) begin
                     response_mem[response_tail] <= response_data;
                     response_tail <= next_ptr(response_tail);
                 end
                 if (response_pop) response_head <= next_ptr(response_head);
-                case ({response_push, response_pop})
+                case ({
+                    response_push, response_pop
+                })
                     2'b10: response_count <= response_count + 1'b1;
                     2'b01: response_count <= response_count - 1'b1;
-                    default: begin end
+                    default: begin
+                    end
                 endcase
             end
         end
     end
 
-    for (genvar s=0; s<SLAVE_N; s++) begin: slave_queue
+    for (genvar s = 0; s < SLAVE_N; s++) begin : slave_queue
         // Keep the owner until R returns, but advance send_head on each AR.
         // Thus many addresses can be sent before the first response arrives.
-        logic [ADDR_WIDTH-1:0] addr_mem[READ_OUTSTANDING];
+        logic [  ADDR_WIDTH-1:0] addr_mem [READ_OUTSTANDING];
         logic [MASTER_WIDTH-1:0] owner_mem[READ_OUTSTANDING];
         logic [PTR_WIDTH-1:0] tail, send_head, response_head;
         logic [COUNT_WIDTH-1:0] count, unsent_count;
@@ -152,7 +196,7 @@ module ixc_read #(
         always_comb begin
             issue[s] = 0;
             grant[s] = '0;
-            for (int offset=0; offset<MASTER_N; offset++) begin
+            for (int offset = 0; offset < MASTER_N; offset++) begin
                 int m;
                 m = int'(robin) + offset;
                 if (m >= MASTER_N) m = m - MASTER_N;
@@ -180,19 +224,25 @@ module ixc_read #(
                     addr_mem[tail] <= request_addr[grant[s]];
                     owner_mem[tail] <= grant[s];
                     tail <= next_ptr(tail);
-                    robin <= (int'(grant[s]) == MASTER_N-1) ? '0 : grant[s] + 1'b1;
+                    robin <= (int'(grant[s]) == MASTER_N - 1) ? '0 : grant[s] + 1'b1;
                 end
                 if (addr_take) send_head <= next_ptr(send_head);
                 if (response_take[s]) response_head <= next_ptr(response_head);
-                case ({issue[s], response_take[s]})
+                case ({
+                    issue[s], response_take[s]
+                })
                     2'b10: count <= count + 1'b1;
                     2'b01: count <= count - 1'b1;
-                    default: begin end
+                    default: begin
+                    end
                 endcase
-                case ({issue[s], addr_take})
+                case ({
+                    issue[s], addr_take
+                })
                     2'b10: unsent_count <= unsent_count + 1'b1;
                     2'b01: unsent_count <= unsent_count - 1'b1;
-                    default: begin end
+                    default: begin
+                    end
                 endcase
             end
         end

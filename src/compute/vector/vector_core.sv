@@ -5,17 +5,19 @@ module vector_core#(
     input logic clk,
     input logic rst_n,
 
-    input logic [DATA_WIDTH-1: 0] lane_in_a[LANE_SIZE],
-    input logic [DATA_WIDTH-1: 0] lane_in_b[LANE_SIZE],
-
-    input logic valid,
-    output logic ready,
-
-    input logic [4:0] opcode,
-    
-    output logic [DATA_WIDTH-1: 0] lane_out[LANE_SIZE]
+    rv_if.sink in_ch,
+    rv_if.source out_ch
 );
 
+    vector_alu #(
+        .DATA_WIDTH(DATA_WIDTH /* default 8 */),
+        .LANE_SIZE (LANE_SIZE /* default 16 */)
+     ) vector_alu (
+        .clk   (clk),
+        .rst_n (rst_n),
+        .in_ch (in_ch),
+        .out_ch(out_ch)
+    );
     /**
         * ALU Operation *
           Add

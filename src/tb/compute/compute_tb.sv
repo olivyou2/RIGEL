@@ -1,5 +1,3 @@
-`timescale 1ns/1ps
-
 module compute_tb;
     localparam ADDR_WIDTH = 32;
     localparam DATA_WIDTH = 128;
@@ -26,28 +24,41 @@ module compute_tb;
 
     always #1 clk = ~clk;
 
+    rv_if #(
+        .ADDR_WIDTH((ADDR_WIDTH)),
+        .DATA_WIDTH(1)
+    ) dut_read_req ();
+    assign dut_read_req.addr = read_addr_in;
+    assign dut_read_req.valid = read_addr_valid;
+    assign read_addr_ready = dut_read_req.ready;
+    assign dut_read_req.data = '0;
+    rv_if #(
+        .ADDR_WIDTH(1),
+        .DATA_WIDTH((DATA_WIDTH))
+    ) dut_read_rsp ();
+    assign read_data_out = dut_read_rsp.data;
+    assign read_data_valid = dut_read_rsp.valid;
+    assign dut_read_rsp.ready = read_data_ready;
+    rv_if #(
+        .ADDR_WIDTH((ADDR_WIDTH)),
+        .DATA_WIDTH((DATA_WIDTH))
+    ) dut_write_req ();
+    assign dut_write_req.addr = write_addr_in;
+    assign dut_write_req.data = write_data_in;
+    assign dut_write_req.valid = write_data_valid;
+    assign write_data_ready = dut_write_req.ready;
     compute #(
         .ADDR_WIDTH(ADDR_WIDTH),
         .DATA_WIDTH(DATA_WIDTH)
     ) dut (
         .clk(clk),
         .rst_n(rst_n),
-        .read_addr_in(read_addr_in),
-        .read_addr_valid(read_addr_valid),
-        .read_addr_ready(read_addr_ready),
-        .read_data_out(read_data_out),
-        .read_data_valid(read_data_valid),
-        .read_data_ready(read_data_ready),
-        .write_addr_in(write_addr_in),
-        .write_data_in(write_data_in),
-        .write_data_valid(write_data_valid),
-        .write_data_ready(write_data_ready)
+        .read_req(dut_read_req),
+        .read_rsp(dut_read_rsp),
+        .write_req(dut_write_req)
     );
 
-    task automatic write_data(
-        input logic [ADDR_WIDTH-1:0] addr,
-        input logic [DATA_WIDTH-1:0] data
-    );
+    task automatic write_data(input logic [ADDR_WIDTH-1:0] addr, input logic [DATA_WIDTH-1:0] data);
         @(negedge clk);
         write_addr_in = addr;
         write_data_in = data;
@@ -65,7 +76,7 @@ module compute_tb;
         read_addr_in = addr;
         read_addr_valid = 1;
 
-        do begin 
+        do begin
             @(posedge clk);
         end while (read_addr_ready !== 1'b1);
 
@@ -73,7 +84,8 @@ module compute_tb;
         read_addr_valid = 0;
     endtask
 
-    task automatic read_request_wait(input logic [ADDR_WIDTH-1:0] addr, output logic [DATA_WIDTH-1: 0]data);
+    task automatic read_request_wait(input logic [ADDR_WIDTH-1:0] addr,
+                                     output logic [DATA_WIDTH-1:0] data);
         read_request(addr);
 
         do begin
@@ -101,21 +113,18 @@ module compute_tb;
     end
 
     task automatic run_dma(
-        input logic [ADDR_WIDTH-1: 0] src_addr,
-        input logic [ADDR_WIDTH-1: 0] dst_addr,
-        input logic [ADDR_WIDTH-1: 0] step_size,
-        input logic [ADDR_WIDTH-1: 0] length,
-        input logic [ADDR_WIDTH-1: 0] dma_idx
-    );
-        write_data({23'd0, 3'(dma_idx), 3'd0, 3'b0}, length);       // LENGTH
-        write_data({23'd0, 3'(dma_idx), 3'd1, 3'b0}, step_size);    // STEP
-        write_data({23'd0, 3'(dma_idx), 3'd2, 3'b0}, src_addr);     // SRC
-        write_data({23'd0, 3'(dma_idx), 3'd3, 3'b0}, dst_addr);     // DST
-        write_data({23'd0, 3'(dma_idx), 3'd4, 3'b0}, 1);            // FIRE
+        input logic [ADDR_WIDTH-1:0] src_addr, input logic [ADDR_WIDTH-1:0] dst_addr,
+        input logic [ADDR_WIDTH-1:0] step_size, input logic [ADDR_WIDTH-1:0] length,
+        input logic [ADDR_WIDTH-1:0] dma_idx);
+        write_data({23'd0, 3'(dma_idx), 3'd0, 3'b0}, length);  // LENGTH
+        write_data({23'd0, 3'(dma_idx), 3'd1, 3'b0}, step_size);  // STEP
+        write_data({23'd0, 3'(dma_idx), 3'd2, 3'b0}, src_addr);  // SRC
+        write_data({23'd0, 3'(dma_idx), 3'd3, 3'b0}, dst_addr);  // DST
+        write_data({23'd0, 3'(dma_idx), 3'd4, 3'b0}, 1);  // FIRE
 
         // IXC가 FIRE 쓰기를 버퍼링하므로 실제 DMA 시작까지 기다림
         do @(posedge clk);
-        while (!(dut.dma_fire_valid[dma_idx] && dut.dma_fire_ready[dma_idx]));
+        while (!(dut.dma_ctrl[DMA_INDEX].valid && dut.dma_ctrl[DMA_INDEX].ready));
         @(negedge clk);
 
     endtask
@@ -130,14 +139,15 @@ module compute_tb;
         write_data(32'h0000_1010, {32'hDEADBEEF, 32'h0});
         write_data(32'h0000_1020, {32'hDEADBEEF, 64'h0});
         write_data(32'h0000_1030, {32'hDEADBEEF, 96'h0});
-        
+
         // 설정 전부터 완료 확인까지 측정: 설정/상태 폴링 지연 포함
         timer_t = cycle_count;
-        run_dma(32'h0000_1000, 32'h0000_5000, DATA_WIDTH/8, DMA_BYTES, DMA_INDEX);
-        
-        do read_request_wait({23'd0, 3'(DMA_INDEX), 3'd5, 3'b0}, dma_status);
+        run_dma(32'h0000_1000, 32'h0000_5000, DATA_WIDTH / 8, DMA_BYTES, DMA_INDEX);
+
+        do
+            read_request_wait({23'd0, 3'(DMA_INDEX), 3'd5, 3'b0}, dma_status);
         while (dma_status[0] !== 1'b1);
-        
+
         timer_t = cycle_count - timer_t;
 
         $display("DMA Transfer rate (setup + polling) = %0.3f bytes/clock (%0d bytes / %0d clocks)",

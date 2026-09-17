@@ -15,7 +15,11 @@ proc find_files {base_dir patterns} {
     return $files
 }
 
-set sv_files [find_files ./src {*.sv}]
+set interface_file ./src/interfaces/rv_if.sv
+set sv_files [list $interface_file]
+foreach f [find_files ./src {*.sv}] {
+    if {$f ne $interface_file} { lappend sv_files $f }
+}
 
 read_verilog -sv $sv_files
 

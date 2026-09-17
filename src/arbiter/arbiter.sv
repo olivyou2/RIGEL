@@ -1,49 +1,53 @@
 // N->1 arbiter
 
-module arbiter#(
-    DATA_WIDTH=64,
-    N=2
-)(
+module arbiter #(
+    DATA_WIDTH = 64,
+    N = 2
+) (
     input logic clk,
     input logic rst_n,
 
-    input logic [DATA_WIDTH-1: 0] data_in[N],
-    input logic data_valid[N],
-    output logic data_ready[N],
+    rv_if.sink in_ch[N],
 
-    output logic [DATA_WIDTH-1: 0] data_out,
-    output logic data_out_valid,
-    input logic data_out_ready,
-    output logic [$clog2(N)-1: 0] data_out_sel
+    rv_if.source out_ch,
+
+    output logic [$clog2(N)-1:0] data_out_sel
 );
+    logic [DATA_WIDTH-1:0] data_in[N];
+    logic data_valid[N];
+    logic data_ready[N];
+    for (genvar ch_idx = 0; ch_idx < $size(data_valid); ch_idx++) begin : map_in_ch
+        assign data_in[ch_idx] = in_ch[ch_idx].data;
+        assign data_valid[ch_idx] = in_ch[ch_idx].valid;
+        assign in_ch[ch_idx].ready = data_ready[ch_idx];
+    end
+    assign out_ch.addr = '0;
 
     localparam N_WIDTH = $clog2(N);
 
     initial begin
-        if (N <= 0 || (N & (N - 1)) != 0)
-            $fatal(1, "N (%0d) must be a power of 2", N);
+        if (N <= 0 || (N & (N - 1)) != 0) $fatal(1, "N (%0d) must be a power of 2", N);
 
-        if (N == 1)
-            $fatal(1, "N must be greater than 1");
+        if (N == 1) $fatal(1, "N must be greater than 1");
     end
 
-    logic [N_WIDTH-1: 0]    robin_idx = 0;
+    logic [N_WIDTH-1:0] robin_idx = 0;
 
-    logic [N_WIDTH-1: 0]    crop_i;
-    logic [N_WIDTH-1: 0]    select;
-    logic                   select_valid;
-    
-    logic data_out_handshaked;
-    assign data_out_handshaked = data_out_valid && data_out_ready;
+    logic [N_WIDTH-1:0] crop_i;
+    logic [N_WIDTH-1:0] select;
+    logic               select_valid;
+
+    logic               data_out_handshaked;
+    assign data_out_handshaked = out_ch.valid && out_ch.ready;
 
     logic writable;
-    assign writable = !data_out_valid || data_out_handshaked;
+    assign writable = !out_ch.valid || data_out_handshaked;
 
     always_comb begin
         select = 0;
         select_valid = 0;
 
-        for (logic [N_WIDTH: 0] i=0; i<N; i++) begin
+        for (logic [N_WIDTH:0] i = 0; i < N; i++) begin
             data_ready[i] = 0;
             crop_i = i + robin_idx;
 
@@ -61,24 +65,24 @@ module arbiter#(
     always @(posedge clk) begin
         if (!rst_n) begin
             robin_idx <= 0;
-            data_out_valid <= 0;
+            out_ch.valid <= 0;
         end else begin
             if (data_out_handshaked) begin
-                data_out_valid <= 0;
+                out_ch.valid <= 0;
             end
 
             if (select_valid && writable) begin
-                data_out_valid <= 1;
+                out_ch.valid <= 1;
                 data_out_sel <= select;
-                data_out <= data_in[select];
+                out_ch.data <= data_in[select];
 
                 robin_idx <= select + 1;
             end
         end
     end
-    
+
     initial begin
-        data_out_valid = 0;
+        out_ch.valid = 0;
     end
 
 endmodule

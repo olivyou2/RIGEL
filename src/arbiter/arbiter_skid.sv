@@ -1,53 +1,56 @@
-// N->1 arbiter
-
-module arbiter_skid#(
-    DATA_WIDTH=64,
-    N=2
-)(
+// N-to-1 data arbiter with a registered output and matching selection tag.
+module arbiter_skid #(
+    parameter DATA_WIDTH = 64,
+    parameter N = 2
+) (
     input logic clk,
     input logic rst_n,
-
-    input logic [DATA_WIDTH-1: 0] data_in[N],
-    input logic data_valid[N],
-    output logic data_ready[N],
-
-    output logic [DATA_WIDTH-1: 0] data_out,
-    output logic data_out_valid,
-    input logic data_out_ready,
-    output logic [$clog2(N)-1: 0] data_out_sel
+    rv_if.sink in_ch[N],
+    rv_if.source out_ch,
+    output logic [$clog2(N)-1:0] data_out_sel
 );
     localparam N_WIDTH = $clog2(N);
-    logic [DATA_WIDTH-1:0] skid_data_in;
-    logic skid_data_in_valid;
-    logic skid_data_in_ready;
-    logic [N_WIDTH-1: 0] skid_data_sel;
+    logic [N_WIDTH-1:0] selected;
+    rv_if #(
+        .ADDR_WIDTH(1),
+        .DATA_WIDTH(DATA_WIDTH)
+    ) arbitrated ();
+    rv_if #(
+        .ADDR_WIDTH(1),
+        .DATA_WIDTH(DATA_WIDTH + N_WIDTH)
+    ) tagged_in ();
+    rv_if #(
+        .ADDR_WIDTH(1),
+        .DATA_WIDTH(DATA_WIDTH + N_WIDTH)
+    ) tagged_out ();
 
     arbiter #(
-        .DATA_WIDTH(DATA_WIDTH /* default 64 */),
-        .N         (N /* default 2 */)
-     ) arbiter (
-        .clk           (clk),
-        .rst_n         (rst_n),
-        .data_in       (data_in),
-        .data_valid    (data_valid),
-        .data_ready    (data_ready),
-        .data_out      (skid_data_in),
-        .data_out_valid(skid_data_in_valid),
-        .data_out_ready(skid_data_in_ready),
-        .data_out_sel(skid_data_sel)
+        .DATA_WIDTH(DATA_WIDTH),
+        .N(N)
+    ) arbiter (
+        .clk(clk),
+        .rst_n(rst_n),
+        .in_ch(in_ch),
+        .out_ch(arbitrated),
+        .data_out_sel(selected)
     );
+
+    assign tagged_in.addr   = '0;
+    assign tagged_in.data   = {arbitrated.data, selected};
+    assign tagged_in.valid  = arbitrated.valid;
+    assign arbitrated.ready = tagged_in.ready;
 
     skid #(
-        .DATA_WIDTH(DATA_WIDTH+N_WIDTH /* default 64 */)
-     ) skid (
-        .clk           (clk),
-        .rst_n          (rst_n),
-        .data_in       ({skid_data_in, skid_data_sel}),
-        .data_in_valid (skid_data_in_valid),
-        .data_in_ready (skid_data_in_ready),
-        .data_out      ({data_out, data_out_sel}),
-        .data_out_valid(data_out_valid),
-        .data_out_ready(data_out_ready)
+        .DATA_WIDTH(DATA_WIDTH + N_WIDTH)
+    ) skid (
+        .clk(clk),
+        .rst_n(rst_n),
+        .in_ch(tagged_in),
+        .out_ch(tagged_out)
     );
 
+    assign out_ch.addr = '0;
+    assign {out_ch.data, data_out_sel} = tagged_out.data;
+    assign out_ch.valid = tagged_out.valid;
+    assign tagged_out.ready = out_ch.ready;
 endmodule

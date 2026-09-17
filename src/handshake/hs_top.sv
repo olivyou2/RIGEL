@@ -1,38 +1,31 @@
-module hs_top();
+module hs_top ();
     logic clk = 0;
     always #1 clk = !clk;
 
-    logic [31:0] ptb_data;
-    logic ptb_valid;
-    logic ptb_ready;
+    rv_if #(
+        .ADDR_WIDTH(1),
+        .DATA_WIDTH(32)
+    ) prod_out_ch ();
 
-    logic [31:0] btc_data;
-    logic btc_out_valid;
-    logic btc_out_ready;
-
-    hs_prod prod(
+    hs_prod prod (
         .clk(clk),
-        .data(ptb_data),
-        .valid(ptb_valid),
-        .ready(ptb_ready)
+        .out_ch(prod_out_ch)
     );
 
-    hs_bridge bridge(
-        .clk(clk),
-        .data_in(ptb_data),
-        .data_in_valid(ptb_valid),
-        .data_in_ready(ptb_ready),
+    rv_if #(
+        .ADDR_WIDTH(1),
+        .DATA_WIDTH(32)
+    ) bridge_out_ch ();
 
-        .data_out(btc_data),
-        .data_out_valid(btc_out_valid),
-        .data_out_ready(btc_out_ready)
+    hs_bridge bridge (
+        .clk(clk),
+        .in_ch(prod_out_ch),
+        .out_ch(bridge_out_ch)
     );
 
-    hs_cons cons(
-        .clk(clk),
-        .data(btc_data),
-        .valid(btc_out_valid),
-        .ready(btc_out_ready)
+    hs_cons cons (
+        .clk  (clk),
+        .in_ch(bridge_out_ch)
     );
 
     initial begin

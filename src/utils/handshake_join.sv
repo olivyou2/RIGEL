@@ -1,70 +1,47 @@
-module handshake_join#(
+module handshake_join #(
     parameter DATA_WIDTH = 64,
     parameter N = 4
-)(
+) (
     input logic clk,
     input logic rst_n,
-
-    input logic [DATA_WIDTH-1: 0] data_in[N],
-    input logic data_in_valid[N],
-    output logic data_in_ready[N],
-
-    output logic [DATA_WIDTH-1: 0] data_out[N],
-    output logic data_out_valid,
-    input logic data_out_ready
+    rv_if.sink in_ch[N],
+    // One atomic transfer containing N words; word i is data[i*DATA_WIDTH +: DATA_WIDTH].
+    rv_if.source out_ch
 );
-    logic [DATA_WIDTH-1: 0] skid_out_data[N];
-    logic [N-1: 0] skid_out_valid;
-    logic elem_skid_out_valid;
-    logic elem_skid_out_ready;
-    
-    always @(*) begin
-        elem_skid_out_valid = &skid_out_valid;
-    end
+    rv_if #(
+        .ADDR_WIDTH(1),
+        .DATA_WIDTH(DATA_WIDTH)
+    ) buffered[N] ();
+    rv_if #(
+        .ADDR_WIDTH(1),
+        .DATA_WIDTH(DATA_WIDTH * N)
+    ) joined ();
+    logic [N-1:0] buffered_valid;
 
-    genvar i;
-    generate
-        for (i=0; i<N; i++) begin
-            skid #(
-                .DATA_WIDTH(DATA_WIDTH /* default 64 */)
-             ) skid (
-                .clk           (clk),
-                .rst_n         (rst_n),
-                .data_in       (data_in[i]),
-                .data_in_valid (data_in_valid[i]),
-                .data_in_ready (data_in_ready[i]),
-                .data_out      (skid_out_data[i]),
-                .data_out_valid(skid_out_valid[i]),
-                .data_out_ready(elem_skid_out_valid && elem_skid_out_ready)
-            );
-        end
-    endgenerate
+    assign joined.addr  = '0;
+    assign joined.valid = &buffered_valid;
 
-    logic [DATA_WIDTH*N-1:0] joined_data_in;
-    logic [DATA_WIDTH*N-1:0] joined_data_out;
+    for (genvar i = 0; i < N; i++) begin : input_buffers
+        assign buffered_valid[i] = buffered[i].valid;
+        assign joined.data[i*DATA_WIDTH+:DATA_WIDTH] = buffered[i].data;
+        assign buffered[i].ready = joined.valid && joined.ready;
 
-    always @(*) begin
-        for (int idx=0; idx<N; idx++) begin
-            joined_data_in[idx*DATA_WIDTH +: DATA_WIDTH] = skid_out_data[idx];
-        end
-
-
-        for (int idx=0; idx<N; idx++) begin
-            data_out[idx] = joined_data_out[idx*DATA_WIDTH +: DATA_WIDTH];
-        end
+        skid #(
+            .DATA_WIDTH(DATA_WIDTH)
+        ) input_skid (
+            .clk(clk),
+            .rst_n(rst_n),
+            .in_ch(in_ch[i]),
+            .out_ch(buffered[i])
+        );
     end
 
     skid #(
-        .DATA_WIDTH(DATA_WIDTH*N /* default 64 */)
-     ) skid_out (
-        .clk           (clk),
-        .rst_n         (rst_n),
-        .data_in       (joined_data_in),
-        .data_in_valid (elem_skid_out_valid),
-        .data_in_ready (elem_skid_out_ready),
-        .data_out      (joined_data_out),
-        .data_out_valid(data_out_valid),
-        .data_out_ready(data_out_ready)
+        .DATA_WIDTH(DATA_WIDTH * N)
+    ) output_skid (
+        .clk(clk),
+        .rst_n(rst_n),
+        .in_ch(joined),
+        .out_ch(out_ch)
     );
-
 endmodule
