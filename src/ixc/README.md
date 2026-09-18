@@ -28,9 +28,11 @@ Each master has a registered read request slot and a two-entry write input FIFO.
 Each slave has a two-entry write output FIFO containing address, data and owner. Each slave
 arbitrates only requests whose captured selection matches that slave. Read and
 write have independent round-robin pointers, advanced when the winning request
-enters the slave output register. Counts of one and non-power-of-two counts are
-supported; the existing `arbiter` module requires powers of two greater than one,
-so this controller implements its own round-robin selection.
+enters the slave output register. `ixc_rr_arbiter.sv` evaluates the fixed-priority
+result for every possible round-robin starting point in parallel, then selects
+with the registered pointer. Its one-hot result feeds queue bookkeeping directly,
+avoiding an encode/decode path through the controller. Counts of one and
+non-power-of-two counts are supported.
 
 Read requests reserve a master response register until the master consumes the
 response. Each slave tracks one owner until its response is captured. Thus there

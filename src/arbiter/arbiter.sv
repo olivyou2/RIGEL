@@ -1,8 +1,9 @@
 // N->1 arbiter
 
 module arbiter #(
-    DATA_WIDTH = 64,
-    N = 2
+    parameter DATA_WIDTH = 64,
+    parameter ADDR_WIDTH = 32,
+    parameter N = 2
 ) (
     input logic clk,
     input logic rst_n,
@@ -14,14 +15,15 @@ module arbiter #(
     output logic [$clog2(N)-1:0] data_out_sel
 );
     logic [DATA_WIDTH-1:0] data_in[N];
+    logic [ADDR_WIDTH-1:0] addr_in[N];
     logic data_valid[N];
     logic data_ready[N];
     for (genvar ch_idx = 0; ch_idx < $size(data_valid); ch_idx++) begin : map_in_ch
         assign data_in[ch_idx] = in_ch[ch_idx].data;
+        assign addr_in[ch_idx] = in_ch[ch_idx].addr;
         assign data_valid[ch_idx] = in_ch[ch_idx].valid;
         assign in_ch[ch_idx].ready = data_ready[ch_idx];
     end
-    assign out_ch.addr = '0;
 
     localparam N_WIDTH = $clog2(N);
 
@@ -75,6 +77,7 @@ module arbiter #(
                 out_ch.valid <= 1;
                 data_out_sel <= select;
                 out_ch.data <= data_in[select];
+                out_ch.addr <= addr_in[select];
 
                 robin_idx <= select + 1;
             end

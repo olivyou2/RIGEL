@@ -1,0 +1,1280 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2026.1 (win64) Build 6511674 Tue Jun 16 11:02:23 MDT 2026
+| Date         : Fri Sep 18 12:06:35 2026
+| Host         : DESKTOP-2MR89AG running 64-bit major release  (build 9200)
+| Command      : report_timing -delay_type max -sort_by slack -max_paths 20 -nworst 1 -file reports/post_place_timing.rpt
+| Design       : compute
+| Device       : 7k480t-ffg1156
+| Speed File   : -2  PRODUCTION 1.12 2017-02-17
+| Design State : Physopt postPlace
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Timing Report
+
+Slack (MET) :             1.195ns  (required time - arrival time)
+  Source:                 ixc/control/write_master_control[0].write_input_head_reg[0]/C
+                            (rising edge-triggered cell FDRE clocked by sys_clk  {rise@0.000ns fall@2.500ns period=5.000ns})
+  Destination:            ixc/write_data_buffer_reg[0][1][0]/D
+                            (rising edge-triggered cell FDRE clocked by sys_clk  {rise@0.000ns fall@2.500ns period=5.000ns})
+  Path Group:             sys_clk
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            5.000ns  (sys_clk rise@5.000ns - sys_clk rise@0.000ns)
+  Data Path Delay:        3.637ns  (logic 0.541ns (14.875%)  route 3.096ns (85.125%))
+  Logic Levels:           6  (LUT3=1 LUT4=1 LUT5=1 LUT6=2 MUXF7=1)
+  Clock Path Skew:        -0.034ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    4.815ns = ( 9.815 - 5.000 ) 
+    Source Clock Delay      (SCD):    5.156ns
+    Clock Pessimism Removal (CPR):    0.308ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock sys_clk rise edge)    0.000     0.000 r  <hidden>
+    AL20                                              0.000     0.000 r  clk
+                         net (fo=0)                   0.000     0.000    clk
+    AL20                 IBUF (Prop_ibuf_I_O)         0.776     0.776 r  clk_IBUF_inst/O
+                         net (fo=1, estimated)        2.715     3.491    clk_IBUF
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.093     3.584 r  clk_IBUF_BUFG_inst/O
+                         net (fo=1524, estimated)     1.572     5.156    ixc/control/clk_IBUF_BUFG
+    SLICE_X4Y124         FDRE                                         r  ixc/control/write_master_control[0].write_input_head_reg[0]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X4Y124         FDRE (Prop_fdre_C_Q)         0.223     5.379 r  ixc/control/write_master_control[0].write_input_head_reg[0]/Q
+                         net (fo=42, estimated)       0.517     5.896    ixc/control/write_input_head[0]_0
+    SLICE_X5Y121         LUT3 (Prop_lut3_I1_O)        0.043     5.939 r  ixc/control/write_master_control[0].write_target[0][0]_i_2/O
+                         net (fo=7, estimated)        0.503     6.442    ixc/control/write_sel_reg[0]0[0]
+    SLICE_X5Y123         LUT6 (Prop_lut6_I0_O)        0.043     6.485 f  ixc/control/write_robin[1][1]_i_6/O
+                         net (fo=6, estimated)        0.302     6.787    ixc/control/write_robin[1][1]_i_6_n_0
+    SLICE_X4Y122         LUT5 (Prop_lut5_I4_O)        0.043     6.830 r  ixc/control/write_robin[0][1]_i_9/O
+                         net (fo=6, estimated)        0.300     7.130    ixc/control/write_arb_request[0]_15[0]
+    SLICE_X4Y121         LUT6 (Prop_lut6_I4_O)        0.043     7.173 f  ixc/control/slave_control[0].write_owner[0][1][1]_i_2/O
+                         net (fo=78, estimated)       0.883     8.056    ixc/control/write_grant[0]_13[1]
+    SLICE_X12Y107        LUT4 (Prop_lut4_I3_O)        0.043     8.099 r  ixc/control/write_data_buffer[0][1][0]_i_3/O
+                         net (fo=1, routed)           0.000     8.099    ixc/control/write_data_buffer[0][1][0]_i_3_n_0
+    SLICE_X12Y107        MUXF7 (Prop_muxf7_I1_O)      0.103     8.202 r  ixc/control/write_data_buffer_reg[0][1][0]_i_1/O
+                         net (fo=2, estimated)        0.591     8.793    ixc/control_n_60
+    SLICE_X3Y110         FDRE                                         r  ixc/write_data_buffer_reg[0][1][0]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock sys_clk rise edge)    5.000     5.000 r  <hidden>
+    AL20                                              0.000     5.000 r  clk
+                         net (fo=0)                   0.000     5.000    clk
+    AL20                 IBUF (Prop_ibuf_I_O)         0.701     5.701 r  clk_IBUF_inst/O
+                         net (fo=1, estimated)        2.579     8.281    clk_IBUF
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.083     8.364 r  clk_IBUF_BUFG_inst/O
+                         net (fo=1524, estimated)     1.451     9.815    ixc/clk_IBUF_BUFG
+    SLICE_X3Y110         FDRE                                         r  ixc/write_data_buffer_reg[0][1][0]/C
+                         clock pessimism              0.308    10.122    <hidden>
+                         clock uncertainty           -0.035    10.087    <hidden>
+    SLICE_X3Y110         FDRE (Setup_fdre_C_D)       -0.099     9.988    ixc/write_data_buffer_reg[0][1][0]
+  -------------------------------------------------------------------
+                         required time                          9.988    <hidden>
+                         arrival time                          -8.793    <hidden>
+  -------------------------------------------------------------------
+                         slack                                  1.195    <hidden>
+
+Slack (MET) :             1.207ns  (required time - arrival time)
+  Source:                 ixc/control/write_master_control[0].write_input_head_reg[0]/C
+                            (rising edge-triggered cell FDRE clocked by sys_clk  {rise@0.000ns fall@2.500ns period=5.000ns})
+  Destination:            ixc/write_data_buffer_reg[0][1][1]/D
+                            (rising edge-triggered cell FDRE clocked by sys_clk  {rise@0.000ns fall@2.500ns period=5.000ns})
+  Path Group:             sys_clk
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            5.000ns  (sys_clk rise@5.000ns - sys_clk rise@0.000ns)
+  Data Path Delay:        3.615ns  (logic 0.542ns (14.993%)  route 3.073ns (85.007%))
+  Logic Levels:           5  (LUT3=1 LUT5=1 LUT6=2 MUXF7=1)
+  Clock Path Skew:        -0.088ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    4.761ns = ( 9.761 - 5.000 ) 
+    Source Clock Delay      (SCD):    5.156ns
+    Clock Pessimism Removal (CPR):    0.308ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock sys_clk rise edge)    0.000     0.000 r  <hidden>
+    AL20                                              0.000     0.000 r  clk
+                         net (fo=0)                   0.000     0.000    clk
+    AL20                 IBUF (Prop_ibuf_I_O)         0.776     0.776 r  clk_IBUF_inst/O
+                         net (fo=1, estimated)        2.715     3.491    clk_IBUF
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.093     3.584 r  clk_IBUF_BUFG_inst/O
+                         net (fo=1524, estimated)     1.572     5.156    ixc/control/clk_IBUF_BUFG
+    SLICE_X4Y124         FDRE                                         r  ixc/control/write_master_control[0].write_input_head_reg[0]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X4Y124         FDRE (Prop_fdre_C_Q)         0.223     5.379 r  ixc/control/write_master_control[0].write_input_head_reg[0]/Q
+                         net (fo=42, estimated)       0.517     5.896    ixc/control/write_input_head[0]_0
+    SLICE_X5Y121         LUT3 (Prop_lut3_I1_O)        0.043     5.939 r  ixc/control/write_master_control[0].write_target[0][0]_i_2/O
+                         net (fo=7, estimated)        0.503     6.442    ixc/control/write_sel_reg[0]0[0]
+    SLICE_X5Y123         LUT6 (Prop_lut6_I0_O)        0.043     6.485 r  ixc/control/write_robin[1][1]_i_6/O
+                         net (fo=6, estimated)        0.302     6.787    ixc/control/write_robin[1][1]_i_6_n_0
+    SLICE_X4Y122         LUT5 (Prop_lut5_I4_O)        0.043     6.830 f  ixc/control/write_robin[0][1]_i_9/O
+                         net (fo=6, estimated)        0.363     7.193    ixc/control/write_arb_request[0]_15[0]
+    SLICE_X5Y121         LUT6 (Prop_lut6_I2_O)        0.043     7.236 r  ixc/control/slave_control[0].write_owner[0][1][0]_i_2/O
+                         net (fo=40, estimated)       0.827     8.063    ixc/control/write_grant[0]_13[0]
+    SLICE_X13Y107        MUXF7 (Prop_muxf7_S_O)       0.147     8.210 r  ixc/control/write_data_buffer_reg[0][1][1]_i_1/O
+                         net (fo=2, estimated)        0.561     8.771    ixc/control_n_59
+    SLICE_X10Y108        FDRE                                         r  ixc/write_data_buffer_reg[0][1][1]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock sys_clk rise edge)    5.000     5.000 r  <hidden>
+    AL20                                              0.000     5.000 r  clk
+                         net (fo=0)                   0.000     5.000    clk
+    AL20                 IBUF (Prop_ibuf_I_O)         0.701     5.701 r  clk_IBUF_inst/O
+                         net (fo=1, estimated)        2.579     8.281    clk_IBUF
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.083     8.364 r  clk_IBUF_BUFG_inst/O
+                         net (fo=1524, estimated)     1.397     9.761    ixc/clk_IBUF_BUFG
+    SLICE_X10Y108        FDRE                                         r  ixc/write_data_buffer_reg[0][1][1]/C
+                         clock pessimism              0.308    10.068    <hidden>
+                         clock uncertainty           -0.035    10.033    <hidden>
+    SLICE_X10Y108        FDRE (Setup_fdre_C_D)       -0.055     9.978    ixc/write_data_buffer_reg[0][1][1]
+  -------------------------------------------------------------------
+                         required time                          9.978    <hidden>
+                         arrival time                          -8.771    <hidden>
+  -------------------------------------------------------------------
+                         slack                                  1.207    <hidden>
+
+Slack (MET) :             1.213ns  (required time - arrival time)
+  Source:                 ixc/control/write_master_control[0].write_input_head_reg[0]/C
+                            (rising edge-triggered cell FDRE clocked by sys_clk  {rise@0.000ns fall@2.500ns period=5.000ns})
+  Destination:            ixc/write_data_buffer_reg[0][1][18]/D
+                            (rising edge-triggered cell FDRE clocked by sys_clk  {rise@0.000ns fall@2.500ns period=5.000ns})
+  Path Group:             sys_clk
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            5.000ns  (sys_clk rise@5.000ns - sys_clk rise@0.000ns)
+  Data Path Delay:        3.565ns  (logic 0.555ns (15.568%)  route 3.010ns (84.432%))
+  Logic Levels:           6  (LUT3=1 LUT4=1 LUT5=1 LUT6=2 MUXF7=1)
+  Clock Path Skew:        -0.095ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    4.754ns = ( 9.754 - 5.000 ) 
+    Source Clock Delay      (SCD):    5.156ns
+    Clock Pessimism Removal (CPR):    0.308ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock sys_clk rise edge)    0.000     0.000 r  <hidden>
+    AL20                                              0.000     0.000 r  clk
+                         net (fo=0)                   0.000     0.000    clk
+    AL20                 IBUF (Prop_ibuf_I_O)         0.776     0.776 r  clk_IBUF_inst/O
+                         net (fo=1, estimated)        2.715     3.491    clk_IBUF
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.093     3.584 r  clk_IBUF_BUFG_inst/O
+                         net (fo=1524, estimated)     1.572     5.156    ixc/control/clk_IBUF_BUFG
+    SLICE_X4Y124         FDRE                                         r  ixc/control/write_master_control[0].write_input_head_reg[0]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X4Y124         FDRE (Prop_fdre_C_Q)         0.223     5.379 r  ixc/control/write_master_control[0].write_input_head_reg[0]/Q
+                         net (fo=42, estimated)       0.517     5.896    ixc/control/write_input_head[0]_0
+    SLICE_X5Y121         LUT3 (Prop_lut3_I1_O)        0.043     5.939 r  ixc/control/write_master_control[0].write_target[0][0]_i_2/O
+                         net (fo=7, estimated)        0.503     6.442    ixc/control/write_sel_reg[0]0[0]
+    SLICE_X5Y123         LUT6 (Prop_lut6_I0_O)        0.043     6.485 f  ixc/control/write_robin[1][1]_i_6/O
+                         net (fo=6, estimated)        0.302     6.787    ixc/control/write_robin[1][1]_i_6_n_0
+    SLICE_X4Y122         LUT5 (Prop_lut5_I4_O)        0.043     6.830 r  ixc/control/write_robin[0][1]_i_9/O
+                         net (fo=6, estimated)        0.300     7.130    ixc/control/write_arb_request[0]_15[0]
+    SLICE_X4Y121         LUT6 (Prop_lut6_I4_O)        0.043     7.173 f  ixc/control/slave_control[0].write_owner[0][1][1]_i_2/O
+                         net (fo=78, estimated)       0.753     7.926    ixc/control/write_grant[0]_13[1]
+    SLICE_X12Y117        LUT4 (Prop_lut4_I3_O)        0.043     7.969 r  ixc/control/write_data_buffer[0][1][18]_i_3/O
+                         net (fo=1, routed)           0.000     7.969    ixc/control/write_data_buffer[0][1][18]_i_3_n_0
+    SLICE_X12Y117        MUXF7 (Prop_muxf7_I1_O)      0.117     8.086 r  ixc/control/write_data_buffer_reg[0][1][18]_i_1/O
+                         net (fo=2, estimated)        0.635     8.721    ixc/control_n_42
+    SLICE_X11Y119        FDRE                                         r  ixc/write_data_buffer_reg[0][1][18]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock sys_clk rise edge)    5.000     5.000 r  <hidden>
+    AL20                                              0.000     5.000 r  clk
+                         net (fo=0)                   0.000     5.000    clk
+    AL20                 IBUF (Prop_ibuf_I_O)         0.701     5.701 r  clk_IBUF_inst/O
+                         net (fo=1, estimated)        2.579     8.281    clk_IBUF
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.083     8.364 r  clk_IBUF_BUFG_inst/O
+                         net (fo=1524, estimated)     1.390     9.754    ixc/clk_IBUF_BUFG
+    SLICE_X11Y119        FDRE                                         r  ixc/write_data_buffer_reg[0][1][18]/C
+                         clock pessimism              0.308    10.061    <hidden>
+                         clock uncertainty           -0.035    10.026    <hidden>
+    SLICE_X11Y119        FDRE (Setup_fdre_C_D)       -0.092     9.934    ixc/write_data_buffer_reg[0][1][18]
+  -------------------------------------------------------------------
+                         required time                          9.934    <hidden>
+                         arrival time                          -8.721    <hidden>
+  -------------------------------------------------------------------
+                         slack                                  1.213    <hidden>
+
+Slack (MET) :             1.232ns  (required time - arrival time)
+  Source:                 ixc/control/write_master_control[0].write_input_head_reg[0]/C
+                            (rising edge-triggered cell FDRE clocked by sys_clk  {rise@0.000ns fall@2.500ns period=5.000ns})
+  Destination:            ixc/write_data_buffer_reg[0][0][1]/CE
+                            (rising edge-triggered cell FDRE clocked by sys_clk  {rise@0.000ns fall@2.500ns period=5.000ns})
+  Path Group:             sys_clk
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            5.000ns  (sys_clk rise@5.000ns - sys_clk rise@0.000ns)
+  Data Path Delay:        3.350ns  (logic 0.449ns (13.403%)  route 2.901ns (86.597%))
+  Logic Levels:           5  (LUT3=2 LUT4=1 LUT5=1 LUT6=1)
+  Clock Path Skew:        -0.088ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    4.761ns = ( 9.761 - 5.000 ) 
+    Source Clock Delay      (SCD):    5.156ns
+    Clock Pessimism Removal (CPR):    0.308ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock sys_clk rise edge)    0.000     0.000 r  <hidden>
+    AL20                                              0.000     0.000 r  clk
+                         net (fo=0)                   0.000     0.000    clk
+    AL20                 IBUF (Prop_ibuf_I_O)         0.776     0.776 r  clk_IBUF_inst/O
+                         net (fo=1, estimated)        2.715     3.491    clk_IBUF
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.093     3.584 r  clk_IBUF_BUFG_inst/O
+                         net (fo=1524, estimated)     1.572     5.156    ixc/control/clk_IBUF_BUFG
+    SLICE_X4Y124         FDRE                                         r  ixc/control/write_master_control[0].write_input_head_reg[0]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X4Y124         FDRE (Prop_fdre_C_Q)         0.223     5.379 r  ixc/control/write_master_control[0].write_input_head_reg[0]/Q
+                         net (fo=42, estimated)       0.517     5.896    ixc/control/write_input_head[0]_0
+    SLICE_X5Y121         LUT3 (Prop_lut3_I1_O)        0.043     5.939 r  ixc/control/write_master_control[0].write_target[0][0]_i_2/O
+                         net (fo=7, estimated)        0.503     6.442    ixc/control/write_sel_reg[0]0[0]
+    SLICE_X5Y123         LUT6 (Prop_lut6_I0_O)        0.043     6.485 f  ixc/control/write_robin[1][1]_i_6/O
+                         net (fo=6, estimated)        0.302     6.787    ixc/control/write_robin[1][1]_i_6_n_0
+    SLICE_X4Y122         LUT5 (Prop_lut5_I4_O)        0.043     6.830 r  ixc/control/write_robin[0][1]_i_9/O
+                         net (fo=6, estimated)        0.377     7.207    ixc/control/write_arb_request[0]_15[0]
+    SLICE_X4Y122         LUT4 (Prop_lut4_I0_O)        0.043     7.250 r  ixc/control/write_robin[0][1]_i_4/O
+                         net (fo=11, estimated)       0.452     7.702    ixc/control/write_issue[0]_23
+    SLICE_X3Y120         LUT3 (Prop_lut3_I2_O)        0.054     7.756 r  ixc/control/write_addr_buffer[0][0][8]_i_1/O
+                         net (fo=38, estimated)       0.750     8.506    ixc/write_addr_buffer[0]
+    SLICE_X11Y108        FDRE                                         r  ixc/write_data_buffer_reg[0][0][1]/CE
+  -------------------------------------------------------------------    -------------------
+
+                         (clock sys_clk rise edge)    5.000     5.000 r  <hidden>
+    AL20                                              0.000     5.000 r  clk
+                         net (fo=0)                   0.000     5.000    clk
+    AL20                 IBUF (Prop_ibuf_I_O)         0.701     5.701 r  clk_IBUF_inst/O
+                         net (fo=1, estimated)        2.579     8.281    clk_IBUF
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.083     8.364 r  clk_IBUF_BUFG_inst/O
+                         net (fo=1524, estimated)     1.397     9.761    ixc/clk_IBUF_BUFG
+    SLICE_X11Y108        FDRE                                         r  ixc/write_data_buffer_reg[0][0][1]/C
+                         clock pessimism              0.308    10.068    <hidden>
+                         clock uncertainty           -0.035    10.033    <hidden>
+    SLICE_X11Y108        FDRE (Setup_fdre_C_CE)      -0.295     9.738    ixc/write_data_buffer_reg[0][0][1]
+  -------------------------------------------------------------------
+                         required time                          9.738    <hidden>
+                         arrival time                          -8.506    <hidden>
+  -------------------------------------------------------------------
+                         slack                                  1.232    <hidden>
+
+Slack (MET) :             1.232ns  (required time - arrival time)
+  Source:                 ixc/control/write_master_control[0].write_input_head_reg[0]/C
+                            (rising edge-triggered cell FDRE clocked by sys_clk  {rise@0.000ns fall@2.500ns period=5.000ns})
+  Destination:            ixc/write_data_buffer_reg[0][0][2]/CE
+                            (rising edge-triggered cell FDRE clocked by sys_clk  {rise@0.000ns fall@2.500ns period=5.000ns})
+  Path Group:             sys_clk
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            5.000ns  (sys_clk rise@5.000ns - sys_clk rise@0.000ns)
+  Data Path Delay:        3.350ns  (logic 0.449ns (13.403%)  route 2.901ns (86.597%))
+  Logic Levels:           5  (LUT3=2 LUT4=1 LUT5=1 LUT6=1)
+  Clock Path Skew:        -0.088ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    4.761ns = ( 9.761 - 5.000 ) 
+    Source Clock Delay      (SCD):    5.156ns
+    Clock Pessimism Removal (CPR):    0.308ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock sys_clk rise edge)    0.000     0.000 r  <hidden>
+    AL20                                              0.000     0.000 r  clk
+                         net (fo=0)                   0.000     0.000    clk
+    AL20                 IBUF (Prop_ibuf_I_O)         0.776     0.776 r  clk_IBUF_inst/O
+                         net (fo=1, estimated)        2.715     3.491    clk_IBUF
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.093     3.584 r  clk_IBUF_BUFG_inst/O
+                         net (fo=1524, estimated)     1.572     5.156    ixc/control/clk_IBUF_BUFG
+    SLICE_X4Y124         FDRE                                         r  ixc/control/write_master_control[0].write_input_head_reg[0]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X4Y124         FDRE (Prop_fdre_C_Q)         0.223     5.379 r  ixc/control/write_master_control[0].write_input_head_reg[0]/Q
+                         net (fo=42, estimated)       0.517     5.896    ixc/control/write_input_head[0]_0
+    SLICE_X5Y121         LUT3 (Prop_lut3_I1_O)        0.043     5.939 r  ixc/control/write_master_control[0].write_target[0][0]_i_2/O
+                         net (fo=7, estimated)        0.503     6.442    ixc/control/write_sel_reg[0]0[0]
+    SLICE_X5Y123         LUT6 (Prop_lut6_I0_O)        0.043     6.485 f  ixc/control/write_robin[1][1]_i_6/O
+                         net (fo=6, estimated)        0.302     6.787    ixc/control/write_robin[1][1]_i_6_n_0
+    SLICE_X4Y122         LUT5 (Prop_lut5_I4_O)        0.043     6.830 r  ixc/control/write_robin[0][1]_i_9/O
+                         net (fo=6, estimated)        0.377     7.207    ixc/control/write_arb_request[0]_15[0]
+    SLICE_X4Y122         LUT4 (Prop_lut4_I0_O)        0.043     7.250 r  ixc/control/write_robin[0][1]_i_4/O
+                         net (fo=11, estimated)       0.452     7.702    ixc/control/write_issue[0]_23
+    SLICE_X3Y120         LUT3 (Prop_lut3_I2_O)        0.054     7.756 r  ixc/control/write_addr_buffer[0][0][8]_i_1/O
+                         net (fo=38, estimated)       0.750     8.506    ixc/write_addr_buffer[0]
+    SLICE_X11Y108        FDRE                                         r  ixc/write_data_buffer_reg[0][0][2]/CE
+  -------------------------------------------------------------------    -------------------
+
+                         (clock sys_clk rise edge)    5.000     5.000 r  <hidden>
+    AL20                                              0.000     5.000 r  clk
+                         net (fo=0)                   0.000     5.000    clk
+    AL20                 IBUF (Prop_ibuf_I_O)         0.701     5.701 r  clk_IBUF_inst/O
+                         net (fo=1, estimated)        2.579     8.281    clk_IBUF
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.083     8.364 r  clk_IBUF_BUFG_inst/O
+                         net (fo=1524, estimated)     1.397     9.761    ixc/clk_IBUF_BUFG
+    SLICE_X11Y108        FDRE                                         r  ixc/write_data_buffer_reg[0][0][2]/C
+                         clock pessimism              0.308    10.068    <hidden>
+                         clock uncertainty           -0.035    10.033    <hidden>
+    SLICE_X11Y108        FDRE (Setup_fdre_C_CE)      -0.295     9.738    ixc/write_data_buffer_reg[0][0][2]
+  -------------------------------------------------------------------
+                         required time                          9.738    <hidden>
+                         arrival time                          -8.506    <hidden>
+  -------------------------------------------------------------------
+                         slack                                  1.232    <hidden>
+
+Slack (MET) :             1.232ns  (required time - arrival time)
+  Source:                 ixc/control/write_master_control[0].write_input_head_reg[0]/C
+                            (rising edge-triggered cell FDRE clocked by sys_clk  {rise@0.000ns fall@2.500ns period=5.000ns})
+  Destination:            ixc/write_data_buffer_reg[0][0][3]/CE
+                            (rising edge-triggered cell FDRE clocked by sys_clk  {rise@0.000ns fall@2.500ns period=5.000ns})
+  Path Group:             sys_clk
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            5.000ns  (sys_clk rise@5.000ns - sys_clk rise@0.000ns)
+  Data Path Delay:        3.350ns  (logic 0.449ns (13.403%)  route 2.901ns (86.597%))
+  Logic Levels:           5  (LUT3=2 LUT4=1 LUT5=1 LUT6=1)
+  Clock Path Skew:        -0.088ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    4.761ns = ( 9.761 - 5.000 ) 
+    Source Clock Delay      (SCD):    5.156ns
+    Clock Pessimism Removal (CPR):    0.308ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock sys_clk rise edge)    0.000     0.000 r  <hidden>
+    AL20                                              0.000     0.000 r  clk
+                         net (fo=0)                   0.000     0.000    clk
+    AL20                 IBUF (Prop_ibuf_I_O)         0.776     0.776 r  clk_IBUF_inst/O
+                         net (fo=1, estimated)        2.715     3.491    clk_IBUF
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.093     3.584 r  clk_IBUF_BUFG_inst/O
+                         net (fo=1524, estimated)     1.572     5.156    ixc/control/clk_IBUF_BUFG
+    SLICE_X4Y124         FDRE                                         r  ixc/control/write_master_control[0].write_input_head_reg[0]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X4Y124         FDRE (Prop_fdre_C_Q)         0.223     5.379 r  ixc/control/write_master_control[0].write_input_head_reg[0]/Q
+                         net (fo=42, estimated)       0.517     5.896    ixc/control/write_input_head[0]_0
+    SLICE_X5Y121         LUT3 (Prop_lut3_I1_O)        0.043     5.939 r  ixc/control/write_master_control[0].write_target[0][0]_i_2/O
+                         net (fo=7, estimated)        0.503     6.442    ixc/control/write_sel_reg[0]0[0]
+    SLICE_X5Y123         LUT6 (Prop_lut6_I0_O)        0.043     6.485 f  ixc/control/write_robin[1][1]_i_6/O
+                         net (fo=6, estimated)        0.302     6.787    ixc/control/write_robin[1][1]_i_6_n_0
+    SLICE_X4Y122         LUT5 (Prop_lut5_I4_O)        0.043     6.830 r  ixc/control/write_robin[0][1]_i_9/O
+                         net (fo=6, estimated)        0.377     7.207    ixc/control/write_arb_request[0]_15[0]
+    SLICE_X4Y122         LUT4 (Prop_lut4_I0_O)        0.043     7.250 r  ixc/control/write_robin[0][1]_i_4/O
+                         net (fo=11, estimated)       0.452     7.702    ixc/control/write_issue[0]_23
+    SLICE_X3Y120         LUT3 (Prop_lut3_I2_O)        0.054     7.756 r  ixc/control/write_addr_buffer[0][0][8]_i_1/O
+                         net (fo=38, estimated)       0.750     8.506    ixc/write_addr_buffer[0]
+    SLICE_X11Y108        FDRE                                         r  ixc/write_data_buffer_reg[0][0][3]/CE
+  -------------------------------------------------------------------    -------------------
+
+                         (clock sys_clk rise edge)    5.000     5.000 r  <hidden>
+    AL20                                              0.000     5.000 r  clk
+                         net (fo=0)                   0.000     5.000    clk
+    AL20                 IBUF (Prop_ibuf_I_O)         0.701     5.701 r  clk_IBUF_inst/O
+                         net (fo=1, estimated)        2.579     8.281    clk_IBUF
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.083     8.364 r  clk_IBUF_BUFG_inst/O
+                         net (fo=1524, estimated)     1.397     9.761    ixc/clk_IBUF_BUFG
+    SLICE_X11Y108        FDRE                                         r  ixc/write_data_buffer_reg[0][0][3]/C
+                         clock pessimism              0.308    10.068    <hidden>
+                         clock uncertainty           -0.035    10.033    <hidden>
+    SLICE_X11Y108        FDRE (Setup_fdre_C_CE)      -0.295     9.738    ixc/write_data_buffer_reg[0][0][3]
+  -------------------------------------------------------------------
+                         required time                          9.738    <hidden>
+                         arrival time                          -8.506    <hidden>
+  -------------------------------------------------------------------
+                         slack                                  1.232    <hidden>
+
+Slack (MET) :             1.232ns  (required time - arrival time)
+  Source:                 ixc/control/write_master_control[0].write_input_head_reg[0]/C
+                            (rising edge-triggered cell FDRE clocked by sys_clk  {rise@0.000ns fall@2.500ns period=5.000ns})
+  Destination:            ixc/write_data_buffer_reg[0][0][4]/CE
+                            (rising edge-triggered cell FDRE clocked by sys_clk  {rise@0.000ns fall@2.500ns period=5.000ns})
+  Path Group:             sys_clk
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            5.000ns  (sys_clk rise@5.000ns - sys_clk rise@0.000ns)
+  Data Path Delay:        3.350ns  (logic 0.449ns (13.403%)  route 2.901ns (86.597%))
+  Logic Levels:           5  (LUT3=2 LUT4=1 LUT5=1 LUT6=1)
+  Clock Path Skew:        -0.088ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    4.761ns = ( 9.761 - 5.000 ) 
+    Source Clock Delay      (SCD):    5.156ns
+    Clock Pessimism Removal (CPR):    0.308ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock sys_clk rise edge)    0.000     0.000 r  <hidden>
+    AL20                                              0.000     0.000 r  clk
+                         net (fo=0)                   0.000     0.000    clk
+    AL20                 IBUF (Prop_ibuf_I_O)         0.776     0.776 r  clk_IBUF_inst/O
+                         net (fo=1, estimated)        2.715     3.491    clk_IBUF
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.093     3.584 r  clk_IBUF_BUFG_inst/O
+                         net (fo=1524, estimated)     1.572     5.156    ixc/control/clk_IBUF_BUFG
+    SLICE_X4Y124         FDRE                                         r  ixc/control/write_master_control[0].write_input_head_reg[0]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X4Y124         FDRE (Prop_fdre_C_Q)         0.223     5.379 r  ixc/control/write_master_control[0].write_input_head_reg[0]/Q
+                         net (fo=42, estimated)       0.517     5.896    ixc/control/write_input_head[0]_0
+    SLICE_X5Y121         LUT3 (Prop_lut3_I1_O)        0.043     5.939 r  ixc/control/write_master_control[0].write_target[0][0]_i_2/O
+                         net (fo=7, estimated)        0.503     6.442    ixc/control/write_sel_reg[0]0[0]
+    SLICE_X5Y123         LUT6 (Prop_lut6_I0_O)        0.043     6.485 f  ixc/control/write_robin[1][1]_i_6/O
+                         net (fo=6, estimated)        0.302     6.787    ixc/control/write_robin[1][1]_i_6_n_0
+    SLICE_X4Y122         LUT5 (Prop_lut5_I4_O)        0.043     6.830 r  ixc/control/write_robin[0][1]_i_9/O
+                         net (fo=6, estimated)        0.377     7.207    ixc/control/write_arb_request[0]_15[0]
+    SLICE_X4Y122         LUT4 (Prop_lut4_I0_O)        0.043     7.250 r  ixc/control/write_robin[0][1]_i_4/O
+                         net (fo=11, estimated)       0.452     7.702    ixc/control/write_issue[0]_23
+    SLICE_X3Y120         LUT3 (Prop_lut3_I2_O)        0.054     7.756 r  ixc/control/write_addr_buffer[0][0][8]_i_1/O
+                         net (fo=38, estimated)       0.750     8.506    ixc/write_addr_buffer[0]
+    SLICE_X11Y108        FDRE                                         r  ixc/write_data_buffer_reg[0][0][4]/CE
+  -------------------------------------------------------------------    -------------------
+
+                         (clock sys_clk rise edge)    5.000     5.000 r  <hidden>
+    AL20                                              0.000     5.000 r  clk
+                         net (fo=0)                   0.000     5.000    clk
+    AL20                 IBUF (Prop_ibuf_I_O)         0.701     5.701 r  clk_IBUF_inst/O
+                         net (fo=1, estimated)        2.579     8.281    clk_IBUF
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.083     8.364 r  clk_IBUF_BUFG_inst/O
+                         net (fo=1524, estimated)     1.397     9.761    ixc/clk_IBUF_BUFG
+    SLICE_X11Y108        FDRE                                         r  ixc/write_data_buffer_reg[0][0][4]/C
+                         clock pessimism              0.308    10.068    <hidden>
+                         clock uncertainty           -0.035    10.033    <hidden>
+    SLICE_X11Y108        FDRE (Setup_fdre_C_CE)      -0.295     9.738    ixc/write_data_buffer_reg[0][0][4]
+  -------------------------------------------------------------------
+                         required time                          9.738    <hidden>
+                         arrival time                          -8.506    <hidden>
+  -------------------------------------------------------------------
+                         slack                                  1.232    <hidden>
+
+Slack (MET) :             1.232ns  (required time - arrival time)
+  Source:                 ixc/control/write_master_control[0].write_input_head_reg[0]/C
+                            (rising edge-triggered cell FDRE clocked by sys_clk  {rise@0.000ns fall@2.500ns period=5.000ns})
+  Destination:            ixc/write_data_buffer_reg[0][0][5]/CE
+                            (rising edge-triggered cell FDRE clocked by sys_clk  {rise@0.000ns fall@2.500ns period=5.000ns})
+  Path Group:             sys_clk
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            5.000ns  (sys_clk rise@5.000ns - sys_clk rise@0.000ns)
+  Data Path Delay:        3.350ns  (logic 0.449ns (13.403%)  route 2.901ns (86.597%))
+  Logic Levels:           5  (LUT3=2 LUT4=1 LUT5=1 LUT6=1)
+  Clock Path Skew:        -0.088ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    4.761ns = ( 9.761 - 5.000 ) 
+    Source Clock Delay      (SCD):    5.156ns
+    Clock Pessimism Removal (CPR):    0.308ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock sys_clk rise edge)    0.000     0.000 r  <hidden>
+    AL20                                              0.000     0.000 r  clk
+                         net (fo=0)                   0.000     0.000    clk
+    AL20                 IBUF (Prop_ibuf_I_O)         0.776     0.776 r  clk_IBUF_inst/O
+                         net (fo=1, estimated)        2.715     3.491    clk_IBUF
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.093     3.584 r  clk_IBUF_BUFG_inst/O
+                         net (fo=1524, estimated)     1.572     5.156    ixc/control/clk_IBUF_BUFG
+    SLICE_X4Y124         FDRE                                         r  ixc/control/write_master_control[0].write_input_head_reg[0]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X4Y124         FDRE (Prop_fdre_C_Q)         0.223     5.379 r  ixc/control/write_master_control[0].write_input_head_reg[0]/Q
+                         net (fo=42, estimated)       0.517     5.896    ixc/control/write_input_head[0]_0
+    SLICE_X5Y121         LUT3 (Prop_lut3_I1_O)        0.043     5.939 r  ixc/control/write_master_control[0].write_target[0][0]_i_2/O
+                         net (fo=7, estimated)        0.503     6.442    ixc/control/write_sel_reg[0]0[0]
+    SLICE_X5Y123         LUT6 (Prop_lut6_I0_O)        0.043     6.485 f  ixc/control/write_robin[1][1]_i_6/O
+                         net (fo=6, estimated)        0.302     6.787    ixc/control/write_robin[1][1]_i_6_n_0
+    SLICE_X4Y122         LUT5 (Prop_lut5_I4_O)        0.043     6.830 r  ixc/control/write_robin[0][1]_i_9/O
+                         net (fo=6, estimated)        0.377     7.207    ixc/control/write_arb_request[0]_15[0]
+    SLICE_X4Y122         LUT4 (Prop_lut4_I0_O)        0.043     7.250 r  ixc/control/write_robin[0][1]_i_4/O
+                         net (fo=11, estimated)       0.452     7.702    ixc/control/write_issue[0]_23
+    SLICE_X3Y120         LUT3 (Prop_lut3_I2_O)        0.054     7.756 r  ixc/control/write_addr_buffer[0][0][8]_i_1/O
+                         net (fo=38, estimated)       0.750     8.506    ixc/write_addr_buffer[0]
+    SLICE_X11Y108        FDRE                                         r  ixc/write_data_buffer_reg[0][0][5]/CE
+  -------------------------------------------------------------------    -------------------
+
+                         (clock sys_clk rise edge)    5.000     5.000 r  <hidden>
+    AL20                                              0.000     5.000 r  clk
+                         net (fo=0)                   0.000     5.000    clk
+    AL20                 IBUF (Prop_ibuf_I_O)         0.701     5.701 r  clk_IBUF_inst/O
+                         net (fo=1, estimated)        2.579     8.281    clk_IBUF
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.083     8.364 r  clk_IBUF_BUFG_inst/O
+                         net (fo=1524, estimated)     1.397     9.761    ixc/clk_IBUF_BUFG
+    SLICE_X11Y108        FDRE                                         r  ixc/write_data_buffer_reg[0][0][5]/C
+                         clock pessimism              0.308    10.068    <hidden>
+                         clock uncertainty           -0.035    10.033    <hidden>
+    SLICE_X11Y108        FDRE (Setup_fdre_C_CE)      -0.295     9.738    ixc/write_data_buffer_reg[0][0][5]
+  -------------------------------------------------------------------
+                         required time                          9.738    <hidden>
+                         arrival time                          -8.506    <hidden>
+  -------------------------------------------------------------------
+                         slack                                  1.232    <hidden>
+
+Slack (MET) :             1.232ns  (required time - arrival time)
+  Source:                 ixc/control/write_master_control[0].write_input_head_reg[0]/C
+                            (rising edge-triggered cell FDRE clocked by sys_clk  {rise@0.000ns fall@2.500ns period=5.000ns})
+  Destination:            ixc/write_data_buffer_reg[0][0][6]/CE
+                            (rising edge-triggered cell FDRE clocked by sys_clk  {rise@0.000ns fall@2.500ns period=5.000ns})
+  Path Group:             sys_clk
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            5.000ns  (sys_clk rise@5.000ns - sys_clk rise@0.000ns)
+  Data Path Delay:        3.350ns  (logic 0.449ns (13.403%)  route 2.901ns (86.597%))
+  Logic Levels:           5  (LUT3=2 LUT4=1 LUT5=1 LUT6=1)
+  Clock Path Skew:        -0.088ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    4.761ns = ( 9.761 - 5.000 ) 
+    Source Clock Delay      (SCD):    5.156ns
+    Clock Pessimism Removal (CPR):    0.308ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock sys_clk rise edge)    0.000     0.000 r  <hidden>
+    AL20                                              0.000     0.000 r  clk
+                         net (fo=0)                   0.000     0.000    clk
+    AL20                 IBUF (Prop_ibuf_I_O)         0.776     0.776 r  clk_IBUF_inst/O
+                         net (fo=1, estimated)        2.715     3.491    clk_IBUF
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.093     3.584 r  clk_IBUF_BUFG_inst/O
+                         net (fo=1524, estimated)     1.572     5.156    ixc/control/clk_IBUF_BUFG
+    SLICE_X4Y124         FDRE                                         r  ixc/control/write_master_control[0].write_input_head_reg[0]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X4Y124         FDRE (Prop_fdre_C_Q)         0.223     5.379 r  ixc/control/write_master_control[0].write_input_head_reg[0]/Q
+                         net (fo=42, estimated)       0.517     5.896    ixc/control/write_input_head[0]_0
+    SLICE_X5Y121         LUT3 (Prop_lut3_I1_O)        0.043     5.939 r  ixc/control/write_master_control[0].write_target[0][0]_i_2/O
+                         net (fo=7, estimated)        0.503     6.442    ixc/control/write_sel_reg[0]0[0]
+    SLICE_X5Y123         LUT6 (Prop_lut6_I0_O)        0.043     6.485 f  ixc/control/write_robin[1][1]_i_6/O
+                         net (fo=6, estimated)        0.302     6.787    ixc/control/write_robin[1][1]_i_6_n_0
+    SLICE_X4Y122         LUT5 (Prop_lut5_I4_O)        0.043     6.830 r  ixc/control/write_robin[0][1]_i_9/O
+                         net (fo=6, estimated)        0.377     7.207    ixc/control/write_arb_request[0]_15[0]
+    SLICE_X4Y122         LUT4 (Prop_lut4_I0_O)        0.043     7.250 r  ixc/control/write_robin[0][1]_i_4/O
+                         net (fo=11, estimated)       0.452     7.702    ixc/control/write_issue[0]_23
+    SLICE_X3Y120         LUT3 (Prop_lut3_I2_O)        0.054     7.756 r  ixc/control/write_addr_buffer[0][0][8]_i_1/O
+                         net (fo=38, estimated)       0.750     8.506    ixc/write_addr_buffer[0]
+    SLICE_X11Y108        FDRE                                         r  ixc/write_data_buffer_reg[0][0][6]/CE
+  -------------------------------------------------------------------    -------------------
+
+                         (clock sys_clk rise edge)    5.000     5.000 r  <hidden>
+    AL20                                              0.000     5.000 r  clk
+                         net (fo=0)                   0.000     5.000    clk
+    AL20                 IBUF (Prop_ibuf_I_O)         0.701     5.701 r  clk_IBUF_inst/O
+                         net (fo=1, estimated)        2.579     8.281    clk_IBUF
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.083     8.364 r  clk_IBUF_BUFG_inst/O
+                         net (fo=1524, estimated)     1.397     9.761    ixc/clk_IBUF_BUFG
+    SLICE_X11Y108        FDRE                                         r  ixc/write_data_buffer_reg[0][0][6]/C
+                         clock pessimism              0.308    10.068    <hidden>
+                         clock uncertainty           -0.035    10.033    <hidden>
+    SLICE_X11Y108        FDRE (Setup_fdre_C_CE)      -0.295     9.738    ixc/write_data_buffer_reg[0][0][6]
+  -------------------------------------------------------------------
+                         required time                          9.738    <hidden>
+                         arrival time                          -8.506    <hidden>
+  -------------------------------------------------------------------
+                         slack                                  1.232    <hidden>
+
+Slack (MET) :             1.232ns  (required time - arrival time)
+  Source:                 ixc/control/write_master_control[0].write_input_head_reg[0]/C
+                            (rising edge-triggered cell FDRE clocked by sys_clk  {rise@0.000ns fall@2.500ns period=5.000ns})
+  Destination:            ixc/write_data_buffer_reg[0][0][7]/CE
+                            (rising edge-triggered cell FDRE clocked by sys_clk  {rise@0.000ns fall@2.500ns period=5.000ns})
+  Path Group:             sys_clk
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            5.000ns  (sys_clk rise@5.000ns - sys_clk rise@0.000ns)
+  Data Path Delay:        3.350ns  (logic 0.449ns (13.403%)  route 2.901ns (86.597%))
+  Logic Levels:           5  (LUT3=2 LUT4=1 LUT5=1 LUT6=1)
+  Clock Path Skew:        -0.088ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    4.761ns = ( 9.761 - 5.000 ) 
+    Source Clock Delay      (SCD):    5.156ns
+    Clock Pessimism Removal (CPR):    0.308ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock sys_clk rise edge)    0.000     0.000 r  <hidden>
+    AL20                                              0.000     0.000 r  clk
+                         net (fo=0)                   0.000     0.000    clk
+    AL20                 IBUF (Prop_ibuf_I_O)         0.776     0.776 r  clk_IBUF_inst/O
+                         net (fo=1, estimated)        2.715     3.491    clk_IBUF
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.093     3.584 r  clk_IBUF_BUFG_inst/O
+                         net (fo=1524, estimated)     1.572     5.156    ixc/control/clk_IBUF_BUFG
+    SLICE_X4Y124         FDRE                                         r  ixc/control/write_master_control[0].write_input_head_reg[0]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X4Y124         FDRE (Prop_fdre_C_Q)         0.223     5.379 r  ixc/control/write_master_control[0].write_input_head_reg[0]/Q
+                         net (fo=42, estimated)       0.517     5.896    ixc/control/write_input_head[0]_0
+    SLICE_X5Y121         LUT3 (Prop_lut3_I1_O)        0.043     5.939 r  ixc/control/write_master_control[0].write_target[0][0]_i_2/O
+                         net (fo=7, estimated)        0.503     6.442    ixc/control/write_sel_reg[0]0[0]
+    SLICE_X5Y123         LUT6 (Prop_lut6_I0_O)        0.043     6.485 f  ixc/control/write_robin[1][1]_i_6/O
+                         net (fo=6, estimated)        0.302     6.787    ixc/control/write_robin[1][1]_i_6_n_0
+    SLICE_X4Y122         LUT5 (Prop_lut5_I4_O)        0.043     6.830 r  ixc/control/write_robin[0][1]_i_9/O
+                         net (fo=6, estimated)        0.377     7.207    ixc/control/write_arb_request[0]_15[0]
+    SLICE_X4Y122         LUT4 (Prop_lut4_I0_O)        0.043     7.250 r  ixc/control/write_robin[0][1]_i_4/O
+                         net (fo=11, estimated)       0.452     7.702    ixc/control/write_issue[0]_23
+    SLICE_X3Y120         LUT3 (Prop_lut3_I2_O)        0.054     7.756 r  ixc/control/write_addr_buffer[0][0][8]_i_1/O
+                         net (fo=38, estimated)       0.750     8.506    ixc/write_addr_buffer[0]
+    SLICE_X11Y108        FDRE                                         r  ixc/write_data_buffer_reg[0][0][7]/CE
+  -------------------------------------------------------------------    -------------------
+
+                         (clock sys_clk rise edge)    5.000     5.000 r  <hidden>
+    AL20                                              0.000     5.000 r  clk
+                         net (fo=0)                   0.000     5.000    clk
+    AL20                 IBUF (Prop_ibuf_I_O)         0.701     5.701 r  clk_IBUF_inst/O
+                         net (fo=1, estimated)        2.579     8.281    clk_IBUF
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.083     8.364 r  clk_IBUF_BUFG_inst/O
+                         net (fo=1524, estimated)     1.397     9.761    ixc/clk_IBUF_BUFG
+    SLICE_X11Y108        FDRE                                         r  ixc/write_data_buffer_reg[0][0][7]/C
+                         clock pessimism              0.308    10.068    <hidden>
+                         clock uncertainty           -0.035    10.033    <hidden>
+    SLICE_X11Y108        FDRE (Setup_fdre_C_CE)      -0.295     9.738    ixc/write_data_buffer_reg[0][0][7]
+  -------------------------------------------------------------------
+                         required time                          9.738    <hidden>
+                         arrival time                          -8.506    <hidden>
+  -------------------------------------------------------------------
+                         slack                                  1.232    <hidden>
+
+Slack (MET) :             1.232ns  (required time - arrival time)
+  Source:                 ixc/control/write_master_control[0].write_input_head_reg[0]/C
+                            (rising edge-triggered cell FDRE clocked by sys_clk  {rise@0.000ns fall@2.500ns period=5.000ns})
+  Destination:            ixc/write_data_buffer_reg[0][0][8]/CE
+                            (rising edge-triggered cell FDRE clocked by sys_clk  {rise@0.000ns fall@2.500ns period=5.000ns})
+  Path Group:             sys_clk
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            5.000ns  (sys_clk rise@5.000ns - sys_clk rise@0.000ns)
+  Data Path Delay:        3.350ns  (logic 0.449ns (13.403%)  route 2.901ns (86.597%))
+  Logic Levels:           5  (LUT3=2 LUT4=1 LUT5=1 LUT6=1)
+  Clock Path Skew:        -0.088ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    4.761ns = ( 9.761 - 5.000 ) 
+    Source Clock Delay      (SCD):    5.156ns
+    Clock Pessimism Removal (CPR):    0.308ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock sys_clk rise edge)    0.000     0.000 r  <hidden>
+    AL20                                              0.000     0.000 r  clk
+                         net (fo=0)                   0.000     0.000    clk
+    AL20                 IBUF (Prop_ibuf_I_O)         0.776     0.776 r  clk_IBUF_inst/O
+                         net (fo=1, estimated)        2.715     3.491    clk_IBUF
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.093     3.584 r  clk_IBUF_BUFG_inst/O
+                         net (fo=1524, estimated)     1.572     5.156    ixc/control/clk_IBUF_BUFG
+    SLICE_X4Y124         FDRE                                         r  ixc/control/write_master_control[0].write_input_head_reg[0]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X4Y124         FDRE (Prop_fdre_C_Q)         0.223     5.379 r  ixc/control/write_master_control[0].write_input_head_reg[0]/Q
+                         net (fo=42, estimated)       0.517     5.896    ixc/control/write_input_head[0]_0
+    SLICE_X5Y121         LUT3 (Prop_lut3_I1_O)        0.043     5.939 r  ixc/control/write_master_control[0].write_target[0][0]_i_2/O
+                         net (fo=7, estimated)        0.503     6.442    ixc/control/write_sel_reg[0]0[0]
+    SLICE_X5Y123         LUT6 (Prop_lut6_I0_O)        0.043     6.485 f  ixc/control/write_robin[1][1]_i_6/O
+                         net (fo=6, estimated)        0.302     6.787    ixc/control/write_robin[1][1]_i_6_n_0
+    SLICE_X4Y122         LUT5 (Prop_lut5_I4_O)        0.043     6.830 r  ixc/control/write_robin[0][1]_i_9/O
+                         net (fo=6, estimated)        0.377     7.207    ixc/control/write_arb_request[0]_15[0]
+    SLICE_X4Y122         LUT4 (Prop_lut4_I0_O)        0.043     7.250 r  ixc/control/write_robin[0][1]_i_4/O
+                         net (fo=11, estimated)       0.452     7.702    ixc/control/write_issue[0]_23
+    SLICE_X3Y120         LUT3 (Prop_lut3_I2_O)        0.054     7.756 r  ixc/control/write_addr_buffer[0][0][8]_i_1/O
+                         net (fo=38, estimated)       0.750     8.506    ixc/write_addr_buffer[0]
+    SLICE_X11Y108        FDRE                                         r  ixc/write_data_buffer_reg[0][0][8]/CE
+  -------------------------------------------------------------------    -------------------
+
+                         (clock sys_clk rise edge)    5.000     5.000 r  <hidden>
+    AL20                                              0.000     5.000 r  clk
+                         net (fo=0)                   0.000     5.000    clk
+    AL20                 IBUF (Prop_ibuf_I_O)         0.701     5.701 r  clk_IBUF_inst/O
+                         net (fo=1, estimated)        2.579     8.281    clk_IBUF
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.083     8.364 r  clk_IBUF_BUFG_inst/O
+                         net (fo=1524, estimated)     1.397     9.761    ixc/clk_IBUF_BUFG
+    SLICE_X11Y108        FDRE                                         r  ixc/write_data_buffer_reg[0][0][8]/C
+                         clock pessimism              0.308    10.068    <hidden>
+                         clock uncertainty           -0.035    10.033    <hidden>
+    SLICE_X11Y108        FDRE (Setup_fdre_C_CE)      -0.295     9.738    ixc/write_data_buffer_reg[0][0][8]
+  -------------------------------------------------------------------
+                         required time                          9.738    <hidden>
+                         arrival time                          -8.506    <hidden>
+  -------------------------------------------------------------------
+                         slack                                  1.232    <hidden>
+
+Slack (MET) :             1.263ns  (required time - arrival time)
+  Source:                 ixc/control/write_master_control[0].write_input_head_reg[0]/C
+                            (rising edge-triggered cell FDRE clocked by sys_clk  {rise@0.000ns fall@2.500ns period=5.000ns})
+  Destination:            ixc/write_addr_buffer_reg[0][0][6]/CE
+                            (rising edge-triggered cell FDRE clocked by sys_clk  {rise@0.000ns fall@2.500ns period=5.000ns})
+  Path Group:             sys_clk
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            5.000ns  (sys_clk rise@5.000ns - sys_clk rise@0.000ns)
+  Data Path Delay:        3.318ns  (logic 0.449ns (13.532%)  route 2.869ns (86.468%))
+  Logic Levels:           5  (LUT3=2 LUT4=1 LUT5=1 LUT6=1)
+  Clock Path Skew:        -0.089ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    4.760ns = ( 9.760 - 5.000 ) 
+    Source Clock Delay      (SCD):    5.156ns
+    Clock Pessimism Removal (CPR):    0.308ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock sys_clk rise edge)    0.000     0.000 r  <hidden>
+    AL20                                              0.000     0.000 r  clk
+                         net (fo=0)                   0.000     0.000    clk
+    AL20                 IBUF (Prop_ibuf_I_O)         0.776     0.776 r  clk_IBUF_inst/O
+                         net (fo=1, estimated)        2.715     3.491    clk_IBUF
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.093     3.584 r  clk_IBUF_BUFG_inst/O
+                         net (fo=1524, estimated)     1.572     5.156    ixc/control/clk_IBUF_BUFG
+    SLICE_X4Y124         FDRE                                         r  ixc/control/write_master_control[0].write_input_head_reg[0]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X4Y124         FDRE (Prop_fdre_C_Q)         0.223     5.379 r  ixc/control/write_master_control[0].write_input_head_reg[0]/Q
+                         net (fo=42, estimated)       0.517     5.896    ixc/control/write_input_head[0]_0
+    SLICE_X5Y121         LUT3 (Prop_lut3_I1_O)        0.043     5.939 r  ixc/control/write_master_control[0].write_target[0][0]_i_2/O
+                         net (fo=7, estimated)        0.503     6.442    ixc/control/write_sel_reg[0]0[0]
+    SLICE_X5Y123         LUT6 (Prop_lut6_I0_O)        0.043     6.485 f  ixc/control/write_robin[1][1]_i_6/O
+                         net (fo=6, estimated)        0.302     6.787    ixc/control/write_robin[1][1]_i_6_n_0
+    SLICE_X4Y122         LUT5 (Prop_lut5_I4_O)        0.043     6.830 r  ixc/control/write_robin[0][1]_i_9/O
+                         net (fo=6, estimated)        0.377     7.207    ixc/control/write_arb_request[0]_15[0]
+    SLICE_X4Y122         LUT4 (Prop_lut4_I0_O)        0.043     7.250 r  ixc/control/write_robin[0][1]_i_4/O
+                         net (fo=11, estimated)       0.452     7.702    ixc/control/write_issue[0]_23
+    SLICE_X3Y120         LUT3 (Prop_lut3_I2_O)        0.054     7.756 r  ixc/control/write_addr_buffer[0][0][8]_i_1/O
+                         net (fo=38, estimated)       0.718     8.474    ixc/write_addr_buffer[0]
+    SLICE_X11Y110        FDRE                                         r  ixc/write_addr_buffer_reg[0][0][6]/CE
+  -------------------------------------------------------------------    -------------------
+
+                         (clock sys_clk rise edge)    5.000     5.000 r  <hidden>
+    AL20                                              0.000     5.000 r  clk
+                         net (fo=0)                   0.000     5.000    clk
+    AL20                 IBUF (Prop_ibuf_I_O)         0.701     5.701 r  clk_IBUF_inst/O
+                         net (fo=1, estimated)        2.579     8.281    clk_IBUF
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.083     8.364 r  clk_IBUF_BUFG_inst/O
+                         net (fo=1524, estimated)     1.396     9.760    ixc/clk_IBUF_BUFG
+    SLICE_X11Y110        FDRE                                         r  ixc/write_addr_buffer_reg[0][0][6]/C
+                         clock pessimism              0.308    10.067    <hidden>
+                         clock uncertainty           -0.035    10.032    <hidden>
+    SLICE_X11Y110        FDRE (Setup_fdre_C_CE)      -0.295     9.737    ixc/write_addr_buffer_reg[0][0][6]
+  -------------------------------------------------------------------
+                         required time                          9.737    <hidden>
+                         arrival time                          -8.474    <hidden>
+  -------------------------------------------------------------------
+                         slack                                  1.263    <hidden>
+
+Slack (MET) :             1.263ns  (required time - arrival time)
+  Source:                 ixc/control/write_master_control[0].write_input_head_reg[0]/C
+                            (rising edge-triggered cell FDRE clocked by sys_clk  {rise@0.000ns fall@2.500ns period=5.000ns})
+  Destination:            ixc/write_data_buffer_reg[0][0][0]/CE
+                            (rising edge-triggered cell FDRE clocked by sys_clk  {rise@0.000ns fall@2.500ns period=5.000ns})
+  Path Group:             sys_clk
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            5.000ns  (sys_clk rise@5.000ns - sys_clk rise@0.000ns)
+  Data Path Delay:        3.318ns  (logic 0.449ns (13.532%)  route 2.869ns (86.468%))
+  Logic Levels:           5  (LUT3=2 LUT4=1 LUT5=1 LUT6=1)
+  Clock Path Skew:        -0.089ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    4.760ns = ( 9.760 - 5.000 ) 
+    Source Clock Delay      (SCD):    5.156ns
+    Clock Pessimism Removal (CPR):    0.308ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock sys_clk rise edge)    0.000     0.000 r  <hidden>
+    AL20                                              0.000     0.000 r  clk
+                         net (fo=0)                   0.000     0.000    clk
+    AL20                 IBUF (Prop_ibuf_I_O)         0.776     0.776 r  clk_IBUF_inst/O
+                         net (fo=1, estimated)        2.715     3.491    clk_IBUF
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.093     3.584 r  clk_IBUF_BUFG_inst/O
+                         net (fo=1524, estimated)     1.572     5.156    ixc/control/clk_IBUF_BUFG
+    SLICE_X4Y124         FDRE                                         r  ixc/control/write_master_control[0].write_input_head_reg[0]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X4Y124         FDRE (Prop_fdre_C_Q)         0.223     5.379 r  ixc/control/write_master_control[0].write_input_head_reg[0]/Q
+                         net (fo=42, estimated)       0.517     5.896    ixc/control/write_input_head[0]_0
+    SLICE_X5Y121         LUT3 (Prop_lut3_I1_O)        0.043     5.939 r  ixc/control/write_master_control[0].write_target[0][0]_i_2/O
+                         net (fo=7, estimated)        0.503     6.442    ixc/control/write_sel_reg[0]0[0]
+    SLICE_X5Y123         LUT6 (Prop_lut6_I0_O)        0.043     6.485 f  ixc/control/write_robin[1][1]_i_6/O
+                         net (fo=6, estimated)        0.302     6.787    ixc/control/write_robin[1][1]_i_6_n_0
+    SLICE_X4Y122         LUT5 (Prop_lut5_I4_O)        0.043     6.830 r  ixc/control/write_robin[0][1]_i_9/O
+                         net (fo=6, estimated)        0.377     7.207    ixc/control/write_arb_request[0]_15[0]
+    SLICE_X4Y122         LUT4 (Prop_lut4_I0_O)        0.043     7.250 r  ixc/control/write_robin[0][1]_i_4/O
+                         net (fo=11, estimated)       0.452     7.702    ixc/control/write_issue[0]_23
+    SLICE_X3Y120         LUT3 (Prop_lut3_I2_O)        0.054     7.756 r  ixc/control/write_addr_buffer[0][0][8]_i_1/O
+                         net (fo=38, estimated)       0.718     8.474    ixc/write_addr_buffer[0]
+    SLICE_X11Y110        FDRE                                         r  ixc/write_data_buffer_reg[0][0][0]/CE
+  -------------------------------------------------------------------    -------------------
+
+                         (clock sys_clk rise edge)    5.000     5.000 r  <hidden>
+    AL20                                              0.000     5.000 r  clk
+                         net (fo=0)                   0.000     5.000    clk
+    AL20                 IBUF (Prop_ibuf_I_O)         0.701     5.701 r  clk_IBUF_inst/O
+                         net (fo=1, estimated)        2.579     8.281    clk_IBUF
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.083     8.364 r  clk_IBUF_BUFG_inst/O
+                         net (fo=1524, estimated)     1.396     9.760    ixc/clk_IBUF_BUFG
+    SLICE_X11Y110        FDRE                                         r  ixc/write_data_buffer_reg[0][0][0]/C
+                         clock pessimism              0.308    10.067    <hidden>
+                         clock uncertainty           -0.035    10.032    <hidden>
+    SLICE_X11Y110        FDRE (Setup_fdre_C_CE)      -0.295     9.737    ixc/write_data_buffer_reg[0][0][0]
+  -------------------------------------------------------------------
+                         required time                          9.737    <hidden>
+                         arrival time                          -8.474    <hidden>
+  -------------------------------------------------------------------
+                         slack                                  1.263    <hidden>
+
+Slack (MET) :             1.263ns  (required time - arrival time)
+  Source:                 ixc/control/write_master_control[0].write_input_head_reg[0]/C
+                            (rising edge-triggered cell FDRE clocked by sys_clk  {rise@0.000ns fall@2.500ns period=5.000ns})
+  Destination:            ixc/write_data_buffer_reg[0][0][10]/CE
+                            (rising edge-triggered cell FDRE clocked by sys_clk  {rise@0.000ns fall@2.500ns period=5.000ns})
+  Path Group:             sys_clk
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            5.000ns  (sys_clk rise@5.000ns - sys_clk rise@0.000ns)
+  Data Path Delay:        3.318ns  (logic 0.449ns (13.532%)  route 2.869ns (86.468%))
+  Logic Levels:           5  (LUT3=2 LUT4=1 LUT5=1 LUT6=1)
+  Clock Path Skew:        -0.089ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    4.760ns = ( 9.760 - 5.000 ) 
+    Source Clock Delay      (SCD):    5.156ns
+    Clock Pessimism Removal (CPR):    0.308ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock sys_clk rise edge)    0.000     0.000 r  <hidden>
+    AL20                                              0.000     0.000 r  clk
+                         net (fo=0)                   0.000     0.000    clk
+    AL20                 IBUF (Prop_ibuf_I_O)         0.776     0.776 r  clk_IBUF_inst/O
+                         net (fo=1, estimated)        2.715     3.491    clk_IBUF
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.093     3.584 r  clk_IBUF_BUFG_inst/O
+                         net (fo=1524, estimated)     1.572     5.156    ixc/control/clk_IBUF_BUFG
+    SLICE_X4Y124         FDRE                                         r  ixc/control/write_master_control[0].write_input_head_reg[0]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X4Y124         FDRE (Prop_fdre_C_Q)         0.223     5.379 r  ixc/control/write_master_control[0].write_input_head_reg[0]/Q
+                         net (fo=42, estimated)       0.517     5.896    ixc/control/write_input_head[0]_0
+    SLICE_X5Y121         LUT3 (Prop_lut3_I1_O)        0.043     5.939 r  ixc/control/write_master_control[0].write_target[0][0]_i_2/O
+                         net (fo=7, estimated)        0.503     6.442    ixc/control/write_sel_reg[0]0[0]
+    SLICE_X5Y123         LUT6 (Prop_lut6_I0_O)        0.043     6.485 f  ixc/control/write_robin[1][1]_i_6/O
+                         net (fo=6, estimated)        0.302     6.787    ixc/control/write_robin[1][1]_i_6_n_0
+    SLICE_X4Y122         LUT5 (Prop_lut5_I4_O)        0.043     6.830 r  ixc/control/write_robin[0][1]_i_9/O
+                         net (fo=6, estimated)        0.377     7.207    ixc/control/write_arb_request[0]_15[0]
+    SLICE_X4Y122         LUT4 (Prop_lut4_I0_O)        0.043     7.250 r  ixc/control/write_robin[0][1]_i_4/O
+                         net (fo=11, estimated)       0.452     7.702    ixc/control/write_issue[0]_23
+    SLICE_X3Y120         LUT3 (Prop_lut3_I2_O)        0.054     7.756 r  ixc/control/write_addr_buffer[0][0][8]_i_1/O
+                         net (fo=38, estimated)       0.718     8.474    ixc/write_addr_buffer[0]
+    SLICE_X11Y110        FDRE                                         r  ixc/write_data_buffer_reg[0][0][10]/CE
+  -------------------------------------------------------------------    -------------------
+
+                         (clock sys_clk rise edge)    5.000     5.000 r  <hidden>
+    AL20                                              0.000     5.000 r  clk
+                         net (fo=0)                   0.000     5.000    clk
+    AL20                 IBUF (Prop_ibuf_I_O)         0.701     5.701 r  clk_IBUF_inst/O
+                         net (fo=1, estimated)        2.579     8.281    clk_IBUF
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.083     8.364 r  clk_IBUF_BUFG_inst/O
+                         net (fo=1524, estimated)     1.396     9.760    ixc/clk_IBUF_BUFG
+    SLICE_X11Y110        FDRE                                         r  ixc/write_data_buffer_reg[0][0][10]/C
+                         clock pessimism              0.308    10.067    <hidden>
+                         clock uncertainty           -0.035    10.032    <hidden>
+    SLICE_X11Y110        FDRE (Setup_fdre_C_CE)      -0.295     9.737    ixc/write_data_buffer_reg[0][0][10]
+  -------------------------------------------------------------------
+                         required time                          9.737    <hidden>
+                         arrival time                          -8.474    <hidden>
+  -------------------------------------------------------------------
+                         slack                                  1.263    <hidden>
+
+Slack (MET) :             1.263ns  (required time - arrival time)
+  Source:                 ixc/control/write_master_control[0].write_input_head_reg[0]/C
+                            (rising edge-triggered cell FDRE clocked by sys_clk  {rise@0.000ns fall@2.500ns period=5.000ns})
+  Destination:            ixc/write_data_buffer_reg[0][0][11]/CE
+                            (rising edge-triggered cell FDRE clocked by sys_clk  {rise@0.000ns fall@2.500ns period=5.000ns})
+  Path Group:             sys_clk
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            5.000ns  (sys_clk rise@5.000ns - sys_clk rise@0.000ns)
+  Data Path Delay:        3.318ns  (logic 0.449ns (13.532%)  route 2.869ns (86.468%))
+  Logic Levels:           5  (LUT3=2 LUT4=1 LUT5=1 LUT6=1)
+  Clock Path Skew:        -0.089ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    4.760ns = ( 9.760 - 5.000 ) 
+    Source Clock Delay      (SCD):    5.156ns
+    Clock Pessimism Removal (CPR):    0.308ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock sys_clk rise edge)    0.000     0.000 r  <hidden>
+    AL20                                              0.000     0.000 r  clk
+                         net (fo=0)                   0.000     0.000    clk
+    AL20                 IBUF (Prop_ibuf_I_O)         0.776     0.776 r  clk_IBUF_inst/O
+                         net (fo=1, estimated)        2.715     3.491    clk_IBUF
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.093     3.584 r  clk_IBUF_BUFG_inst/O
+                         net (fo=1524, estimated)     1.572     5.156    ixc/control/clk_IBUF_BUFG
+    SLICE_X4Y124         FDRE                                         r  ixc/control/write_master_control[0].write_input_head_reg[0]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X4Y124         FDRE (Prop_fdre_C_Q)         0.223     5.379 r  ixc/control/write_master_control[0].write_input_head_reg[0]/Q
+                         net (fo=42, estimated)       0.517     5.896    ixc/control/write_input_head[0]_0
+    SLICE_X5Y121         LUT3 (Prop_lut3_I1_O)        0.043     5.939 r  ixc/control/write_master_control[0].write_target[0][0]_i_2/O
+                         net (fo=7, estimated)        0.503     6.442    ixc/control/write_sel_reg[0]0[0]
+    SLICE_X5Y123         LUT6 (Prop_lut6_I0_O)        0.043     6.485 f  ixc/control/write_robin[1][1]_i_6/O
+                         net (fo=6, estimated)        0.302     6.787    ixc/control/write_robin[1][1]_i_6_n_0
+    SLICE_X4Y122         LUT5 (Prop_lut5_I4_O)        0.043     6.830 r  ixc/control/write_robin[0][1]_i_9/O
+                         net (fo=6, estimated)        0.377     7.207    ixc/control/write_arb_request[0]_15[0]
+    SLICE_X4Y122         LUT4 (Prop_lut4_I0_O)        0.043     7.250 r  ixc/control/write_robin[0][1]_i_4/O
+                         net (fo=11, estimated)       0.452     7.702    ixc/control/write_issue[0]_23
+    SLICE_X3Y120         LUT3 (Prop_lut3_I2_O)        0.054     7.756 r  ixc/control/write_addr_buffer[0][0][8]_i_1/O
+                         net (fo=38, estimated)       0.718     8.474    ixc/write_addr_buffer[0]
+    SLICE_X11Y110        FDRE                                         r  ixc/write_data_buffer_reg[0][0][11]/CE
+  -------------------------------------------------------------------    -------------------
+
+                         (clock sys_clk rise edge)    5.000     5.000 r  <hidden>
+    AL20                                              0.000     5.000 r  clk
+                         net (fo=0)                   0.000     5.000    clk
+    AL20                 IBUF (Prop_ibuf_I_O)         0.701     5.701 r  clk_IBUF_inst/O
+                         net (fo=1, estimated)        2.579     8.281    clk_IBUF
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.083     8.364 r  clk_IBUF_BUFG_inst/O
+                         net (fo=1524, estimated)     1.396     9.760    ixc/clk_IBUF_BUFG
+    SLICE_X11Y110        FDRE                                         r  ixc/write_data_buffer_reg[0][0][11]/C
+                         clock pessimism              0.308    10.067    <hidden>
+                         clock uncertainty           -0.035    10.032    <hidden>
+    SLICE_X11Y110        FDRE (Setup_fdre_C_CE)      -0.295     9.737    ixc/write_data_buffer_reg[0][0][11]
+  -------------------------------------------------------------------
+                         required time                          9.737    <hidden>
+                         arrival time                          -8.474    <hidden>
+  -------------------------------------------------------------------
+                         slack                                  1.263    <hidden>
+
+Slack (MET) :             1.263ns  (required time - arrival time)
+  Source:                 ixc/control/write_master_control[0].write_input_head_reg[0]/C
+                            (rising edge-triggered cell FDRE clocked by sys_clk  {rise@0.000ns fall@2.500ns period=5.000ns})
+  Destination:            ixc/write_data_buffer_reg[0][0][12]/CE
+                            (rising edge-triggered cell FDRE clocked by sys_clk  {rise@0.000ns fall@2.500ns period=5.000ns})
+  Path Group:             sys_clk
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            5.000ns  (sys_clk rise@5.000ns - sys_clk rise@0.000ns)
+  Data Path Delay:        3.318ns  (logic 0.449ns (13.532%)  route 2.869ns (86.468%))
+  Logic Levels:           5  (LUT3=2 LUT4=1 LUT5=1 LUT6=1)
+  Clock Path Skew:        -0.089ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    4.760ns = ( 9.760 - 5.000 ) 
+    Source Clock Delay      (SCD):    5.156ns
+    Clock Pessimism Removal (CPR):    0.308ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock sys_clk rise edge)    0.000     0.000 r  <hidden>
+    AL20                                              0.000     0.000 r  clk
+                         net (fo=0)                   0.000     0.000    clk
+    AL20                 IBUF (Prop_ibuf_I_O)         0.776     0.776 r  clk_IBUF_inst/O
+                         net (fo=1, estimated)        2.715     3.491    clk_IBUF
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.093     3.584 r  clk_IBUF_BUFG_inst/O
+                         net (fo=1524, estimated)     1.572     5.156    ixc/control/clk_IBUF_BUFG
+    SLICE_X4Y124         FDRE                                         r  ixc/control/write_master_control[0].write_input_head_reg[0]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X4Y124         FDRE (Prop_fdre_C_Q)         0.223     5.379 r  ixc/control/write_master_control[0].write_input_head_reg[0]/Q
+                         net (fo=42, estimated)       0.517     5.896    ixc/control/write_input_head[0]_0
+    SLICE_X5Y121         LUT3 (Prop_lut3_I1_O)        0.043     5.939 r  ixc/control/write_master_control[0].write_target[0][0]_i_2/O
+                         net (fo=7, estimated)        0.503     6.442    ixc/control/write_sel_reg[0]0[0]
+    SLICE_X5Y123         LUT6 (Prop_lut6_I0_O)        0.043     6.485 f  ixc/control/write_robin[1][1]_i_6/O
+                         net (fo=6, estimated)        0.302     6.787    ixc/control/write_robin[1][1]_i_6_n_0
+    SLICE_X4Y122         LUT5 (Prop_lut5_I4_O)        0.043     6.830 r  ixc/control/write_robin[0][1]_i_9/O
+                         net (fo=6, estimated)        0.377     7.207    ixc/control/write_arb_request[0]_15[0]
+    SLICE_X4Y122         LUT4 (Prop_lut4_I0_O)        0.043     7.250 r  ixc/control/write_robin[0][1]_i_4/O
+                         net (fo=11, estimated)       0.452     7.702    ixc/control/write_issue[0]_23
+    SLICE_X3Y120         LUT3 (Prop_lut3_I2_O)        0.054     7.756 r  ixc/control/write_addr_buffer[0][0][8]_i_1/O
+                         net (fo=38, estimated)       0.718     8.474    ixc/write_addr_buffer[0]
+    SLICE_X11Y110        FDRE                                         r  ixc/write_data_buffer_reg[0][0][12]/CE
+  -------------------------------------------------------------------    -------------------
+
+                         (clock sys_clk rise edge)    5.000     5.000 r  <hidden>
+    AL20                                              0.000     5.000 r  clk
+                         net (fo=0)                   0.000     5.000    clk
+    AL20                 IBUF (Prop_ibuf_I_O)         0.701     5.701 r  clk_IBUF_inst/O
+                         net (fo=1, estimated)        2.579     8.281    clk_IBUF
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.083     8.364 r  clk_IBUF_BUFG_inst/O
+                         net (fo=1524, estimated)     1.396     9.760    ixc/clk_IBUF_BUFG
+    SLICE_X11Y110        FDRE                                         r  ixc/write_data_buffer_reg[0][0][12]/C
+                         clock pessimism              0.308    10.067    <hidden>
+                         clock uncertainty           -0.035    10.032    <hidden>
+    SLICE_X11Y110        FDRE (Setup_fdre_C_CE)      -0.295     9.737    ixc/write_data_buffer_reg[0][0][12]
+  -------------------------------------------------------------------
+                         required time                          9.737    <hidden>
+                         arrival time                          -8.474    <hidden>
+  -------------------------------------------------------------------
+                         slack                                  1.263    <hidden>
+
+Slack (MET) :             1.263ns  (required time - arrival time)
+  Source:                 ixc/control/write_master_control[0].write_input_head_reg[0]/C
+                            (rising edge-triggered cell FDRE clocked by sys_clk  {rise@0.000ns fall@2.500ns period=5.000ns})
+  Destination:            ixc/write_data_buffer_reg[0][0][9]/CE
+                            (rising edge-triggered cell FDRE clocked by sys_clk  {rise@0.000ns fall@2.500ns period=5.000ns})
+  Path Group:             sys_clk
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            5.000ns  (sys_clk rise@5.000ns - sys_clk rise@0.000ns)
+  Data Path Delay:        3.318ns  (logic 0.449ns (13.532%)  route 2.869ns (86.468%))
+  Logic Levels:           5  (LUT3=2 LUT4=1 LUT5=1 LUT6=1)
+  Clock Path Skew:        -0.089ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    4.760ns = ( 9.760 - 5.000 ) 
+    Source Clock Delay      (SCD):    5.156ns
+    Clock Pessimism Removal (CPR):    0.308ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock sys_clk rise edge)    0.000     0.000 r  <hidden>
+    AL20                                              0.000     0.000 r  clk
+                         net (fo=0)                   0.000     0.000    clk
+    AL20                 IBUF (Prop_ibuf_I_O)         0.776     0.776 r  clk_IBUF_inst/O
+                         net (fo=1, estimated)        2.715     3.491    clk_IBUF
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.093     3.584 r  clk_IBUF_BUFG_inst/O
+                         net (fo=1524, estimated)     1.572     5.156    ixc/control/clk_IBUF_BUFG
+    SLICE_X4Y124         FDRE                                         r  ixc/control/write_master_control[0].write_input_head_reg[0]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X4Y124         FDRE (Prop_fdre_C_Q)         0.223     5.379 r  ixc/control/write_master_control[0].write_input_head_reg[0]/Q
+                         net (fo=42, estimated)       0.517     5.896    ixc/control/write_input_head[0]_0
+    SLICE_X5Y121         LUT3 (Prop_lut3_I1_O)        0.043     5.939 r  ixc/control/write_master_control[0].write_target[0][0]_i_2/O
+                         net (fo=7, estimated)        0.503     6.442    ixc/control/write_sel_reg[0]0[0]
+    SLICE_X5Y123         LUT6 (Prop_lut6_I0_O)        0.043     6.485 f  ixc/control/write_robin[1][1]_i_6/O
+                         net (fo=6, estimated)        0.302     6.787    ixc/control/write_robin[1][1]_i_6_n_0
+    SLICE_X4Y122         LUT5 (Prop_lut5_I4_O)        0.043     6.830 r  ixc/control/write_robin[0][1]_i_9/O
+                         net (fo=6, estimated)        0.377     7.207    ixc/control/write_arb_request[0]_15[0]
+    SLICE_X4Y122         LUT4 (Prop_lut4_I0_O)        0.043     7.250 r  ixc/control/write_robin[0][1]_i_4/O
+                         net (fo=11, estimated)       0.452     7.702    ixc/control/write_issue[0]_23
+    SLICE_X3Y120         LUT3 (Prop_lut3_I2_O)        0.054     7.756 r  ixc/control/write_addr_buffer[0][0][8]_i_1/O
+                         net (fo=38, estimated)       0.718     8.474    ixc/write_addr_buffer[0]
+    SLICE_X11Y110        FDRE                                         r  ixc/write_data_buffer_reg[0][0][9]/CE
+  -------------------------------------------------------------------    -------------------
+
+                         (clock sys_clk rise edge)    5.000     5.000 r  <hidden>
+    AL20                                              0.000     5.000 r  clk
+                         net (fo=0)                   0.000     5.000    clk
+    AL20                 IBUF (Prop_ibuf_I_O)         0.701     5.701 r  clk_IBUF_inst/O
+                         net (fo=1, estimated)        2.579     8.281    clk_IBUF
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.083     8.364 r  clk_IBUF_BUFG_inst/O
+                         net (fo=1524, estimated)     1.396     9.760    ixc/clk_IBUF_BUFG
+    SLICE_X11Y110        FDRE                                         r  ixc/write_data_buffer_reg[0][0][9]/C
+                         clock pessimism              0.308    10.067    <hidden>
+                         clock uncertainty           -0.035    10.032    <hidden>
+    SLICE_X11Y110        FDRE (Setup_fdre_C_CE)      -0.295     9.737    ixc/write_data_buffer_reg[0][0][9]
+  -------------------------------------------------------------------
+                         required time                          9.737    <hidden>
+                         arrival time                          -8.474    <hidden>
+  -------------------------------------------------------------------
+                         slack                                  1.263    <hidden>
+
+Slack (MET) :             1.303ns  (required time - arrival time)
+  Source:                 ixc/control/write_master_control[0].write_input_head_reg[0]/C
+                            (rising edge-triggered cell FDRE clocked by sys_clk  {rise@0.000ns fall@2.500ns period=5.000ns})
+  Destination:            ixc/write_data_buffer_reg[0][0][13]/CE
+                            (rising edge-triggered cell FDRE clocked by sys_clk  {rise@0.000ns fall@2.500ns period=5.000ns})
+  Path Group:             sys_clk
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            5.000ns  (sys_clk rise@5.000ns - sys_clk rise@0.000ns)
+  Data Path Delay:        3.274ns  (logic 0.449ns (13.714%)  route 2.825ns (86.286%))
+  Logic Levels:           5  (LUT3=2 LUT4=1 LUT5=1 LUT6=1)
+  Clock Path Skew:        -0.093ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    4.756ns = ( 9.756 - 5.000 ) 
+    Source Clock Delay      (SCD):    5.156ns
+    Clock Pessimism Removal (CPR):    0.308ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock sys_clk rise edge)    0.000     0.000 r  <hidden>
+    AL20                                              0.000     0.000 r  clk
+                         net (fo=0)                   0.000     0.000    clk
+    AL20                 IBUF (Prop_ibuf_I_O)         0.776     0.776 r  clk_IBUF_inst/O
+                         net (fo=1, estimated)        2.715     3.491    clk_IBUF
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.093     3.584 r  clk_IBUF_BUFG_inst/O
+                         net (fo=1524, estimated)     1.572     5.156    ixc/control/clk_IBUF_BUFG
+    SLICE_X4Y124         FDRE                                         r  ixc/control/write_master_control[0].write_input_head_reg[0]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X4Y124         FDRE (Prop_fdre_C_Q)         0.223     5.379 r  ixc/control/write_master_control[0].write_input_head_reg[0]/Q
+                         net (fo=42, estimated)       0.517     5.896    ixc/control/write_input_head[0]_0
+    SLICE_X5Y121         LUT3 (Prop_lut3_I1_O)        0.043     5.939 r  ixc/control/write_master_control[0].write_target[0][0]_i_2/O
+                         net (fo=7, estimated)        0.503     6.442    ixc/control/write_sel_reg[0]0[0]
+    SLICE_X5Y123         LUT6 (Prop_lut6_I0_O)        0.043     6.485 f  ixc/control/write_robin[1][1]_i_6/O
+                         net (fo=6, estimated)        0.302     6.787    ixc/control/write_robin[1][1]_i_6_n_0
+    SLICE_X4Y122         LUT5 (Prop_lut5_I4_O)        0.043     6.830 r  ixc/control/write_robin[0][1]_i_9/O
+                         net (fo=6, estimated)        0.377     7.207    ixc/control/write_arb_request[0]_15[0]
+    SLICE_X4Y122         LUT4 (Prop_lut4_I0_O)        0.043     7.250 r  ixc/control/write_robin[0][1]_i_4/O
+                         net (fo=11, estimated)       0.452     7.702    ixc/control/write_issue[0]_23
+    SLICE_X3Y120         LUT3 (Prop_lut3_I2_O)        0.054     7.756 r  ixc/control/write_addr_buffer[0][0][8]_i_1/O
+                         net (fo=38, estimated)       0.674     8.430    ixc/write_addr_buffer[0]
+    SLICE_X13Y116        FDRE                                         r  ixc/write_data_buffer_reg[0][0][13]/CE
+  -------------------------------------------------------------------    -------------------
+
+                         (clock sys_clk rise edge)    5.000     5.000 r  <hidden>
+    AL20                                              0.000     5.000 r  clk
+                         net (fo=0)                   0.000     5.000    clk
+    AL20                 IBUF (Prop_ibuf_I_O)         0.701     5.701 r  clk_IBUF_inst/O
+                         net (fo=1, estimated)        2.579     8.281    clk_IBUF
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.083     8.364 r  clk_IBUF_BUFG_inst/O
+                         net (fo=1524, estimated)     1.392     9.756    ixc/clk_IBUF_BUFG
+    SLICE_X13Y116        FDRE                                         r  ixc/write_data_buffer_reg[0][0][13]/C
+                         clock pessimism              0.308    10.063    <hidden>
+                         clock uncertainty           -0.035    10.028    <hidden>
+    SLICE_X13Y116        FDRE (Setup_fdre_C_CE)      -0.295     9.733    ixc/write_data_buffer_reg[0][0][13]
+  -------------------------------------------------------------------
+                         required time                          9.733    <hidden>
+                         arrival time                          -8.430    <hidden>
+  -------------------------------------------------------------------
+                         slack                                  1.303    <hidden>
+
+Slack (MET) :             1.321ns  (required time - arrival time)
+  Source:                 ixc/control/write_master_control[0].write_input_head_reg[0]/C
+                            (rising edge-triggered cell FDRE clocked by sys_clk  {rise@0.000ns fall@2.500ns period=5.000ns})
+  Destination:            ixc/write_data_buffer_reg[0][1][2]/D
+                            (rising edge-triggered cell FDRE clocked by sys_clk  {rise@0.000ns fall@2.500ns period=5.000ns})
+  Path Group:             sys_clk
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            5.000ns  (sys_clk rise@5.000ns - sys_clk rise@0.000ns)
+  Data Path Delay:        3.496ns  (logic 0.549ns (15.704%)  route 2.947ns (84.296%))
+  Logic Levels:           5  (LUT3=1 LUT5=1 LUT6=2 MUXF7=1)
+  Clock Path Skew:        -0.088ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    4.761ns = ( 9.761 - 5.000 ) 
+    Source Clock Delay      (SCD):    5.156ns
+    Clock Pessimism Removal (CPR):    0.308ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock sys_clk rise edge)    0.000     0.000 r  <hidden>
+    AL20                                              0.000     0.000 r  clk
+                         net (fo=0)                   0.000     0.000    clk
+    AL20                 IBUF (Prop_ibuf_I_O)         0.776     0.776 r  clk_IBUF_inst/O
+                         net (fo=1, estimated)        2.715     3.491    clk_IBUF
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.093     3.584 r  clk_IBUF_BUFG_inst/O
+                         net (fo=1524, estimated)     1.572     5.156    ixc/control/clk_IBUF_BUFG
+    SLICE_X4Y124         FDRE                                         r  ixc/control/write_master_control[0].write_input_head_reg[0]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X4Y124         FDRE (Prop_fdre_C_Q)         0.223     5.379 r  ixc/control/write_master_control[0].write_input_head_reg[0]/Q
+                         net (fo=42, estimated)       0.517     5.896    ixc/control/write_input_head[0]_0
+    SLICE_X5Y121         LUT3 (Prop_lut3_I1_O)        0.043     5.939 r  ixc/control/write_master_control[0].write_target[0][0]_i_2/O
+                         net (fo=7, estimated)        0.503     6.442    ixc/control/write_sel_reg[0]0[0]
+    SLICE_X5Y123         LUT6 (Prop_lut6_I0_O)        0.043     6.485 r  ixc/control/write_robin[1][1]_i_6/O
+                         net (fo=6, estimated)        0.302     6.787    ixc/control/write_robin[1][1]_i_6_n_0
+    SLICE_X4Y122         LUT5 (Prop_lut5_I4_O)        0.043     6.830 f  ixc/control/write_robin[0][1]_i_9/O
+                         net (fo=6, estimated)        0.363     7.193    ixc/control/write_arb_request[0]_15[0]
+    SLICE_X5Y121         LUT6 (Prop_lut6_I2_O)        0.043     7.236 r  ixc/control/slave_control[0].write_owner[0][1][0]_i_2/O
+                         net (fo=40, estimated)       0.728     7.964    ixc/control/write_grant[0]_13[0]
+    SLICE_X10Y107        MUXF7 (Prop_muxf7_S_O)       0.154     8.118 r  ixc/control/write_data_buffer_reg[0][1][2]_i_1/O
+                         net (fo=2, estimated)        0.534     8.652    ixc/control_n_58
+    SLICE_X10Y108        FDRE                                         r  ixc/write_data_buffer_reg[0][1][2]/D
+  -------------------------------------------------------------------    -------------------
+
+                         (clock sys_clk rise edge)    5.000     5.000 r  <hidden>
+    AL20                                              0.000     5.000 r  clk
+                         net (fo=0)                   0.000     5.000    clk
+    AL20                 IBUF (Prop_ibuf_I_O)         0.701     5.701 r  clk_IBUF_inst/O
+                         net (fo=1, estimated)        2.579     8.281    clk_IBUF
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.083     8.364 r  clk_IBUF_BUFG_inst/O
+                         net (fo=1524, estimated)     1.397     9.761    ixc/clk_IBUF_BUFG
+    SLICE_X10Y108        FDRE                                         r  ixc/write_data_buffer_reg[0][1][2]/C
+                         clock pessimism              0.308    10.068    <hidden>
+                         clock uncertainty           -0.035    10.033    <hidden>
+    SLICE_X10Y108        FDRE (Setup_fdre_C_D)       -0.060     9.973    ixc/write_data_buffer_reg[0][1][2]
+  -------------------------------------------------------------------
+                         required time                          9.973    <hidden>
+                         arrival time                          -8.652    <hidden>
+  -------------------------------------------------------------------
+                         slack                                  1.321    <hidden>
+
+Slack (MET) :             1.323ns  (required time - arrival time)
+  Source:                 ixc/read_path/slave_queue[0].unsent_count_reg[3]/C
+                            (rising edge-triggered cell FDRE clocked by sys_clk  {rise@0.000ns fall@2.500ns period=5.000ns})
+  Destination:            ixc/read_path/master_queue[1].response_mem_reg_0_7_0_5/RAMA/WE
+                            (rising edge-triggered cell RAMD32 clocked by sys_clk  {rise@0.000ns fall@2.500ns period=5.000ns})
+  Path Group:             sys_clk
+  Path Type:              Setup (Max at Slow Process Corner)
+  Requirement:            5.000ns  (sys_clk rise@5.000ns - sys_clk rise@0.000ns)
+  Data Path Delay:        3.193ns  (logic 0.562ns (17.601%)  route 2.631ns (82.399%))
+  Logic Levels:           4  (LUT2=1 LUT4=1 LUT5=1 LUT6=1)
+  Clock Path Skew:        -0.054ns (DCD - SCD + CPR)
+    Destination Clock Delay (DCD):    4.760ns = ( 9.760 - 5.000 ) 
+    Source Clock Delay      (SCD):    5.121ns
+    Clock Pessimism Removal (CPR):    0.308ns
+  Clock Uncertainty:      0.035ns  ((TSJ^2 + TIJ^2)^1/2 + DJ) / 2 + PE
+    Total System Jitter     (TSJ):    0.071ns
+    Total Input Jitter      (TIJ):    0.000ns
+    Discrete Jitter          (DJ):    0.000ns
+    Phase Error              (PE):    0.000ns
+
+    Location             Delay type                Incr(ns)  Path(ns)    Netlist Resource(s)
+  -------------------------------------------------------------------    -------------------
+                         (clock sys_clk rise edge)    0.000     0.000 r  <hidden>
+    AL20                                              0.000     0.000 r  clk
+                         net (fo=0)                   0.000     0.000    clk
+    AL20                 IBUF (Prop_ibuf_I_O)         0.776     0.776 r  clk_IBUF_inst/O
+                         net (fo=1, estimated)        2.715     3.491    clk_IBUF
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.093     3.584 r  clk_IBUF_BUFG_inst/O
+                         net (fo=1524, estimated)     1.537     5.121    ixc/read_path/clk_IBUF_BUFG
+    SLICE_X9Y103         FDRE                                         r  ixc/read_path/slave_queue[0].unsent_count_reg[3]/C
+  -------------------------------------------------------------------    -------------------
+    SLICE_X9Y103         FDRE (Prop_fdre_C_Q)         0.204     5.325 r  ixc/read_path/slave_queue[0].unsent_count_reg[3]/Q
+                         net (fo=4, estimated)        0.560     5.885    ixc/read_path/slave_queue[0].unsent_count_reg[3]
+    SLICE_X8Y103         LUT6 (Prop_lut6_I0_O)        0.123     6.008 r  ixc/read_path/slave_queue[0].send_head[2]_i_2/O
+                         net (fo=7, estimated)        0.390     6.398    ixc/read_path/slave_queue[0].unsent_count_reg[3]_0
+    SLICE_X8Y103         LUT5 (Prop_lut5_I1_O)        0.043     6.441 r  ixc/read_path/slave_queue[0].response_head[2]_i_2/O
+                         net (fo=8, estimated)        0.418     6.859    ixc/read_path/slave_queue[0].unsent_count_reg[3]_1
+    SLICE_X7Y105         LUT4 (Prop_lut4_I0_O)        0.049     6.908 r  ixc/read_path/master_queue[1].response_tail[2]_i_2/O
+                         net (fo=40, estimated)       0.809     7.717    ixc/read_path/read_rsp\\.valid_reg_0
+    SLICE_X15Y115        LUT2 (Prop_lut2_I0_O)        0.143     7.860 r  ixc/read_path/master_queue[1].response_mem_reg_0_7_0_5_i_1/O
+                         net (fo=44, estimated)       0.454     8.314    ixc/read_path/master_queue[1].response_mem_reg_0_7_0_5/WE
+    SLICE_X14Y110        RAMD32                                       r  ixc/read_path/master_queue[1].response_mem_reg_0_7_0_5/RAMA/WE
+  -------------------------------------------------------------------    -------------------
+
+                         (clock sys_clk rise edge)    5.000     5.000 r  <hidden>
+    AL20                                              0.000     5.000 r  clk
+                         net (fo=0)                   0.000     5.000    clk
+    AL20                 IBUF (Prop_ibuf_I_O)         0.701     5.701 r  clk_IBUF_inst/O
+                         net (fo=1, estimated)        2.579     8.281    clk_IBUF
+    BUFGCTRL_X0Y0        BUFG (Prop_bufg_I_O)         0.083     8.364 r  clk_IBUF_BUFG_inst/O
+                         net (fo=1524, estimated)     1.396     9.760    ixc/read_path/master_queue[1].response_mem_reg_0_7_0_5/WCLK
+    SLICE_X14Y110        RAMD32                                       r  ixc/read_path/master_queue[1].response_mem_reg_0_7_0_5/RAMA/CLK
+                         clock pessimism              0.308    10.067    <hidden>
+                         clock uncertainty           -0.035    10.032    <hidden>
+    SLICE_X14Y110        RAMD32 (Setup_ramd32_CLK_WE)
+                                                     -0.395     9.637    ixc/read_path/master_queue[1].response_mem_reg_0_7_0_5/RAMA
+  -------------------------------------------------------------------
+                         required time                          9.637    <hidden>
+                         arrival time                          -8.314    <hidden>
+  -------------------------------------------------------------------
+                         slack                                  1.323    <hidden>
+
+
+
+

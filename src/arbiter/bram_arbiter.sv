@@ -89,6 +89,7 @@ module bram_arbiter #(
     assign arbiter_out_ch.ready = arb_addr_out_ready;
     arbiter_skid #(
         .DATA_WIDTH(ADDR_WIDTH  /* default 64 */),
+        .ADDR_WIDTH(1),
         .N         (N  /* default 2 */)
     ) arbiter (
         .clk(clk),

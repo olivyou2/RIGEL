@@ -24,6 +24,9 @@ module ixc_control#(
     logic write_take[MASTER_N], write_retire[MASTER_N];
     logic write_pop[SLAVE_N];
     logic [MASTER_WIDTH-1:0] write_robin[SLAVE_N];
+    logic [MASTER_N-1:0] write_arb_request[SLAVE_N];
+    logic [MASTER_N-1:0] write_grant_onehot[SLAVE_N];
+    logic write_arb_valid[SLAVE_N];
 
     // Only registered state feeds input ready and request arbitration.
     for (genvar m=0; m<MASTER_N; m++) begin: master_control
@@ -39,7 +42,10 @@ module ixc_control#(
             write_take[m] = 0;
             write_retire[m] = 0;
             for (int s=0; s<SLAVE_N; s++) begin
-                if (write_issue[s] && int'(write_grant[s]) == m) write_take[m] = 1;
+                // Consume the arbiter's native one-hot result.  Re-decoding
+                // write_grant here creates a long select -> arbiter -> decoder
+                // feedback path into every master queue.
+                if (write_grant_onehot[s][m]) write_take[m] = 1;
                 if (write_pop[s] && int'(write_owner[s][write_output_head[s]]) == m)
                     write_retire[m] = 1;
             end
@@ -74,6 +80,24 @@ module ixc_control#(
     for (genvar s=0; s<SLAVE_N; s++) begin: slave_control
         assign slave_write_data_valid[s] = write_output_count[s] != 0;
         assign write_pop[s] = rst_n && slave_write_data_valid[s] && slave_write_data_ready[s];
+        for (genvar m=0; m<MASTER_N; m++) begin : arb_request
+            assign write_arb_request[s][m] = rst_n && (write_output_count[s] < 2) &&
+                write_pending[m] && int'(write_sel_reg[m]) == s &&
+                (write_inflight[m] == 0 || write_target[m] == write_sel_reg[m]);
+        end
+
+        ixc_rr_arbiter #(
+            .N(MASTER_N),
+            .INDEX_WIDTH(MASTER_WIDTH)
+        ) write_arbiter (
+            .request(write_arb_request[s]),
+            .priority_idx(write_robin[s]),
+            .grant_onehot(write_grant_onehot[s]),
+            .grant_valid(write_arb_valid[s]),
+            .grant_index(write_grant[s])
+        );
+        assign write_issue[s] = write_arb_valid[s];
+
         always @(posedge clk) begin
             if (!rst_n) begin
                 write_output_count[s] <= 0;
@@ -93,22 +117,6 @@ module ixc_control#(
             end
         end
 
-        always_comb begin
-            write_issue[s] = 0;
-            write_grant[s] = 0;
-            for (int offset=0; offset<MASTER_N; offset++) begin
-                int w;
-                w = int'(write_robin[s]) + offset;
-                if (w >= MASTER_N) w = w - MASTER_N;
-                // Deliberately no downstream ready -> grant combinational path.
-                if (rst_n && (write_output_count[s] < 2) && !write_issue[s] &&
-                    write_pending[w] && int'(write_sel_reg[w]) == s &&
-                    (write_inflight[w] == 0 || write_target[w] == write_sel_reg[w])) begin
-                    write_issue[s] = 1;
-                    write_grant[s] = MASTER_WIDTH'(w);
-                end
-            end
-        end
     end
 
     always @(posedge clk) begin

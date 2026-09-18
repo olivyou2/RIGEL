@@ -72,6 +72,9 @@ module ixc_read #(
     logic [COUNT_WIDTH-1:0] inflight[MASTER_N];
     logic issue[SLAVE_N], response_take[SLAVE_N];
     logic [MASTER_WIDTH-1:0] grant[SLAVE_N], owner[SLAVE_N];
+    logic [MASTER_N-1:0] arb_request[SLAVE_N];
+    logic [MASTER_N-1:0] grant_onehot[SLAVE_N];
+    logic arb_valid[SLAVE_N];
 
     initial begin
         if (READ_FIFO_DEPTH < 1 || READ_OUTSTANDING < 1)
@@ -84,7 +87,9 @@ module ixc_read #(
 
     for (genvar m = 0; m < MASTER_N; m++) begin : master_queue
         logic [ADDR_WIDTH-1:0] addr_mem[READ_FIFO_DEPTH];
-        logic [ SEL_WIDTH-1:0] sel_mem [READ_FIFO_DEPTH];
+        // The selector queue is small control state.  A flop implementation
+        // removes the asynchronous distributed-RAM read from the grant path.
+        (* ram_style = "registers" *) logic [SEL_WIDTH-1:0] sel_mem[READ_FIFO_DEPTH];
         logic [AR_PTR_WIDTH-1:0] ar_head, ar_tail;
         logic [AR_COUNT_WIDTH-1:0] ar_count;
         logic ar_push;
@@ -111,7 +116,9 @@ module ixc_read #(
             response_push   = 0;
             response_data   = '0;
             for (int s = 0; s < SLAVE_N; s++) begin
-                if (issue[s] && int'(grant[s]) == m) request_take[m] = 1;
+                // Use the native one-hot arbitration result instead of
+                // encoding grant and immediately decoding it again.
+                if (grant_onehot[s][m]) request_take[m] = 1;
                 if (response_take[s] && int'(owner[s]) == m) begin
                     response_push = 1;
                     response_data = slave_read_data_in[s];
@@ -193,23 +200,24 @@ module ixc_read #(
         assign slave_read_data_ready[s] = rst_n && ((count > unsent_count) || addr_take);
         assign response_take[s] = slave_read_data_valid[s] && slave_read_data_ready[s];
 
-        always_comb begin
-            issue[s] = 0;
-            grant[s] = '0;
-            for (int offset = 0; offset < MASTER_N; offset++) begin
-                int m;
-                m = int'(robin) + offset;
-                if (m >= MASTER_N) m = m - MASTER_N;
-                // Registered capacity only: no downstream ready -> AR grant path.
-                if (rst_n && !issue[s] && int'(count) < READ_OUTSTANDING &&
-                    request_valid[m] && int'(request_sel[m]) == s &&
-                    int'(inflight[m]) < READ_OUTSTANDING &&
-                    (inflight[m] == 0 || target[m] == request_sel[m])) begin
-                    issue[s] = 1;
-                    grant[s] = MASTER_WIDTH'(m);
-                end
-            end
+        for (genvar m = 0; m < MASTER_N; m++) begin : arb_request_map
+            assign arb_request[s][m] = rst_n && int'(count) < READ_OUTSTANDING &&
+                request_valid[m] && int'(request_sel[m]) == s &&
+                int'(inflight[m]) < READ_OUTSTANDING &&
+                (inflight[m] == 0 || target[m] == request_sel[m]);
         end
+
+        ixc_rr_arbiter #(
+            .N(MASTER_N),
+            .INDEX_WIDTH(MASTER_WIDTH)
+        ) read_arbiter (
+            .request(arb_request[s]),
+            .priority_idx(robin),
+            .grant_onehot(grant_onehot[s]),
+            .grant_valid(arb_valid[s]),
+            .grant_index(grant[s])
+        );
+        assign issue[s] = arb_valid[s];
 
         always @(posedge clk) begin
             if (!rst_n) begin

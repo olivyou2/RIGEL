@@ -11,16 +11,13 @@ module compute_ixc_sel#(
     // AXI -> Mesh Converter 에서는 따로 addressing system 사용
 
     localparam logic [23:0] ADDR_DMA_CTRL_START = 24'h00_0000;
-    localparam logic [23:0] ADDR_DMA_CTRL_END   = 24'h00_0FFF; // 4KB
+    localparam logic [23:0] ADDR_DMA_CTRL_END   = 24'h0F_FFFF; // 1MB
 
-    localparam logic [23:0] ADDR_BRAM_START     = 24'h00_1000;
-    localparam logic [23:0] ADDR_BRAM_END       = 24'h00_8FFF; // 32KB
+    localparam logic [23:0] ADDR_MATRIX_START   = 24'h10_0000;
+    localparam logic [23:0] ADDR_MATRIX_END     = 24'h1F_FFFF; // 1MB
 
-    localparam logic [23:0] ADDR_MATRIX_START   = 24'h01_0000;
-    localparam logic [23:0] ADDR_MATRIX_END     = 24'h01_FFFF; // 64KB
-
-    localparam logic [23:0] ADDR_VECTOR_START   = 24'h02_0000;
-    localparam logic [23:0] ADDR_VECTOR_END     = 24'h02_FFFF; // 64KB
+    localparam logic [23:0] ADDR_VECTOR_START   = 24'h20_0000;
+    localparam logic [23:0] ADDR_VECTOR_END     = 24'h2F_FFFF; // 1MB
 
     initial begin
         if (SLAVE_N < 4) begin
@@ -37,12 +34,10 @@ module compute_ixc_sel#(
 
             if ((addr_local >= ADDR_DMA_CTRL_START) && (addr_local <= ADDR_DMA_CTRL_END)) begin
                 sel_out[i][0] = 1'b1;
-            end else if ((addr_local >= ADDR_BRAM_START) && (addr_local <= ADDR_BRAM_END)) begin
-                sel_out[i][1] = 1'b1;
             end else if ((addr_local >= ADDR_MATRIX_START) && (addr_local <= ADDR_MATRIX_END)) begin
-                sel_out[i][2] = 1'b1;
+                sel_out[i][1] = 1'b1;
             end else if ((addr_local >= ADDR_VECTOR_START) && (addr_local <= ADDR_VECTOR_END)) begin
-                sel_out[i][3] = 1'b1;
+                sel_out[i][2] = 1'b1;
             end
         end
     end

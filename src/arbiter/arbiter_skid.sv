@@ -1,6 +1,7 @@
-// N-to-1 data arbiter with a registered output and matching selection tag.
+// N-to-1 request arbiter with registered address/data and a matching selection tag.
 module arbiter_skid #(
     parameter DATA_WIDTH = 64,
+    parameter ADDR_WIDTH = 32,
     parameter N = 2
 ) (
     input logic clk,
@@ -12,20 +13,21 @@ module arbiter_skid #(
     localparam N_WIDTH = $clog2(N);
     logic [N_WIDTH-1:0] selected;
     rv_if #(
-        .ADDR_WIDTH(1),
+        .ADDR_WIDTH(ADDR_WIDTH),
         .DATA_WIDTH(DATA_WIDTH)
     ) arbitrated ();
     rv_if #(
         .ADDR_WIDTH(1),
-        .DATA_WIDTH(DATA_WIDTH + N_WIDTH)
+        .DATA_WIDTH(ADDR_WIDTH + DATA_WIDTH + N_WIDTH)
     ) tagged_in ();
     rv_if #(
         .ADDR_WIDTH(1),
-        .DATA_WIDTH(DATA_WIDTH + N_WIDTH)
+        .DATA_WIDTH(ADDR_WIDTH + DATA_WIDTH + N_WIDTH)
     ) tagged_out ();
 
     arbiter #(
         .DATA_WIDTH(DATA_WIDTH),
+        .ADDR_WIDTH(ADDR_WIDTH),
         .N(N)
     ) arbiter (
         .clk(clk),
@@ -36,12 +38,12 @@ module arbiter_skid #(
     );
 
     assign tagged_in.addr   = '0;
-    assign tagged_in.data   = {arbitrated.data, selected};
+    assign tagged_in.data   = {arbitrated.addr, arbitrated.data, selected};
     assign tagged_in.valid  = arbitrated.valid;
     assign arbitrated.ready = tagged_in.ready;
 
     skid #(
-        .DATA_WIDTH(DATA_WIDTH + N_WIDTH)
+        .DATA_WIDTH(ADDR_WIDTH + DATA_WIDTH + N_WIDTH)
     ) skid (
         .clk(clk),
         .rst_n(rst_n),
@@ -49,8 +51,7 @@ module arbiter_skid #(
         .out_ch(tagged_out)
     );
 
-    assign out_ch.addr = '0;
-    assign {out_ch.data, data_out_sel} = tagged_out.data;
+    assign {out_ch.addr, out_ch.data, data_out_sel} = tagged_out.data;
     assign out_ch.valid = tagged_out.valid;
     assign tagged_out.ready = out_ch.ready;
 endmodule

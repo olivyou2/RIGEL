@@ -43,8 +43,7 @@ module vector#(
   rv_if.sink read_req,
   rv_if.source read_rsp,
 
-  rv_if.sink write_req[3], // write_req_0 = A vector, 1 = B vector, 2 = opcode
-  rv_if.sink bram_addr_write_req
+  rv_if.sink write_req[3] // write_req_0 = A vector, 1 = B vector, 2 = opcode
 );
 
   // Data -> Handshake join -> ALU
@@ -75,6 +74,20 @@ module vector#(
     .DATA_WIDTH(DATA_WIDTH)
   ) bram_write_req();
 
+  rv_if #(
+    .ADDR_WIDTH(ADDR_WIDTH),
+    .DATA_WIDTH(DATA_WIDTH)
+  ) distributed_write_req[2]();
+
+  handshake_distribute #(
+    .N(2 /* default 4 */)
+   ) handshake_distribute (
+    .clk   (clk),
+    .rst_n (rst_n),
+    .in_ch (write_req[2]),
+    .out_ch(distributed_write_req)
+  );
+
   handshake_addr_join #(
     .ADDR_WIDTH(ADDR_WIDTH /* default 32 */),
     .DATA_WIDTH(DATA_WIDTH /* default 64 */)
@@ -82,25 +95,40 @@ module vector#(
     .clk       (clk),
     .rst_n     (rst_n),
     .data_in_ch(bram_data_write_req),
-    .addr_in_ch(bram_addr_write_req),
+    .addr_in_ch(distributed_write_req[1]),
     .out_ch    (bram_write_req)
   );
 
   // Write Vector into ALU
+  rv_if #(
+    .ADDR_WIDTH(ADDR_WIDTH /* default 32 */),
+    .DATA_WIDTH(DATA_WIDTH /* default 64 */)
+   ) alu_rv_if [3]();
+
+  for (genvar i = 0; i < 2; i++) begin : map_vector_operand
+    assign alu_rv_if[i].data = write_req[i].data;
+    assign alu_rv_if[i].addr = write_req[i].addr;
+    assign alu_rv_if[i].valid = write_req[i].valid;
+    assign write_req[i].ready = alu_rv_if[i].ready;
+  end
+
+  assign alu_rv_if[2].data = distributed_write_req[0].data;
+  assign alu_rv_if[2].addr = distributed_write_req[0].addr;
+  assign alu_rv_if[2].valid = distributed_write_req[0].valid;
+  assign distributed_write_req[0].ready = alu_rv_if[2].ready;
+
   handshake_join #(
     .DATA_WIDTH(DATA_WIDTH /* default 64 */),
     .N         (3 /* default 4 */)
    ) handshake_join (
     .clk   (clk),
     .rst_n (rst_n),
-    .in_ch (write_req),
+    .in_ch (alu_rv_if),
     .out_ch(alu_write_req)
   );
 
-  vector_core #(
-    .DATA_WIDTH(DATA_WIDTH/16 /* default 8 */),
-    .LANE_SIZE (16 /* default 16 */)
-   ) vector_core (
+  vector_alu #(
+   ) vector_alu (
     .clk   (clk),
     .rst_n (rst_n),
     .in_ch (alu_write_req),

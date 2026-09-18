@@ -112,6 +112,7 @@ module mesh_router #(
     assign arbiter_east_dut_out_ch.ready = east_ch.ready;
     arbiter_skid #(
         .DATA_WIDTH(DATA_WIDTH + ADDR_WIDTH  /* default 64 */),
+        .ADDR_WIDTH(1),
         .N         (4  /* default 2 */)
     ) arbiter_east_dut (
         .clk(clk),
@@ -140,6 +141,7 @@ module mesh_router #(
     assign arbiter_south_dut_out_ch.ready = south_ch.ready;
     arbiter_skid #(
         .DATA_WIDTH(DATA_WIDTH + ADDR_WIDTH  /* default 64 */),
+        .ADDR_WIDTH(1),
         .N         (4  /* default 2 */)
     ) arbiter_south_dut (
         .clk(clk),
@@ -168,6 +170,7 @@ module mesh_router #(
     assign arbiter_local_dut_out_ch.ready = local_out_ch.ready;
     arbiter_skid #(
         .DATA_WIDTH(DATA_WIDTH + ADDR_WIDTH  /* default 64 */),
+        .ADDR_WIDTH(1),
         .N         (4  /* default 2 */)
     ) arbiter_local_dut (
         .clk(clk),

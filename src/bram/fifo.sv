@@ -1,7 +1,7 @@
 // FIFO using BRAM
 module fifo #(
     parameter DATA_WIDTH = 64,
-    parameter DATA_DEPTH = 512
+    parameter DATA_DEPTH = 8
 ) (
     input logic clk,
     input logic rst_n,

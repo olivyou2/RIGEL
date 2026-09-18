@@ -81,11 +81,6 @@ module compute #(
         .slave_write_req(ixc_slave_write_req)
     );
 
-    // Interface            ->                  -> BRAM scratchpad  [1]
-    //                      ->        IXC       -> Matrix Engine
-    // DMA (3 channel)      ->                  -> Vector Engine
-    //                      ->                  -> DMA Control      [0]
-
     compute_ixc_sel #(
         .ADDR_WIDTH(ADDR_WIDTH),
         .MASTER_N(MASTER_N),
@@ -127,8 +122,8 @@ module compute #(
 
     genvar dma_idx;
 
-    localparam DMA_N = 3;
-    localparam IXC_BASE_OFFSET = 1;
+    localparam DMA_N = 1;
+    localparam DMA_BASE_OFFSET = 1;
 
     dma_ctrl_if #(
         .ADDR_WIDTH(ADDR_WIDTH)
@@ -157,37 +152,36 @@ module compute #(
                 .clk(clk),
                 .rst_n(rst_n),
                 .ctrl(dma_ctrl[dma_idx]),
-                .read_req(ixc_read_req[IXC_BASE_OFFSET+dma_idx]),
-                .read_rsp(ixc_read_rsp[IXC_BASE_OFFSET+dma_idx]),
-                .write_req(ixc_write_req[IXC_BASE_OFFSET+dma_idx])
+                .read_req(ixc_read_req[DMA_BASE_OFFSET+dma_idx]),
+                .read_rsp(ixc_read_rsp[DMA_BASE_OFFSET+dma_idx]),
+                .write_req(ixc_write_req[DMA_BASE_OFFSET+dma_idx])
             );
         end
     endgenerate
 
-    // BRAM scratchpad slave
+    // vector #(
+    //     .ADDR_WIDTH(ADDR_WIDTH /* default 32 */),
+    //     .DATA_WIDTH(DATA_WIDTH /* default 128 */)
+    //  ) vector (
+    //     .clk                (clk),
+    //     .rst_n              (rst_n),
+    //     .read_req           (ixc_slave_read_req[2]),
+    //     .read_rsp           (ixc_slave_read_rsp[2]),
+    //     .write_req          (ixc_slave_write_req[2]),
+    //     .bram_addr_write_req(bram_addr_write_req)
+    // );
 
-    bram_stream #(
-        .ADDR_WIDTH(ADDR_WIDTH  /* default 32 */),
-        .DATA_WIDTH(DATA_WIDTH  /* default 64 */),
-        .DATA_DEPTH(2048)  // 32KB
-    ) bram_stream (
-        .clk(clk),
-        .rst_n(rst_n),
-        .read_req(ixc_slave_read_req[1]),
-        .read_rsp(ixc_slave_read_rsp[1]),
-        .write_req(ixc_slave_write_req[1])
-    );
-
-    vector #(
+    vector_core #(
         .ADDR_WIDTH(ADDR_WIDTH /* default 32 */),
-        .DATA_WIDTH(DATA_WIDTH /* default 128 */)
-     ) vector (
-        .clk                (clk),
-        .rst_n              (rst_n),
-        .read_req           (ixc_slave_read_req[2]),
-        .read_rsp           (ixc_slave_read_rsp[2]),
-        .write_req          (ixc_slave_write_req[2]),
-        .bram_addr_write_req(bram_addr_write_req)
+        .DATA_WIDTH(DATA_WIDTH /* default 128 */),
+        .LANE_WIDTH(8 /* default 8 */),
+        .LANE_SIZE (16 /* default 16 */)
+     ) vector_core (
+        .clk   (clk),
+        .rst_n (rst_n),
+        .read_req (ixc_slave_read_req[2]),
+        .read_rsp(ixc_slave_read_rsp[2]),
+        .write_req(ixc_slave_write_req[2])
     );
 
 endmodule

@@ -1,9 +1,9 @@
 module ixc #(
     parameter ADDR_WIDTH = 32,
-    parameter DATA_WIDTH = 64,
+    parameter DATA_WIDTH = 128,
 
-    parameter MASTER_N = 2,
-    parameter SLAVE_N = 2,
+    parameter MASTER_N = 3,
+    parameter SLAVE_N = 5,
     parameter SEL_WIDTH = (SLAVE_N > 1) ? $clog2(SLAVE_N) : 1,
     parameter READ_FIFO_DEPTH = 4,
     parameter READ_OUTSTANDING = 8
@@ -62,7 +62,9 @@ module ixc #(
     logic [SEL_WIDTH-1:0] write_sel_reg[MASTER_N];
     logic [ADDR_WIDTH-1:0] write_addr_reg[MASTER_N][2];
     logic [DATA_WIDTH-1:0] write_data_reg[MASTER_N][2];
-    logic [SEL_WIDTH-1:0] write_sel_buffer[MASTER_N][2];
+    // This is only a two-entry control queue.  Keeping it in flops avoids
+    // putting an asynchronous distributed-RAM read in front of arbitration.
+    (* ram_style = "registers" *) logic [SEL_WIDTH-1:0] write_sel_buffer[MASTER_N][2];
     logic write_input_head[MASTER_N], write_input_tail[MASTER_N];
     logic write_output_head[SLAVE_N], write_output_tail[SLAVE_N];
     logic [ADDR_WIDTH-1:0] write_addr_buffer[SLAVE_N][2];
