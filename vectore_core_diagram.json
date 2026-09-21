@@ -1,0 +1,429 @@
+{
+  "version": 1,
+  "name": "vector_core_yar",
+  "nodes": [
+    {
+      "id": "ixc_read_sel",
+      "module": "compute/vector/vector_core_ixc_sel.sv::vector_core_ixc_sel",
+      "parameters": {
+        "MASTER_N": "1"
+      },
+      "x": 470,
+      "y": 467
+    },
+    {
+      "id": "vector_main_ixc",
+      "module": "ixc/ixc.sv::ixc",
+      "parameters": {
+        "MASTER_N": "1",
+        "SLAVE_N": "3"
+      },
+      "x": 1640.28515625,
+      "y": 69.7109375
+    },
+    {
+      "id": "ixc_write_sel",
+      "module": "compute/vector/vector_core_ixc_sel.sv::vector_core_ixc_sel",
+      "parameters": {
+        "MASTER_N": "1"
+      },
+      "x": 2030,
+      "y": 829
+    },
+    {
+      "id": "scratchpad_a",
+      "module": "bram/bram_dp_stream.sv::bram_dp_stream",
+      "parameters": {
+        "DATA_WIDTH": "128",
+        "ADDR_WIDTH": "32"
+      },
+      "x": 80,
+      "y": 381.6171875
+    },
+    {
+      "id": "bram_arbiter_0",
+      "module": "arbiter/bram_arbiter.sv::bram_arbiter",
+      "parameters": {
+        "N": "2",
+        "DATA_WIDTH": "128",
+        "ADDR_WIDTH": "32"
+      },
+      "x": 2030,
+      "y": 438
+    },
+    {
+      "id": "alu_a_dma",
+      "module": "compute/dma/dma.sv::dma",
+      "parameters": {},
+      "x": 2420,
+      "y": 410.5
+    },
+    {
+      "id": "vector_dma_control",
+      "module": "compute/dma_ixc_control.sv::dma_ixc_control",
+      "parameters": {},
+      "x": 860,
+      "y": 381.5
+    },
+    {
+      "id": "alu",
+      "module": "compute/vector/vector.sv::vector",
+      "parameters": {},
+      "x": 2030,
+      "y": 105
+    },
+    {
+      "id": "alu_b_dma",
+      "module": "compute/dma/dma.sv::dma",
+      "parameters": {},
+      "x": 1250,
+      "y": 606
+    },
+    {
+      "id": "bram_control_bram",
+      "module": "bram/bram_dp_stream.sv::bram_dp_stream",
+      "parameters": {
+        "DATA_WIDTH": "128"
+      },
+      "x": 1250,
+      "y": 215.125
+    },
+    {
+      "id": "alu_control_dma",
+      "module": "compute/dma/dma.sv::dma",
+      "parameters": {},
+      "x": 1635.2613144648149,
+      "y": 721.2240804430903
+    }
+  ],
+  "edges": [
+    {
+      "kind": "wire",
+      "a": {
+        "node": "vector_main_ixc",
+        "port": "ixc_addr_out[0]"
+      },
+      "b": {
+        "node": "ixc_read_sel",
+        "port": "addr_in[0]"
+      }
+    },
+    {
+      "kind": "wire",
+      "a": {
+        "node": "ixc_read_sel",
+        "port": "sel_out[0]"
+      },
+      "b": {
+        "node": "vector_main_ixc",
+        "port": "ixc_slave_sel[0]"
+      }
+    },
+    {
+      "kind": "wire",
+      "a": {
+        "node": "vector_main_ixc",
+        "port": "ixc_write_addr_out[0]"
+      },
+      "b": {
+        "node": "ixc_write_sel",
+        "port": "addr_in[0]"
+      }
+    },
+    {
+      "kind": "wire",
+      "a": {
+        "node": "ixc_write_sel",
+        "port": "sel_out[0]"
+      },
+      "b": {
+        "node": "vector_main_ixc",
+        "port": "ixc_write_slave_sel[0]"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "bram_arbiter_0",
+        "port": "slave_read_req"
+      },
+      "b": {
+        "node": "scratchpad_a",
+        "port": "read_req_a"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "scratchpad_a",
+        "port": "read_rsp_a"
+      },
+      "b": {
+        "node": "bram_arbiter_0",
+        "port": "slave_read_rsp"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "vector_main_ixc",
+        "port": "slave_read_req[0]"
+      },
+      "b": {
+        "node": "bram_arbiter_0",
+        "port": "read_req[0]"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "bram_arbiter_0",
+        "port": "read_rsp[0]"
+      },
+      "b": {
+        "node": "vector_main_ixc",
+        "port": "slave_read_rsp[0]"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "alu_a_dma",
+        "port": "read_rsp"
+      },
+      "b": {
+        "node": "bram_arbiter_0",
+        "port": "read_rsp[1]"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "alu_a_dma",
+        "port": "read_req"
+      },
+      "b": {
+        "node": "bram_arbiter_0",
+        "port": "read_req[1]"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "vector_main_ixc",
+        "port": "slave_read_req[2]"
+      },
+      "b": {
+        "node": "vector_dma_control",
+        "port": "read_req"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "vector_dma_control",
+        "port": "read_rsp"
+      },
+      "b": {
+        "node": "vector_main_ixc",
+        "port": "slave_read_rsp[2]"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "vector_main_ixc",
+        "port": "slave_write_req[2]"
+      },
+      "b": {
+        "node": "vector_dma_control",
+        "port": "write_req"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "vector_dma_control",
+        "port": "dma_ctrl[0]"
+      },
+      "b": {
+        "node": "alu_a_dma",
+        "port": "ctrl"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "alu",
+        "port": "alu_input[0]"
+      },
+      "b": {
+        "node": "alu_a_dma",
+        "port": "write_req"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "vector_dma_control",
+        "port": "dma_ctrl[1]"
+      },
+      "b": {
+        "node": "alu_b_dma",
+        "port": "ctrl"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "alu_b_dma",
+        "port": "read_req"
+      },
+      "b": {
+        "node": "scratchpad_a",
+        "port": "read_req_b"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "scratchpad_a",
+        "port": "read_rsp_b"
+      },
+      "b": {
+        "node": "alu_b_dma",
+        "port": "read_rsp"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "alu_b_dma",
+        "port": "write_req"
+      },
+      "b": {
+        "node": "alu",
+        "port": "alu_input[1]"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "vector_main_ixc",
+        "port": "slave_read_req[1]"
+      },
+      "b": {
+        "node": "bram_control_bram",
+        "port": "read_req_a"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "bram_control_bram",
+        "port": "read_rsp_a"
+      },
+      "b": {
+        "node": "vector_main_ixc",
+        "port": "slave_read_rsp[1]"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "vector_main_ixc",
+        "port": "slave_write_req[1]"
+      },
+      "b": {
+        "node": "bram_control_bram",
+        "port": "write_req_a"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "vector_main_ixc",
+        "port": "slave_write_req[0]"
+      },
+      "b": {
+        "node": "scratchpad_a",
+        "port": "write_req_a"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "alu_control_dma",
+        "port": "read_req"
+      },
+      "b": {
+        "node": "bram_control_bram",
+        "port": "read_req_b"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "bram_control_bram",
+        "port": "read_rsp_b"
+      },
+      "b": {
+        "node": "alu_control_dma",
+        "port": "read_rsp"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "vector_dma_control",
+        "port": "dma_ctrl[2]"
+      },
+      "b": {
+        "node": "alu_control_dma",
+        "port": "ctrl"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "alu_control_dma",
+        "port": "write_req"
+      },
+      "b": {
+        "node": "alu",
+        "port": "alu_input[2]"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "alu",
+        "port": "alu_output"
+      },
+      "b": {
+        "node": "scratchpad_a",
+        "port": "write_req_b"
+      }
+    }
+  ],
+  "exposed": [
+    {
+      "node": "vector_main_ixc",
+      "port": "read_req[0]",
+      "kind": "interface",
+      "name": "read_req"
+    },
+    {
+      "node": "vector_main_ixc",
+      "port": "read_rsp[0]",
+      "kind": "interface",
+      "name": "read_rsp"
+    },
+    {
+      "node": "vector_main_ixc",
+      "port": "write_req[0]",
+      "kind": "interface",
+      "name": "write_req"
+    }
+  ]
+}
