@@ -40,10 +40,8 @@ module vector#(
   input logic clk,
   input logic rst_n,
 
-  rv_if.sink read_req,
-  rv_if.source read_rsp,
-
-  rv_if.sink write_req[3] // write_req_0 = A vector, 1 = B vector, 2 = opcode
+  rv_if.sink alu_input[3], // write_req_0 = A vector, 1 = B vector, 2 = opcode
+  rv_if.source alu_output
 );
 
   // Data -> Handshake join -> ALU
@@ -84,7 +82,7 @@ module vector#(
    ) handshake_distribute (
     .clk   (clk),
     .rst_n (rst_n),
-    .in_ch (write_req[2]),
+    .in_ch (alu_input[2]),
     .out_ch(distributed_write_req)
   );
 
@@ -96,7 +94,7 @@ module vector#(
     .rst_n     (rst_n),
     .data_in_ch(bram_data_write_req),
     .addr_in_ch(distributed_write_req[1]),
-    .out_ch    (bram_write_req)
+    .out_ch    (alu_output)
   );
 
   // Write Vector into ALU
@@ -106,10 +104,10 @@ module vector#(
    ) alu_rv_if [3]();
 
   for (genvar i = 0; i < 2; i++) begin : map_vector_operand
-    assign alu_rv_if[i].data = write_req[i].data;
-    assign alu_rv_if[i].addr = write_req[i].addr;
-    assign alu_rv_if[i].valid = write_req[i].valid;
-    assign write_req[i].ready = alu_rv_if[i].ready;
+    assign alu_rv_if[i].data = alu_input[i].data;
+    assign alu_rv_if[i].addr = alu_input[i].addr;
+    assign alu_rv_if[i].valid = alu_input[i].valid;
+    assign alu_input[i].ready = alu_rv_if[i].ready;
   end
 
   assign alu_rv_if[2].data = distributed_write_req[0].data;
@@ -134,18 +132,5 @@ module vector#(
     .in_ch (alu_write_req),
     .out_ch(bram_data_write_req)
   );
-
-  bram_stream #(
-    .ADDR_WIDTH(ADDR_WIDTH /* default 32 */),
-    .DATA_WIDTH(DATA_WIDTH /* default 64 */),
-    .DATA_DEPTH(1024 /* default 1024 */)
-   ) bram_stream (
-    .clk      (clk),
-    .rst_n    (rst_n),
-    .read_req (read_req),
-    .read_rsp (read_rsp),
-    .write_req(bram_write_req)
-  );
-
 
 endmodule

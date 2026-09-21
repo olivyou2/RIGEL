@@ -60,6 +60,7 @@ module dma_ixc_control #(
     localparam REG_ADDR_DST = 3'd3;
     localparam REG_FIRE = 3'd4;
     localparam REG_IDLE = 3'd5;
+    localparam REG_PRINT_T = 3'd6;
 
     assign read_req.ready = (read_fsm == FSM_IDLE);
 
@@ -149,6 +150,10 @@ module dma_ixc_control #(
                                 dma_fire[write_dma_idx] <= 1;
                                 last_fired_dma <= write_dma_idx;
                                 write_fsm <= FSM_DMA_WAIT;
+                            end
+
+                            REG_PRINT_T:  begin
+                                $display("Time=%0d", $time());
                             end
 
                             default: begin
