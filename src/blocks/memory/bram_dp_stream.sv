@@ -21,12 +21,17 @@ module bram_dp_stream #(
     logic [ADDR_WIDTH-1:0] write_addr_a;
     logic [DATA_WIDTH-1:0] write_data_a;
     logic                  write_enable_a;
+    logic [ADDR_WIDTH-1:0] mem_addr_a;
 
     logic [ADDR_WIDTH-1:0] read_addr_b;
     logic [DATA_WIDTH-1:0] read_data_b;
     logic [ADDR_WIDTH-1:0] write_addr_b;
     logic [DATA_WIDTH-1:0] write_data_b;
     logic                  write_enable_b;
+    logic [ADDR_WIDTH-1:0] mem_addr_b;
+
+    assign mem_addr_a = write_enable_a ? write_addr_a : read_addr_a;
+    assign mem_addr_b = write_enable_b ? write_addr_b : read_addr_b;
 
     bram_dp #(
         .ADDR_WIDTH(ADDR_WIDTH),
@@ -34,14 +39,12 @@ module bram_dp_stream #(
         .DATA_DEPTH(DATA_DEPTH)
     ) bram_dp_dut (
         .clk           (clk),
-        .read_addr_a   (read_addr_a),
+        .addr_a        (mem_addr_a),
         .read_data_a   (read_data_a),
-        .write_addr_a  (write_addr_a),
         .write_data_a  (write_data_a),
         .write_enable_a(write_enable_a),
-        .read_addr_b   (read_addr_b),
+        .addr_b        (mem_addr_b),
         .read_data_b   (read_data_b),
-        .write_addr_b  (write_addr_b),
         .write_data_b  (write_data_b),
         .write_enable_b(write_enable_b)
     );
@@ -139,8 +142,11 @@ module bram_dp_stream_port #(
         response_consumed = read_rsp.valid && read_rsp.ready;
 
         // A response consumed this cycle also releases one reservation.
-        read_req.ready  = (outstanding_reads < RESPONSE_DEPTH_VALUE)
-                       || response_consumed;
+        // A physical BRAM port has one address. A write takes the slot; the
+        // read request remains pending through ready/valid backpressure.
+        read_req.ready  = rst_n && !write_req.valid &&
+                          ((outstanding_reads < RESPONSE_DEPTH_VALUE)
+                           || response_consumed);
         write_req.ready = rst_n;
 
         read_accepted = read_req.valid && read_req.ready;
