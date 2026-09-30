@@ -1,7 +1,7 @@
 module vector_alu_tb;
     parameter LANE_SIZE = 16;
     logic clk = 0, rst_n = 0;
-    logic [7:0] lane_in_a[LANE_SIZE], lane_in_b[LANE_SIZE], lane_out[LANE_SIZE];
+    logic [7:0] lane_mac_a[LANE_SIZE], lane_in_a[LANE_SIZE], lane_in_b[LANE_SIZE], lane_out[LANE_SIZE];
     logic lane_sel = 0, valid = 0, ready, out_valid, out_ready = 0;
     logic [4:0] opcode = 0;
     typedef logic [LANE_SIZE*8-1:0] result_t;
@@ -14,17 +14,19 @@ module vector_alu_tb;
     always #5 clk = ~clk;
     rv_if #(
         .ADDR_WIDTH(1),
-        .DATA_WIDTH(2 * (8) * (LANE_SIZE) + 6)
+        .DATA_WIDTH(4 * (8) * (LANE_SIZE))
     ) dut_in_ch ();
     assign dut_in_ch.addr = '0;
     for (genvar lane = 0; lane < (LANE_SIZE); lane++) begin : connect_dut_lane_in_a
-        assign dut_in_ch.data[lane*(8)+:(8)] = lane_in_a[lane];
+        assign dut_in_ch.data[lane*(8)+:(8)] = lane_mac_a[lane];
+        assign dut_in_ch.data[(8)*(LANE_SIZE)+lane*(8)+:(8)] = lane_in_a[lane];
     end
     for (genvar lane = 0; lane < (LANE_SIZE); lane++) begin : connect_dut_lane_in_b
-        assign dut_in_ch.data[(8)*(LANE_SIZE)+lane*(8)+:(8)] = lane_in_b[lane];
+        assign dut_in_ch.data[2*(8)*(LANE_SIZE)+lane*(8)+:(8)] = lane_in_b[lane];
     end
-    assign dut_in_ch.data[2*(8)*(LANE_SIZE)] = lane_sel;
-    assign dut_in_ch.data[2*(8)*(LANE_SIZE)+1+:5] = opcode;
+    assign dut_in_ch.data[3*(8)*(LANE_SIZE)] = lane_sel;
+    assign dut_in_ch.data[3*(8)*(LANE_SIZE)+1+:5] = opcode;
+    assign dut_in_ch.data[4*(8)*(LANE_SIZE)-1:3*(8)*(LANE_SIZE)+6] = '0;
     assign dut_in_ch.valid = valid;
     assign ready = dut_in_ch.ready;
     rv_if #(
@@ -42,10 +44,11 @@ module vector_alu_tb;
         .clk(clk),
         .rst_n(rst_n),
         .in_ch(dut_in_ch),
-        .out_ch(dut_out_ch)
+        .out_ch(dut_out_ch),
+        .done()
     );
 
-    function automatic logic [7:0] reference_op(input logic [7:0] a, b, input logic [4:0] op,
+    function automatic logic [7:0] reference_op(input logic [7:0] a, b, mac_a, input logic [4:0] op,
                                                 input logic sel);
         int sa, sb, x, value;
         real exponential;
@@ -76,6 +79,7 @@ module vector_alu_tb;
             11: begin
                 while ((value + 1) * (value + 1) <= x) value++;
             end
+            12: value = int'($signed(mac_a)) + sa * sb;
             default: value = 0;
         endcase
         return 8'(value);
@@ -109,7 +113,7 @@ module vector_alu_tb;
             if (valid && ready) begin
                 for (int lane = 0; lane < LANE_SIZE; lane++)
                 wanted[lane*8+:8] =
-                    reference_op(lane_in_a[lane], lane_in_b[lane], opcode, lane_sel);
+                    reference_op(lane_in_a[lane], lane_in_b[lane], lane_mac_a[lane], opcode, lane_sel);
                 expected.push_back(wanted);
                 accepted++;
                 op_count[opcode]++;
@@ -126,6 +130,7 @@ module vector_alu_tb;
         lane_sel = 1'(sel);
         valid = 1;
         for (int lane = 0; lane < LANE_SIZE; lane++) begin
+            lane_mac_a[lane] = 8'(37 + 13 * lane);
             lane_in_a[lane] = 8'(a + 17 * lane);
             lane_in_b[lane] = 8'(b + 31 * lane);
         end

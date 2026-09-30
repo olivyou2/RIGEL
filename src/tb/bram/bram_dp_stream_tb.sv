@@ -7,10 +7,10 @@ module bram_dp_stream_tb ();
     logic rst_n;
 
     rv_if #(.ADDR_WIDTH(ADDR_WIDTH), .DATA_WIDTH(1)) read_req_a ();
-    rv_if #(.ADDR_WIDTH(1), .DATA_WIDTH(DATA_WIDTH)) read_rsp_a ();
+    rv_if #(.ADDR_WIDTH(ADDR_WIDTH), .DATA_WIDTH(DATA_WIDTH)) read_rsp_a ();
     rv_if #(.ADDR_WIDTH(ADDR_WIDTH), .DATA_WIDTH(DATA_WIDTH)) write_req_a ();
     rv_if #(.ADDR_WIDTH(ADDR_WIDTH), .DATA_WIDTH(1)) read_req_b ();
-    rv_if #(.ADDR_WIDTH(1), .DATA_WIDTH(DATA_WIDTH)) read_rsp_b ();
+    rv_if #(.ADDR_WIDTH(ADDR_WIDTH), .DATA_WIDTH(DATA_WIDTH)) read_rsp_b ();
     rv_if #(.ADDR_WIDTH(ADDR_WIDTH), .DATA_WIDTH(DATA_WIDTH)) write_req_b ();
 
     bram_dp_stream #(
@@ -51,6 +51,12 @@ module bram_dp_stream_tb ();
                     $fatal(1, "port A mismatch: index=%0d data=%h",
                            received_a, read_rsp_a.data);
                 end
+                if (read_rsp_a.tag !== 4'(received_a) || read_rsp_a.epoch !== 4'hA)
+                    $fatal(1, "port A metadata mismatch: index=%0d tag=%h epoch=%h",
+                           received_a, read_rsp_a.tag, read_rsp_a.epoch);
+                if (read_rsp_a.addr !== ADDR_WIDTH'(received_a * 8))
+                    $fatal(1, "port A address mismatch: index=%0d addr=%h",
+                           received_a, read_rsp_a.addr);
                 received_a <= received_a + 1;
             end
 
@@ -59,6 +65,12 @@ module bram_dp_stream_tb ();
                     $fatal(1, "port B mismatch: index=%0d data=%h",
                            received_b, read_rsp_b.data);
                 end
+                if (read_rsp_b.tag !== 4'(received_b) || read_rsp_b.epoch !== 4'hB)
+                    $fatal(1, "port B metadata mismatch: index=%0d tag=%h epoch=%h",
+                           received_b, read_rsp_b.tag, read_rsp_b.epoch);
+                if (read_rsp_b.addr !== ADDR_WIDTH'((received_b + TEST_COUNT) * 8))
+                    $fatal(1, "port B address mismatch: index=%0d addr=%h",
+                           received_b, read_rsp_b.addr);
                 received_b <= received_b + 1;
             end
         end
@@ -74,18 +86,26 @@ module bram_dp_stream_tb ();
         read_req_a.valid = 1'b0;
         read_req_a.addr = '0;
         read_req_a.data = '0;
+        read_req_a.tag = '0;
+        read_req_a.epoch = '0;
         read_rsp_a.ready = 1'b0;
         write_req_a.valid = 1'b0;
         write_req_a.addr = '0;
         write_req_a.data = '0;
+        write_req_a.tag = '0;
+        write_req_a.epoch = '0;
 
         read_req_b.valid = 1'b0;
         read_req_b.addr = '0;
         read_req_b.data = '0;
+        read_req_b.tag = '0;
+        read_req_b.epoch = '0;
         read_rsp_b.ready = 1'b0;
         write_req_b.valid = 1'b0;
         write_req_b.addr = '0;
         write_req_b.data = '0;
+        write_req_b.tag = '0;
+        write_req_b.epoch = '0;
 
         repeat (3) @(posedge clk);
         @(negedge clk);
@@ -119,6 +139,8 @@ module bram_dp_stream_tb ();
                     @(negedge clk);
                     read_req_a.valid = 1'b1;
                     read_req_a.addr = i * 8;
+                    read_req_a.tag = 4'(i);
+                    read_req_a.epoch = 4'hA;
                     do @(posedge clk); while (!read_req_a.ready);
                 end
                 @(negedge clk);
@@ -129,6 +151,8 @@ module bram_dp_stream_tb ();
                     @(negedge clk);
                     read_req_b.valid = 1'b1;
                     read_req_b.addr = (i + TEST_COUNT) * 8;
+                    read_req_b.tag = 4'(i);
+                    read_req_b.epoch = 4'hB;
                     do @(posedge clk); while (!read_req_b.ready);
                 end
                 @(negedge clk);

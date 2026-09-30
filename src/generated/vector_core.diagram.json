@@ -1,0 +1,701 @@
+{
+  "version": 1,
+  "name": "vector_system",
+  "nodes": [
+    {
+      "id": "ixc_read_sel",
+      "module": "engines/vector/vector_core_ixc_sel.sv::vector_core_ixc_sel",
+      "parameters": {
+        "MASTER_N": "1",
+        "SLAVE_N": "4"
+      },
+      "x": 658.7362478871187,
+      "y": 201.75874345182842
+    },
+    {
+      "id": "vector_main_ixc",
+      "module": "blocks/interconnect/ixc/ixc.sv::ixc",
+      "parameters": {
+        "MASTER_N": "1",
+        "SLAVE_N": "4"
+      },
+      "x": 56.998013175773586,
+      "y": 63.02152445030199,
+      "interface_parameters": {
+        "slave_write_req": {
+          "ADDR_WIDTH": 32,
+          "DATA_WIDTH": 128,
+          "TAG_WIDTH": 4,
+          "EPOCH_WIDTH": 4
+        }
+      }
+    },
+    {
+      "id": "ixc_write_sel",
+      "module": "engines/vector/vector_core_ixc_sel.sv::vector_core_ixc_sel",
+      "parameters": {
+        "MASTER_N": "1",
+        "SLAVE_N": "4"
+      },
+      "x": 656.5815710009072,
+      "y": 66.00588313386885
+    },
+    {
+      "id": "scratchpad_a",
+      "module": "blocks/memory/bram_dp_stream.sv::bram_dp_stream",
+      "parameters": {
+        "DATA_WIDTH": "128",
+        "ADDR_WIDTH": "32"
+      },
+      "x": 349.5259770051359,
+      "y": 786.2403436274199
+    },
+    {
+      "id": "bram_arbiter_0",
+      "module": "blocks/memory/bram_arbiter.sv::bram_arbiter",
+      "parameters": {
+        "N": "2",
+        "DATA_WIDTH": "128",
+        "ADDR_WIDTH": "32"
+      },
+      "x": 794.4965675137278,
+      "y": 488.22003131276676
+    },
+    {
+      "id": "alu_a_dma",
+      "module": "engines/dma/dma.sv::dma",
+      "parameters": {
+        "DATA_WIDTH": "128"
+      },
+      "x": 1180.0425887461424,
+      "y": 748.702295704043
+    },
+    {
+      "id": "alu_b_dma",
+      "module": "engines/dma/dma.sv::dma",
+      "parameters": {
+        "DATA_WIDTH": "128"
+      },
+      "x": 1170.5195061062248,
+      "y": 1092.263179522841
+    },
+    {
+      "id": "alu_c_dma",
+      "module": "engines/dma/dma.sv::dma",
+      "parameters": {
+        "DATA_WIDTH": "128"
+      },
+      "x": 1170.0,
+      "y": 1360.0
+    },
+    {
+      "id": "scratchpad_c",
+      "module": "blocks/memory/bram_dp_stream.sv::bram_dp_stream",
+      "parameters": {
+        "DATA_WIDTH": "128",
+        "ADDR_WIDTH": "32"
+      },
+      "x": 350.0,
+      "y": 1490.0
+    },
+    {
+      "id": "bram_arbiter_c",
+      "module": "blocks/memory/bram_arbiter.sv::bram_arbiter",
+      "parameters": {
+        "N": "2",
+        "DATA_WIDTH": "128",
+        "ADDR_WIDTH": "32"
+      },
+      "x": 790.0,
+      "y": 1500.0
+    },
+    {
+      "id": "vector_alu_0",
+      "module": "engines/vector/vector_core/vector_alu.sv::vector_alu",
+      "parameters": {
+        "RESULT_WIDTH": "16"
+      },
+      "x": 2396.2954216878716,
+      "y": 992.1387095739263,
+      "interface_parameters": {
+        "in_ch": {
+          "ADDR_WIDTH": 32,
+          "DATA_WIDTH": 512
+        },
+        "out_ch": {
+          "ADDR_WIDTH": 32,
+          "DATA_WIDTH": 272
+        }
+      }
+    },
+    {
+      "id": "vector_accumulate_0",
+      "module": "engines/vector/vector_core/vector_accumulate_slot.sv::vector_accumulate_slot",
+      "parameters": {
+        "DATA_WIDTH": "16",
+        "ACC_WIDTH": "32",
+        "LANE_SIZE": "16"
+      },
+      "x": 2710.0,
+      "y": 992.0,
+      "interface_parameters": {
+        "data": {
+          "ADDR_WIDTH": 32,
+          "DATA_WIDTH": 272
+        },
+        "out_ch": {
+          "ADDR_WIDTH": 32,
+          "DATA_WIDTH": 128
+        }
+      }
+    },
+    {
+      "id": "handshake_join_0",
+      "module": "common/rv/handshake_join.sv::handshake_join",
+      "parameters": {
+        "N": "4",
+        "DATA_WIDTH": "128",
+        "ADDR_SEL": "3"
+      },
+      "x": 1962.7748241192285,
+      "y": 945.2430619740627,
+      "interface_parameters": {
+        "out_ch": {
+          "ADDR_WIDTH": 32,
+          "DATA_WIDTH": 512
+        }
+      }
+    },
+    {
+      "id": "sch_0",
+      "module": "scheduler/sch.sv::sch",
+      "parameters": {},
+      "x": 787.9093075161743,
+      "y": 1224.2590336729706
+    },
+    {
+      "id": "bram_dp_stream_0",
+      "module": "blocks/memory/bram_dp_stream.sv::bram_dp_stream",
+      "parameters": {
+        "DATA_WIDTH": "32"
+      },
+      "x": 363.8792572426079,
+      "y": 1223.4208103121084
+    },
+    {
+      "id": "idle_scratchpad_a_write",
+      "module": "common/rv/rv_idle_write.sv::rv_idle_write",
+      "parameters": {},
+      "x": 690.0,
+      "y": 920.0
+    },
+    {
+      "id": "idle_instruction_write",
+      "module": "common/rv/rv_idle_write.sv::rv_idle_write",
+      "parameters": {},
+      "x": 690.0,
+      "y": 1290.0
+    },
+    {
+      "id": "idle_scratchpad_c_read",
+      "module": "common/rv/rv_idle_read.sv::rv_idle_read",
+      "parameters": {},
+      "x": 700.0,
+      "y": 1710.0
+    },
+    {
+      "id": "scheduler_zero_read",
+      "module": "common/rv/rv_zero_read.sv::rv_zero_read",
+      "parameters": {},
+      "x": 390.0,
+      "y": 1350.0
+    }
+  ],
+  "edges": [
+    {
+      "kind": "wire",
+      "a": {
+        "node": "vector_main_ixc",
+        "port": "ixc_addr_out[0]"
+      },
+      "b": {
+        "node": "ixc_read_sel",
+        "port": "addr_in[0]"
+      }
+    },
+    {
+      "kind": "wire",
+      "a": {
+        "node": "ixc_read_sel",
+        "port": "sel_out[0]"
+      },
+      "b": {
+        "node": "vector_main_ixc",
+        "port": "ixc_slave_sel[0]"
+      }
+    },
+    {
+      "kind": "wire",
+      "a": {
+        "node": "vector_main_ixc",
+        "port": "ixc_write_addr_out[0]"
+      },
+      "b": {
+        "node": "ixc_write_sel",
+        "port": "addr_in[0]"
+      }
+    },
+    {
+      "kind": "wire",
+      "a": {
+        "node": "ixc_write_sel",
+        "port": "sel_out[0]"
+      },
+      "b": {
+        "node": "vector_main_ixc",
+        "port": "ixc_write_slave_sel[0]"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "bram_arbiter_0",
+        "port": "slave_read_req"
+      },
+      "b": {
+        "node": "scratchpad_a",
+        "port": "read_req_a"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "scratchpad_a",
+        "port": "read_rsp_a"
+      },
+      "b": {
+        "node": "bram_arbiter_0",
+        "port": "slave_read_rsp"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "vector_main_ixc",
+        "port": "slave_read_req[0]"
+      },
+      "b": {
+        "node": "bram_arbiter_0",
+        "port": "read_req[0]"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "bram_arbiter_0",
+        "port": "read_rsp[0]"
+      },
+      "b": {
+        "node": "vector_main_ixc",
+        "port": "slave_read_rsp[0]"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "alu_a_dma",
+        "port": "read_rsp"
+      },
+      "b": {
+        "node": "bram_arbiter_0",
+        "port": "read_rsp[1]"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "alu_a_dma",
+        "port": "read_req"
+      },
+      "b": {
+        "node": "bram_arbiter_0",
+        "port": "read_req[1]"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "alu_b_dma",
+        "port": "read_req"
+      },
+      "b": {
+        "node": "scratchpad_a",
+        "port": "read_req_b"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "scratchpad_a",
+        "port": "read_rsp_b"
+      },
+      "b": {
+        "node": "alu_b_dma",
+        "port": "read_rsp"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "vector_main_ixc",
+        "port": "slave_write_req[0]"
+      },
+      "b": {
+        "node": "scratchpad_a",
+        "port": "write_req_a"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "alu_a_dma",
+        "port": "write_req"
+      },
+      "b": {
+        "node": "handshake_join_0",
+        "port": "in_ch[0]"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "alu_b_dma",
+        "port": "write_req"
+      },
+      "b": {
+        "node": "handshake_join_0",
+        "port": "in_ch[1]"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "alu_c_dma",
+        "port": "write_req"
+      },
+      "b": {
+        "node": "handshake_join_0",
+        "port": "in_ch[2]"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "handshake_join_0",
+        "port": "out_ch"
+      },
+      "b": {
+        "node": "vector_alu_0",
+        "port": "in_ch"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "vector_alu_0",
+        "port": "out_ch"
+      },
+      "b": {
+        "node": "vector_accumulate_0",
+        "port": "data"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "vector_accumulate_0",
+        "port": "out_ch"
+      },
+      "b": {
+        "node": "scratchpad_c",
+        "port": "write_req_b"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "sch_0",
+        "port": "dma_ctrl[0]"
+      },
+      "b": {
+        "node": "alu_a_dma",
+        "port": "ctrl"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "sch_0",
+        "port": "dma_ctrl[1]"
+      },
+      "b": {
+        "node": "alu_b_dma",
+        "port": "ctrl"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "sch_0",
+        "port": "dma_ctrl[2]"
+      },
+      "b": {
+        "node": "alu_c_dma",
+        "port": "ctrl"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "bram_dp_stream_0",
+        "port": "read_rsp_a"
+      },
+      "b": {
+        "node": "sch_0",
+        "port": "mem_read_rsp"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "sch_0",
+        "port": "mem_read_req"
+      },
+      "b": {
+        "node": "bram_dp_stream_0",
+        "port": "read_req_a"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "vector_main_ixc",
+        "port": "slave_write_req[1]"
+      },
+      "b": {
+        "node": "bram_dp_stream_0",
+        "port": "write_req_a"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "vector_main_ixc",
+        "port": "slave_read_req[1]"
+      },
+      "b": {
+        "node": "bram_dp_stream_0",
+        "port": "read_req_b"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "vector_main_ixc",
+        "port": "slave_read_rsp[1]"
+      },
+      "b": {
+        "node": "bram_dp_stream_0",
+        "port": "read_rsp_b"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "sch_0",
+        "port": "vector_control_req"
+      },
+      "b": {
+        "node": "handshake_join_0",
+        "port": "in_ch[3]"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "vector_main_ixc",
+        "port": "slave_write_req[2]"
+      },
+      "b": {
+        "node": "sch_0",
+        "port": "write_req"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "vector_main_ixc",
+        "port": "slave_read_req[3]"
+      },
+      "b": {
+        "node": "bram_arbiter_c",
+        "port": "read_req[0]"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "bram_arbiter_c",
+        "port": "read_rsp[0]"
+      },
+      "b": {
+        "node": "vector_main_ixc",
+        "port": "slave_read_rsp[3]"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "alu_c_dma",
+        "port": "read_req"
+      },
+      "b": {
+        "node": "bram_arbiter_c",
+        "port": "read_req[1]"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "bram_arbiter_c",
+        "port": "read_rsp[1]"
+      },
+      "b": {
+        "node": "alu_c_dma",
+        "port": "read_rsp"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "bram_arbiter_c",
+        "port": "slave_read_req"
+      },
+      "b": {
+        "node": "scratchpad_c",
+        "port": "read_req_a"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "scratchpad_c",
+        "port": "read_rsp_a"
+      },
+      "b": {
+        "node": "bram_arbiter_c",
+        "port": "slave_read_rsp"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "vector_main_ixc",
+        "port": "slave_write_req[3]"
+      },
+      "b": {
+        "node": "scratchpad_c",
+        "port": "write_req_a"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "idle_scratchpad_a_write",
+        "port": "write_req"
+      },
+      "b": {
+        "node": "scratchpad_a",
+        "port": "write_req_b"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "idle_instruction_write",
+        "port": "write_req"
+      },
+      "b": {
+        "node": "bram_dp_stream_0",
+        "port": "write_req_b"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "idle_scratchpad_c_read",
+        "port": "read_req"
+      },
+      "b": {
+        "node": "scratchpad_c",
+        "port": "read_req_b"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "scratchpad_c",
+        "port": "read_rsp_b"
+      },
+      "b": {
+        "node": "idle_scratchpad_c_read",
+        "port": "read_rsp"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "vector_main_ixc",
+        "port": "slave_read_req[2]"
+      },
+      "b": {
+        "node": "scheduler_zero_read",
+        "port": "read_req"
+      }
+    },
+    {
+      "kind": "interface",
+      "a": {
+        "node": "scheduler_zero_read",
+        "port": "read_rsp"
+      },
+      "b": {
+        "node": "vector_main_ixc",
+        "port": "slave_read_rsp[2]"
+      }
+    }
+  ],
+  "exposed": [
+    {
+      "node": "vector_main_ixc",
+      "port": "read_req[0]",
+      "kind": "interface",
+      "name": "read_req"
+    },
+    {
+      "node": "vector_main_ixc",
+      "port": "read_rsp[0]",
+      "kind": "interface",
+      "name": "read_rsp"
+    },
+    {
+      "node": "vector_main_ixc",
+      "port": "write_req[0]",
+      "kind": "interface",
+      "name": "write_req"
+    }
+  ],
+  "library": {
+    "path": "generated/vector_core"
+  }
+}

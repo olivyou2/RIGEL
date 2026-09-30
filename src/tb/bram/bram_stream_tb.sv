@@ -12,6 +12,7 @@ module bram_stream_tb ();
     logic read_addr_in_valid;
     logic read_addr_in_ready;
     logic [DATA_WIDTH-1:0] read_data_out;
+    logic [ADDR_WIDTH-1:0] read_addr_out;
     logic read_data_out_valid;
     logic read_data_out_ready;
 
@@ -29,10 +30,11 @@ module bram_stream_tb ();
     assign read_addr_in_ready = bram_stream_dut_read_req.ready;
     assign bram_stream_dut_read_req.data = '0;
     rv_if #(
-        .ADDR_WIDTH(1),
+        .ADDR_WIDTH(ADDR_WIDTH),
         .DATA_WIDTH((DATA_WIDTH))
     ) bram_stream_dut_read_rsp ();
     assign read_data_out = bram_stream_dut_read_rsp.data;
+    assign read_addr_out = bram_stream_dut_read_rsp.addr;
     assign read_data_out_valid = bram_stream_dut_read_rsp.valid;
     assign bram_stream_dut_read_rsp.ready = read_data_out_ready;
     rv_if #(
@@ -81,9 +83,15 @@ module bram_stream_tb ();
     endtask
 
     logic [63:0] prev_val = 0;
+    int received_count = 0;
 
     always @(posedge clk) begin
         if (read_data_out_valid && read_data_out_ready) begin
+            if (read_addr_out !== ADDR_WIDTH'(received_count * 8)) begin
+                $fatal(1, "response address mismatch: index=%0d addr=%h",
+                       received_count, read_addr_out);
+            end
+            received_count <= received_count + 1;
             if (prev_val == 0) begin
                 prev_val <= read_data_out;
                 $display("[BRAM_STREAM_TB] data_out=%0h", read_data_out);

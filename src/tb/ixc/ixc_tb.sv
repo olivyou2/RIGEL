@@ -11,6 +11,7 @@ module ixc_tb;
     logic [ADDR_WIDTH-1:0] ixc_addr_out[MASTER_N];
     logic [SEL_WIDTH-1:0] ixc_slave_sel[MASTER_N];
     logic [DATA_WIDTH-1:0] read_data_out[MASTER_N];
+    logic [ADDR_WIDTH-1:0] read_addr_out[MASTER_N];
     logic read_data_valid[MASTER_N];
     logic read_data_ready[MASTER_N];
     logic [ADDR_WIDTH-1:0] write_addr_in[MASTER_N];
@@ -24,6 +25,7 @@ module ixc_tb;
     logic slave_read_addr_valid[SLAVE_N];
     logic slave_read_addr_ready[SLAVE_N];
     logic [DATA_WIDTH-1:0] slave_read_data_in[SLAVE_N];
+    logic [ADDR_WIDTH-1:0] slave_read_rsp_addr_in[SLAVE_N];
     logic slave_read_data_valid[SLAVE_N];
     logic slave_read_data_ready[SLAVE_N];
     logic [ADDR_WIDTH-1 : 0] slave_write_addr_out[SLAVE_N];
@@ -41,11 +43,12 @@ module ixc_tb;
         assign dut_read_req[ch_idx].data = '0;
     end
     rv_if #(
-        .ADDR_WIDTH(1),
+        .ADDR_WIDTH(ADDR_WIDTH),
         .DATA_WIDTH((64))
     ) dut_read_rsp[(MASTER_N)] ();
     for (genvar ch_idx = 0; ch_idx < (MASTER_N); ch_idx++) begin : connect_dut_read_rsp
         assign read_data_out[ch_idx] = dut_read_rsp[ch_idx].data;
+        assign read_addr_out[ch_idx] = dut_read_rsp[ch_idx].addr;
         assign read_data_valid[ch_idx] = dut_read_rsp[ch_idx].valid;
         assign dut_read_rsp[ch_idx].ready = read_data_ready[ch_idx];
     end
@@ -69,14 +72,14 @@ module ixc_tb;
         assign dut_slave_read_req[ch_idx].ready = slave_read_addr_ready[ch_idx];
     end
     rv_if #(
-        .ADDR_WIDTH(1),
+        .ADDR_WIDTH(ADDR_WIDTH),
         .DATA_WIDTH((64))
     ) dut_slave_read_rsp[(SLAVE_N)] ();
     for (genvar ch_idx = 0; ch_idx < (SLAVE_N); ch_idx++) begin : connect_dut_slave_read_rsp
         assign dut_slave_read_rsp[ch_idx].data = slave_read_data_in[ch_idx];
+        assign dut_slave_read_rsp[ch_idx].addr = slave_read_rsp_addr_in[ch_idx];
         assign dut_slave_read_rsp[ch_idx].valid = slave_read_data_valid[ch_idx];
         assign slave_read_data_ready[ch_idx] = dut_slave_read_rsp[ch_idx].ready;
-        assign dut_slave_read_rsp[ch_idx].addr = '0;
     end
     rv_if #(
         .ADDR_WIDTH((32)),
@@ -89,6 +92,8 @@ module ixc_tb;
         assign dut_slave_write_req[ch_idx].ready = slave_write_data_ready[ch_idx];
     end
     ixc #(
+        .ADDR_WIDTH(ADDR_WIDTH),
+        .DATA_WIDTH(DATA_WIDTH),
         .MASTER_N(MASTER_N),
         .SLAVE_N(SLAVE_N),
         .SEL_WIDTH(SEL_WIDTH),
@@ -113,12 +118,14 @@ module ixc_tb;
     int read_seq[MASTER_N], write_seq[MASTER_N], write_seen[MASTER_N];
     int read_seen[MASTER_N];
     logic [63:0] mem_data[SLAVE_N][16];
+    logic [31:0] mem_addr[SLAVE_N][16];
     int mem_due[SLAVE_N][16];
     int mem_head[SLAVE_N], mem_tail[SLAVE_N], mem_count[SLAVE_N];
     int accepted_reads, returned_reads, accepted_writes, completed_writes;
     int simultaneous;
     logic [31:0] held_ra[SLAVE_N], held_wa[SLAVE_N];
     logic [63:0] held_wd[SLAVE_N], held_rd[MASTER_N];
+    logic [31:0] held_raddr[MASTER_N];
     bit ra_stall[SLAVE_N], wr_stall[SLAVE_N], rd_stall[MASTER_N];
 
     function automatic logic [63:0] response(input logic [31:0] addr);
@@ -172,6 +179,8 @@ module ixc_tb;
                     (mem_count[s]!=0 && cycle>=mem_due[s][mem_head[s]]);
                 slave_read_data_in[s] = ZERO_LATENCY ? response(slave_read_addr_out[s]) :
                     mem_data[s][mem_head[s]];
+                slave_read_rsp_addr_in[s] = ZERO_LATENCY ? slave_read_addr_out[s] :
+                    mem_addr[s][mem_head[s]];
             end
             @(posedge clk);
             for (int m = 0; m < MASTER_N; m++) begin
@@ -180,18 +189,20 @@ module ixc_tb;
                     $fatal(1, "AR burst stalled before FIFO filled");
                 if (cycle == 19 && read_addr_ready[m])
                     $fatal(1, "full AR FIFO failed to backpressure");
-                if (rd_stall[m] && (!read_data_valid[m] || read_data_out[m] !== held_rd[m]))
+                if (rd_stall[m] && (!read_data_valid[m] || read_data_out[m] !== held_rd[m] ||
+                                    read_addr_out[m] !== held_raddr[m]))
                     $fatal(1, "unstable master response");
                 rd_stall[m] = read_data_valid[m] && !read_data_ready[m];
                 held_rd[m]  = read_data_out[m];
+                held_raddr[m] = read_addr_out[m];
                 if (read_addr_valid[m] && read_addr_ready[m]) begin
                     accepted_reads++;
                     read_seq[m]++;
                 end
                 if (read_data_valid[m] && read_data_ready[m]) begin
-                    if (read_seen[m] >= read_seq[m] || read_data_out[m] !== response(
-                            read_address(read_seen[m], m)
-                        ))
+                    if (read_seen[m] >= read_seq[m] ||
+                        read_addr_out[m] !== read_address(read_seen[m], m) ||
+                        read_data_out[m] !== response(read_address(read_seen[m], m)))
                         $fatal(1, "read mismatch master %0d", m);
                     read_seen[m]++;
                     returned_reads++;
@@ -225,6 +236,7 @@ module ixc_tb;
                         if (!ZERO_LATENCY) begin
                             if (mem_count[s] >= 16) $fatal(1, "slave model overrun");
                             mem_data[s][mem_tail[s]] = response(slave_read_addr_out[s]);
+                            mem_addr[s][mem_tail[s]] = slave_read_addr_out[s];
                             mem_due[s][mem_tail[s]] = cycle + int'($urandom_range(1, 12));
                             mem_tail[s] = (mem_tail[s] + 1) % 16;
                             mem_count[s]++;

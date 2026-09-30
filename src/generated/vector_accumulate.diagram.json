@@ -1,0 +1,80 @@
+{
+  "version": 1,
+  "name": "vector_accumulate",
+  "nodes": [
+    {
+      "id": "data_addr_join",
+      "module": "common/rv/handshake_join.sv::handshake_join",
+      "parameters": {
+        "N": "2",
+        "DATA_WIDTH": "128",
+        "ADDR_SEL": "1"
+      },
+      "x": 750.8002347365345,
+      "y": 357.3576844164202,
+      "interface_parameters": {
+        "out_ch": {
+          "ADDR_WIDTH": 32,
+          "DATA_WIDTH": 256
+        }
+      }
+    },
+    {
+      "id": "accumulate",
+      "module": "engines/vector/vector_core/vector_accumulate_slot.sv::vector_accumulate_slot",
+      "parameters": {},
+      "x": 1266.1448186909547,
+      "y": 495.87565306026477,
+      "interface_parameters": {
+        "data": {
+          "ADDR_WIDTH": 32,
+          "DATA_WIDTH": 256
+        },
+        "out_ch": {
+          "ADDR_WIDTH": 32,
+          "DATA_WIDTH": 128
+        }
+      }
+    }
+  ],
+  "edges": [
+    {
+      "kind": "interface",
+      "a": {
+        "node": "accumulate",
+        "port": "data"
+      },
+      "b": {
+        "node": "data_addr_join",
+        "port": "out_ch"
+      }
+    }
+  ],
+  "exposed": [
+    {
+      "node": "data_addr_join",
+      "port": "in_ch[0]",
+      "kind": "interface",
+      "name": "data_in"
+    },
+    {
+      "node": "data_addr_join",
+      "port": "in_ch[1]",
+      "kind": "interface",
+      "name": "control_in"
+    },
+    {
+      "node": "accumulate",
+      "port": "out_ch",
+      "kind": "interface",
+      "name": "accumulate_out",
+      "parameters": {
+        "ADDR_WIDTH": 32,
+        "DATA_WIDTH": 128
+      }
+    }
+  ],
+  "library": {
+    "path": "generated/vector_accumulate"
+  }
+}

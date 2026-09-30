@@ -57,7 +57,7 @@ module dma_sge_tb ();
     assign read_addr_in_ready = bram_stream_dut_read_req.ready;
     assign bram_stream_dut_read_req.data = '0;
     rv_if #(
-        .ADDR_WIDTH(1),
+        .ADDR_WIDTH(ADDR_WIDTH),
         .DATA_WIDTH((DATA_WIDTH))
     ) bram_stream_dut_read_rsp ();
     assign read_data_out = bram_stream_dut_read_rsp.data;

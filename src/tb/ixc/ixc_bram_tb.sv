@@ -8,9 +8,11 @@ module ixc_bram_tb;
     logic read_addr_valid[2], read_addr_ready[2], read_data_valid[2], read_data_ready[2];
     logic write_data_valid[2], write_data_ready[2];
     logic [127:0] read_data_out[2], write_data_in[2];
+    logic [31:0] read_addr_out[2];
     logic [0:0] read_sel[2], write_sel[2];
     logic [31:0] slave_read_addr_out[1], slave_write_addr_out[1];
     logic [127:0] slave_read_data_in[1], slave_write_data_out[1];
+    logic [31:0] slave_read_rsp_addr_in[1];
     logic slave_read_addr_valid[1], slave_read_addr_ready[1];
     logic slave_read_data_valid[1], slave_read_data_ready[1];
     logic slave_write_data_valid[1], slave_write_data_ready[1];
@@ -26,11 +28,12 @@ module ixc_bram_tb;
         assign dut_read_req[ch_idx].data = '0;
     end
     rv_if #(
-        .ADDR_WIDTH(1),
+        .ADDR_WIDTH(32),
         .DATA_WIDTH((128))
     ) dut_read_rsp[(2)] ();
     for (genvar ch_idx = 0; ch_idx < (2); ch_idx++) begin : connect_dut_read_rsp
         assign read_data_out[ch_idx] = dut_read_rsp[ch_idx].data;
+        assign read_addr_out[ch_idx] = dut_read_rsp[ch_idx].addr;
         assign read_data_valid[ch_idx] = dut_read_rsp[ch_idx].valid;
         assign dut_read_rsp[ch_idx].ready = read_data_ready[ch_idx];
     end
@@ -54,14 +57,14 @@ module ixc_bram_tb;
         assign dut_slave_read_req[ch_idx].ready = slave_read_addr_ready[ch_idx];
     end
     rv_if #(
-        .ADDR_WIDTH(1),
+        .ADDR_WIDTH(32),
         .DATA_WIDTH((128))
     ) dut_slave_read_rsp[(1)] ();
     for (genvar ch_idx = 0; ch_idx < (1); ch_idx++) begin : connect_dut_slave_read_rsp
         assign dut_slave_read_rsp[ch_idx].data = slave_read_data_in[ch_idx];
+        assign dut_slave_read_rsp[ch_idx].addr = slave_read_rsp_addr_in[ch_idx];
         assign dut_slave_read_rsp[ch_idx].valid = slave_read_data_valid[ch_idx];
         assign slave_read_data_ready[ch_idx] = dut_slave_read_rsp[ch_idx].ready;
-        assign dut_slave_read_rsp[ch_idx].addr = '0;
     end
     rv_if #(
         .ADDR_WIDTH((32)),
@@ -100,10 +103,11 @@ module ixc_bram_tb;
     assign slave_read_addr_ready[0] = memory_read_req.ready;
     assign memory_read_req.data = '0;
     rv_if #(
-        .ADDR_WIDTH(1),
+        .ADDR_WIDTH(32),
         .DATA_WIDTH((128))
     ) memory_read_rsp ();
     assign slave_read_data_in[0] = memory_read_rsp.data;
+    assign slave_read_rsp_addr_in[0] = memory_read_rsp.addr;
     assign slave_read_data_valid[0] = memory_read_rsp.valid;
     assign memory_read_rsp.ready = slave_read_data_ready[0];
     rv_if #(
@@ -136,6 +140,7 @@ module ixc_bram_tb;
 
     int sent[2], received[2];
     logic [127:0] held[2];
+    logic [31:0] held_addr[2];
     bit stalled[2];
     int consecutive;
 
@@ -187,13 +192,16 @@ module ixc_bram_tb;
                 consecutive++;
             end
             for (int m = 0; m < 2; m++) begin
-                if (stalled[m] && (!read_data_valid[m] || read_data_out[m] !== held[m]))
+                if (stalled[m] && (!read_data_valid[m] || read_data_out[m] !== held[m] ||
+                                   read_addr_out[m] !== held_addr[m]))
                     $fatal(1, "BRAM response changed under backpressure");
                 stalled[m] = read_data_valid[m] && !read_data_ready[m];
                 held[m] = read_data_out[m];
+                held_addr[m] = read_addr_out[m];
                 if (read_addr_valid[m] && read_addr_ready[m]) sent[m]++;
                 if (read_data_valid[m] && read_data_ready[m]) begin
-                    if (received[m] >= sent[m] || read_data_out[m] !== pattern(received[m]))
+                    if (received[m] >= sent[m] || read_addr_out[m] !== 32'(received[m] * 16) ||
+                        read_data_out[m] !== pattern(received[m]))
                         $fatal(1, "BRAM data/order mismatch master=%0d index=%0d", m, received[m]);
                     received[m]++;
                 end
@@ -235,7 +243,8 @@ module ixc_bram_tb;
         @(negedge clk);
         read_addr_valid[0] = 0;
         do @(posedge clk); while (!read_data_valid[0]);
-        if (read_data_out[0] !== pattern(1)) $fatal(1, "post-reset read mismatch");
+        if (read_addr_out[0] !== 32'd16 || read_data_out[0] !== pattern(1))
+            $fatal(1, "post-reset read mismatch");
         $display("PASS BRAM: reset flush and post-reset read");
         $finish;
     end
