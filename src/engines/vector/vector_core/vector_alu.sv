@@ -71,10 +71,12 @@ module vector_alu #(
     logic signed [RESULT_WIDTH-1:0] signed_a[LANE_SIZE];
     logic signed [RESULT_WIDTH-1:0] signed_b[LANE_SIZE];
     logic signed [RESULT_WIDTH-1:0] signed_c[LANE_SIZE];
+    (* use_dsp = "yes" *) logic signed [RESULT_WIDTH-1:0] lane_product[LANE_SIZE];
     for (genvar lane = 0; lane < LANE_SIZE; lane++) begin : widen_operands
         assign signed_a[lane] = $signed(lane_in_a[lane]);
         assign signed_b[lane] = $signed(lane_in_b[lane]);
         assign signed_c[lane] = $signed(lane_in_c[lane]);
+        assign lane_product[lane] = signed_b[lane] * signed_c[lane];
     end
     logic [DATA_WIDTH-1:0] lane_exp_out[LANE_SIZE];
     logic [DATA_WIDTH-1:0] lane_sqrt_out[LANE_SIZE];
@@ -127,7 +129,7 @@ module vector_alu #(
             case (opcode)
                 ALU_ADD:  lane_alu_out[i] = signed_b[i] + signed_c[i];
                 ALU_SUB:  lane_alu_out[i] = signed_b[i] - signed_c[i];
-                ALU_MUL:  lane_alu_out[i] = signed_b[i] * signed_c[i];
+                ALU_MUL:  lane_alu_out[i] = lane_product[i];
                 ALU_AND:  lane_alu_out[i] = signed_b[i] & signed_c[i];
                 ALU_OR:   lane_alu_out[i] = signed_b[i] | signed_c[i];
                 ALU_XOR:  lane_alu_out[i] = signed_b[i] ^ signed_c[i];
@@ -137,7 +139,7 @@ module vector_alu #(
                 ALU_MIN:  lane_alu_out[i] = lane_b_bigger[i] ? signed_c[i] : signed_b[i];
                 ALU_EXP:  lane_alu_out[i] = lane_exp_out[i];
                 ALU_SQRT: lane_alu_out[i] = lane_sqrt_out[i];
-                ALU_FMA:  lane_alu_out[i] = signed_a[i] + signed_b[i] * signed_c[i];
+                ALU_FMA:  lane_alu_out[i] = signed_a[i] + lane_product[i];
 
                 default: lane_alu_out[i] = 0;
             endcase

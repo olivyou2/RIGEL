@@ -69,6 +69,14 @@ module sch_execute #(
     sch_ex_wb wb;
     sch_ex_wb decoded;
     logic wb_valid;
+    // MUL is held in-order while its 16x16 partial products are registered.
+    sch_ex_wb mul_pending_wb;
+    logic mul_operands_valid, mul_products_valid;
+    logic [31:0] mul_a, mul_b;
+    (* use_dsp = "yes" *) logic [31:0] mul_lo_product;
+    (* use_dsp = "yes" *) logic [31:0] mul_cross_ab;
+    (* use_dsp = "yes" *) logic [31:0] mul_cross_ba;
+    logic [31:0] mul_result;
     logic [31:0] instr;
     logic [4:0] opcode, rd, rs0, rs1;
     logic use_imm;
@@ -91,7 +99,13 @@ module sch_execute #(
     assign src1 = reg_read(rs1);
     assign imm_signed = {{21{imm[10]}}, imm};
     assign imm_unsigned = {21'b0, imm};
-    assign mem_read_rsp.ready = rst_n && running && !fault && !wb_valid;
+    assign mem_read_rsp.ready = rst_n && running && !fault && !wb_valid &&
+                                !mul_operands_valid && !mul_products_valid;
+    // Only the low 32 bits are architectural. Three 16x16 products suffice;
+    // the high-half times high-half term contributes above bit 31.
+    assign mul_result = {16'(mul_lo_product[31:16] +
+                             mul_cross_ab[15:0] + mul_cross_ba[15:0]),
+                         mul_lo_product[15:0]};
 
     for (genvar i = 0; i < 3; i++) begin : dma_ports
         assign dma_ctrl[i].valid = wb_valid && wb_current && !fault &&
@@ -130,7 +144,7 @@ module sch_execute #(
 
         case (opcode)
             OP_ADD: begin decoded.reg_write = 1'b1; decoded.result = src0 + operand; end
-            OP_MUL: begin decoded.reg_write = 1'b1; decoded.result = src0 * operand; end
+            OP_MUL: begin decoded.reg_write = 1'b1; end
             OP_AND: begin decoded.reg_write = 1'b1; decoded.result = src0 & (use_imm ? imm_unsigned : src1); end
             OP_OR:  begin decoded.reg_write = 1'b1; decoded.result = src0 | (use_imm ? imm_unsigned : src1); end
             OP_XOR: begin decoded.reg_write = 1'b1; decoded.result = src0 ^ (use_imm ? imm_unsigned : src1); end
@@ -169,6 +183,14 @@ module sch_execute #(
         if (!rst_n) begin
             wb_valid <= 1'b0;
             wb <= '0;
+            mul_operands_valid <= 1'b0;
+            mul_products_valid <= 1'b0;
+            mul_pending_wb <= '0;
+            mul_a <= '0;
+            mul_b <= '0;
+            mul_lo_product <= '0;
+            mul_cross_ab <= '0;
+            mul_cross_ba <= '0;
             fault <= 1'b0;
             output_base <= '0;
             output_step <= 32'(SRC_DMA_BEAT_BYTES);
@@ -178,16 +200,31 @@ module sch_execute #(
         end else begin
             if (restart) begin
                 wb_valid <= 1'b0;
+                mul_operands_valid <= 1'b0;
+                mul_products_valid <= 1'b0;
                 fault <= 1'b0;
                 emit_remaining <= '0;
-            end else if (wb_valid && wb_complete) begin
-                wb_valid <= 1'b0;
-                if (wb_current) begin
-                    if (wb.illegal) fault <= 1'b1;
-                    else if (wb.reg_write) begin
-                        if (wb.rd < 5'd16) gpr[wb.rd[3:0]] <= wb.result;
-                        else if (wb.rd == 5'd16) output_base <= wb.result;
-                        else if (wb.rd == 5'd17) output_step <= wb.result;
+            end else begin
+                if (mul_operands_valid) begin
+                    mul_lo_product <= mul_a[15:0] * mul_b[15:0];
+                    mul_cross_ab <= mul_a[15:0] * mul_b[31:16];
+                    mul_cross_ba <= mul_a[31:16] * mul_b[15:0];
+                    mul_operands_valid <= 1'b0;
+                    mul_products_valid <= 1'b1;
+                end else if (mul_products_valid) begin
+                    wb <= mul_pending_wb;
+                    wb.result <= mul_result;
+                    wb_valid <= 1'b1;
+                    mul_products_valid <= 1'b0;
+                end else if (wb_valid && wb_complete) begin
+                    wb_valid <= 1'b0;
+                    if (wb_current) begin
+                        if (wb.illegal) fault <= 1'b1;
+                        else if (wb.reg_write) begin
+                            if (wb.rd < 5'd16) gpr[wb.rd[3:0]] <= wb.result;
+                            else if (wb.rd == 5'd16) output_base <= wb.result;
+                            else if (wb.rd == 5'd17) output_step <= wb.result;
+                        end
                     end
                 end
             end
@@ -198,10 +235,17 @@ module sch_execute #(
             end
             if (!restart && mem_read_rsp.valid && mem_read_rsp.ready &&
                 mem_read_rsp.epoch == current_epoch) begin
-                wb <= decoded;
-                wb_valid <= 1'b1;
-                emit_remaining <= decoded.emit_count;
-                emit_addr <= decoded.emit_base;
+                if (opcode == OP_MUL) begin
+                    mul_a <= src0;
+                    mul_b <= operand;
+                    mul_pending_wb <= decoded;
+                    mul_operands_valid <= 1'b1;
+                end else begin
+                    wb <= decoded;
+                    wb_valid <= 1'b1;
+                    emit_remaining <= decoded.emit_count;
+                    emit_addr <= decoded.emit_base;
+                end
             end else if (emit_fire) begin
                 emit_remaining <= emit_remaining - 32'd1;
                 emit_addr <= emit_addr + wb.emit_step;

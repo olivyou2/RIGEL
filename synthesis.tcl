@@ -23,7 +23,7 @@ foreach f [find_files ./src {*.sv}] {
 
 read_verilog -sv $sv_files
 
-synth_design -top compute -part xc7k480tffg1156-2
+synth_design -top vector_system -part xc7k480tffg1156-2
 
 # 200 MHz system clock (5.000 ns period).
 create_clock -name sys_clk -period 5.000 [get_ports clk]

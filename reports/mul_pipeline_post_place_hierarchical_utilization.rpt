@@ -1,14 +1,14 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
----------------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2026.1 (win64) Build 6511674 Tue Jun 16 11:02:23 MDT 2026
-| Date         : Wed Sep 30 21:59:10 2026
+| Date         : Wed Sep 30 22:41:42 2026
 | Host         : DESKTOP-2MR89AG running 64-bit major release  (build 9200)
-| Command      : report_utilization -hierarchical -hierarchical_depth 10 -file reports/post_place_hierarchical_utilization.rpt
+| Command      : report_utilization -hierarchical -hierarchical_depth 10 -file C:/Users/wonho/AppData/Local/Temp/rigel_mul_verify/post_place_hierarchical_utilization.rpt
 | Design       : vector_system
 | Device       : xc7k480tffg1156-2
 | Speed File   : -2
 | Design State : Physopt postPlace
----------------------------------------------------------------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 Utilization Design Information
 
@@ -22,10 +22,10 @@ Table of Contents
 +-----------------------------------+----------------------------------------+------------+------------+---------+------+-------+--------+--------+------------+
 |              Instance             |                 Module                 | Total LUTs | Logic LUTs | LUTRAMs | SRLs |  FFs  | RAMB36 | RAMB18 | DSP Blocks |
 +-----------------------------------+----------------------------------------+------------+------------+---------+------+-------+--------+--------+------------+
-| vector_system                     |                                  (top) |      13338 |      13084 |     254 |    0 | 16121 |      9 |      0 |          0 |
+| vector_system                     |                                  (top) |      12205 |      11951 |     254 |    0 | 16100 |      9 |      0 |         35 |
 |   (vector_system)                 |                                  (top) |          0 |          0 |       0 |    0 |     0 |      0 |      0 |          0 |
-|   alu_a_dma                       |                                    dma |        751 |        751 |       0 |    0 |  1967 |      0 |      0 |          0 |
-|     dma_control_dut               |                         dma_control_26 |        102 |        102 |       0 |    0 |   189 |      0 |      0 |          0 |
+|   alu_a_dma                       |                                    dma |        752 |        752 |       0 |    0 |  1967 |      0 |      0 |          0 |
+|     dma_control_dut               |                         dma_control_26 |        103 |        103 |       0 |    0 |   189 |      0 |      0 |          0 |
 |     dma_dst_addr_dut              |                        dma_dst_addr_27 |        195 |        195 |       0 |    0 |   258 |      0 |      0 |          0 |
 |     dma_src_addr_dut              |                        dma_src_addr_28 |         52 |         52 |       0 |    0 |    99 |      0 |      0 |          0 |
 |     fifo_dut                      |                fifo__parameterized0_29 |        402 |        402 |       0 |    0 |  1421 |      0 |      0 |          0 |
@@ -55,27 +55,27 @@ Table of Contents
 |   bram_dp_stream_0                |         bram_dp_stream__parameterized1 |        317 |        317 |       0 |    0 |   639 |      1 |      0 |          0 |
 |     port_b                        | bram_dp_stream_port__parameterized3_11 |        187 |        187 |       0 |    0 |   373 |      0 |      0 |          0 |
 |     port_a                        |    bram_dp_stream_port__parameterized3 |        125 |        125 |       0 |    0 |   266 |      0 |      0 |          0 |
-|   handshake_join_0                |         handshake_join__parameterized0 |       4688 |       4688 |       0 |    0 |  1660 |      0 |      0 |          0 |
-|     input_buffers[0].input_skid   |                   skid__parameterized0 |         68 |         68 |       0 |    0 |   259 |      0 |      0 |          0 |
-|     input_buffers[1].input_skid   |                 skid__parameterized0_8 |         68 |         68 |       0 |    0 |   259 |      0 |      0 |          0 |
-|     input_buffers[2].input_skid   |                 skid__parameterized0_9 |         69 |         69 |       0 |    0 |   259 |      0 |      0 |          0 |
-|     output_skid                   |                   skid__parameterized3 |       4460 |       4460 |       0 |    0 |   842 |      0 |      0 |          0 |
-|   sch_0                           |                                    sch |        990 |        990 |       0 |    0 |   894 |      0 |      0 |          0 |
-|     execute                       |                            sch_execute |        482 |        482 |       0 |    0 |   764 |      0 |      0 |          0 |
-|     epoch_filter                  |                       sch_epoch_filter |        509 |        509 |       0 |    0 |    97 |      0 |      0 |          0 |
-|   scratchpad_a                    |                         bram_dp_stream |        918 |        918 |       0 |    0 |  1439 |      4 |      0 |          0 |
-|     port_b                        |                  bram_dp_stream_port_7 |        398 |        398 |       0 |    0 |   537 |      0 |      0 |          0 |
+|   handshake_join_0                |         handshake_join__parameterized0 |       3399 |       3399 |       0 |    0 |  1529 |      0 |      0 |          0 |
+|     input_buffers[0].input_skid   |                   skid__parameterized0 |         97 |         97 |       0 |    0 |   259 |      0 |      0 |          0 |
+|     input_buffers[1].input_skid   |                 skid__parameterized0_8 |         93 |         93 |       0 |    0 |   259 |      0 |      0 |          0 |
+|     input_buffers[2].input_skid   |                 skid__parameterized0_9 |         92 |         92 |       0 |    0 |   259 |      0 |      0 |          0 |
+|     output_skid                   |                   skid__parameterized3 |       3161 |       3161 |       0 |    0 |   711 |      0 |      0 |          0 |
+|   sch_0                           |                                    sch |       1115 |       1115 |       0 |    0 |  1004 |      0 |      0 |          3 |
+|     execute                       |                            sch_execute |        542 |        542 |       0 |    0 |   874 |      0 |      0 |          3 |
+|     epoch_filter                  |                       sch_epoch_filter |        569 |        569 |       0 |    0 |    97 |      0 |      0 |          0 |
+|   scratchpad_a                    |                         bram_dp_stream |        919 |        919 |       0 |    0 |  1439 |      4 |      0 |          0 |
+|     port_b                        |                  bram_dp_stream_port_7 |        399 |        399 |       0 |    0 |   537 |      0 |      0 |          0 |
 |     port_a                        |                  bram_dp_stream_port_6 |        515 |        515 |       0 |    0 |   902 |      0 |      0 |          0 |
 |   scratchpad_c                    |                       bram_dp_stream_3 |        610 |        610 |       0 |    0 |  1043 |      4 |      0 |          0 |
 |     port_b                        |                  bram_dp_stream_port_4 |          5 |          5 |       0 |    0 |   139 |      0 |      0 |          0 |
 |     port_a                        |                    bram_dp_stream_port |        600 |        600 |       0 |    0 |   904 |      0 |      0 |          0 |
-|   vector_accumulate_0             |                 vector_accumulate_slot |       1252 |       1252 |       0 |    0 |   651 |      0 |      0 |          0 |
-|   vector_alu_0                    |                             vector_alu |        661 |        661 |       0 |    0 |   541 |      0 |      0 |          0 |
-|     (vector_alu_0)                |                             vector_alu |        549 |        549 |       0 |    0 |   541 |      0 |      0 |          0 |
-|     vector_exp                    |                             vector_exp |        112 |        112 |       0 |    0 |     0 |      0 |      0 |          0 |
-|   vector_main_ixc                 |                                    ixc |       1388 |       1134 |     254 |    0 |  1155 |      0 |      0 |          0 |
+|   vector_accumulate_0             |                 vector_accumulate_slot |       1249 |       1249 |       0 |    0 |   651 |      0 |      0 |          0 |
+|   vector_alu_0                    |                             vector_alu |        692 |        692 |       0 |    0 |   541 |      0 |      0 |         32 |
+|     (vector_alu_0)                |                             vector_alu |        560 |        560 |       0 |    0 |   541 |      0 |      0 |         32 |
+|     vector_exp                    |                             vector_exp |        132 |        132 |       0 |    0 |     0 |      0 |      0 |          0 |
+|   vector_main_ixc                 |                                    ixc |       1389 |       1135 |     254 |    0 |  1155 |      0 |      0 |          0 |
 |     (vector_main_ixc)             |                                    ixc |          0 |          0 |       0 |    0 |  1032 |      0 |      0 |          0 |
-|     control                       |                            ixc_control |        784 |        784 |       0 |    0 |    32 |      0 |      0 |          0 |
+|     control                       |                            ixc_control |        785 |        785 |       0 |    0 |    32 |      0 |      0 |          0 |
 |     read_path                     |                               ixc_read |        604 |        350 |     254 |    0 |    91 |      0 |      0 |          0 |
 +-----------------------------------+----------------------------------------+------------+------------+---------+------+-------+--------+--------+------------+
 * Note: The sum of lower-level cells may be larger than their parent cells total, due to cross-hierarchy LUT combining
