@@ -34,30 +34,30 @@ module vector_system(
     wire [3:0] vector_main_ixc__slave_read_req__epoch_1;
     wire [3:0] vector_main_ixc__slave_read_req__epoch_2;
     wire [3:0] vector_main_ixc__slave_read_req__epoch_3;
-    wire bram_arbiter_0__read_req__ready_0;
-    wire bram_dp_stream_0__read_req_b__ready;
+    wire scratchpad_a__read_req__ready_0;
+    wire bram_dp_stream_0__read_req__ready_1;
     wire scheduler_zero_read__read_req__ready;
-    wire bram_arbiter_c__read_req__ready_0;
-    wire bram_arbiter_0__read_rsp__valid_0;
-    wire bram_dp_stream_0__read_rsp_b__valid;
+    wire scratchpad_c__read_req__ready_0;
+    wire scratchpad_a__read_rsp__valid_0;
+    wire bram_dp_stream_0__read_rsp__valid_1;
     wire scheduler_zero_read__read_rsp__valid;
-    wire bram_arbiter_c__read_rsp__valid_0;
-    wire [31:0] bram_arbiter_0__read_rsp__addr_0;
-    wire [31:0] bram_dp_stream_0__read_rsp_b__addr;
+    wire scratchpad_c__read_rsp__valid_0;
+    wire [31:0] scratchpad_a__read_rsp__addr_0;
+    wire [31:0] bram_dp_stream_0__read_rsp__addr_1;
     wire [31:0] scheduler_zero_read__read_rsp__addr;
-    wire [31:0] bram_arbiter_c__read_rsp__addr_0;
-    wire [127:0] bram_arbiter_0__read_rsp__data_0;
-    wire [127:0] bram_dp_stream_0__read_rsp_b__data;
+    wire [31:0] scratchpad_c__read_rsp__addr_0;
+    wire [127:0] scratchpad_a__read_rsp__data_0;
+    wire [127:0] bram_dp_stream_0__read_rsp__data_1;
     wire [127:0] scheduler_zero_read__read_rsp__data;
-    wire [127:0] bram_arbiter_c__read_rsp__data_0;
-    wire [3:0] bram_arbiter_0__read_rsp__tag_0;
-    wire [3:0] bram_dp_stream_0__read_rsp_b__tag;
+    wire [127:0] scratchpad_c__read_rsp__data_0;
+    wire [3:0] scratchpad_a__read_rsp__tag_0;
+    wire [3:0] bram_dp_stream_0__read_rsp__tag_1;
     wire [3:0] scheduler_zero_read__read_rsp__tag;
-    wire [3:0] bram_arbiter_c__read_rsp__tag_0;
-    wire [3:0] bram_arbiter_0__read_rsp__epoch_0;
-    wire [3:0] bram_dp_stream_0__read_rsp_b__epoch;
+    wire [3:0] scratchpad_c__read_rsp__tag_0;
+    wire [3:0] scratchpad_a__read_rsp__epoch_0;
+    wire [3:0] bram_dp_stream_0__read_rsp__epoch_1;
     wire [3:0] scheduler_zero_read__read_rsp__epoch;
-    wire [3:0] bram_arbiter_c__read_rsp__epoch_0;
+    wire [3:0] scratchpad_c__read_rsp__epoch_0;
     wire vector_main_ixc__slave_read_rsp__ready_0;
     wire vector_main_ixc__slave_read_rsp__ready_1;
     wire vector_main_ixc__slave_read_rsp__ready_2;
@@ -82,52 +82,34 @@ module vector_system(
     wire [3:0] vector_main_ixc__slave_write_req__epoch_1;
     wire [3:0] vector_main_ixc__slave_write_req__epoch_2;
     wire [3:0] vector_main_ixc__slave_write_req__epoch_3;
-    wire scratchpad_a__write_req_a__ready;
-    wire bram_dp_stream_0__write_req_a__ready;
+    wire scratchpad_a__write_req__ready_0;
+    wire bram_dp_stream_0__write_req__ready_0;
     wire sch_0__write_req__ready;
-    wire scratchpad_c__write_req_a__ready;
-    wire bram_arbiter_0__slave_read_req__valid;
-    wire [31:0] bram_arbiter_0__slave_read_req__addr;
-    wire [127:0] bram_arbiter_0__slave_read_req__data;
-    wire [3:0] bram_arbiter_0__slave_read_req__tag;
-    wire [3:0] bram_arbiter_0__slave_read_req__epoch;
-    wire scratchpad_a__read_req_a__ready;
-    wire scratchpad_a__read_rsp_a__valid;
-    wire [31:0] scratchpad_a__read_rsp_a__addr;
-    wire [127:0] scratchpad_a__read_rsp_a__data;
-    wire [3:0] scratchpad_a__read_rsp_a__tag;
-    wire [3:0] scratchpad_a__read_rsp_a__epoch;
-    wire bram_arbiter_0__slave_read_rsp__ready;
-    wire alu_b_dma__read_req__valid;
-    wire [31:0] alu_b_dma__read_req__addr;
-    wire [127:0] alu_b_dma__read_req__data;
-    wire [3:0] alu_b_dma__read_req__tag;
-    wire [3:0] alu_b_dma__read_req__epoch;
-    wire scratchpad_a__read_req_b__ready;
-    wire scratchpad_a__read_rsp_b__valid;
-    wire [31:0] scratchpad_a__read_rsp_b__addr;
-    wire [127:0] scratchpad_a__read_rsp_b__data;
-    wire [3:0] scratchpad_a__read_rsp_b__tag;
-    wire [3:0] scratchpad_a__read_rsp_b__epoch;
-    wire alu_b_dma__read_rsp__ready;
-    wire idle_scratchpad_a_write__write_req__valid;
-    wire [31:0] idle_scratchpad_a_write__write_req__addr;
-    wire [127:0] idle_scratchpad_a_write__write_req__data;
-    wire [3:0] idle_scratchpad_a_write__write_req__tag;
-    wire [3:0] idle_scratchpad_a_write__write_req__epoch;
-    wire scratchpad_a__write_req_b__ready;
+    wire scratchpad_c__write_req__ready_0;
     wire alu_a_dma__read_req__valid;
+    wire alu_b_dma__read_req__valid;
     wire [31:0] alu_a_dma__read_req__addr;
+    wire [31:0] alu_b_dma__read_req__addr;
     wire [127:0] alu_a_dma__read_req__data;
+    wire [127:0] alu_b_dma__read_req__data;
     wire [3:0] alu_a_dma__read_req__tag;
+    wire [3:0] alu_b_dma__read_req__tag;
     wire [3:0] alu_a_dma__read_req__epoch;
-    wire bram_arbiter_0__read_req__ready_1;
-    wire bram_arbiter_0__read_rsp__valid_1;
-    wire [31:0] bram_arbiter_0__read_rsp__addr_1;
-    wire [127:0] bram_arbiter_0__read_rsp__data_1;
-    wire [3:0] bram_arbiter_0__read_rsp__tag_1;
-    wire [3:0] bram_arbiter_0__read_rsp__epoch_1;
+    wire [3:0] alu_b_dma__read_req__epoch;
+    wire scratchpad_a__read_req__ready_1;
+    wire scratchpad_a__read_req__ready_2;
+    wire scratchpad_a__read_rsp__valid_1;
+    wire scratchpad_a__read_rsp__valid_2;
+    wire [31:0] scratchpad_a__read_rsp__addr_1;
+    wire [31:0] scratchpad_a__read_rsp__addr_2;
+    wire [127:0] scratchpad_a__read_rsp__data_1;
+    wire [127:0] scratchpad_a__read_rsp__data_2;
+    wire [3:0] scratchpad_a__read_rsp__tag_1;
+    wire [3:0] scratchpad_a__read_rsp__tag_2;
+    wire [3:0] scratchpad_a__read_rsp__epoch_1;
+    wire [3:0] scratchpad_a__read_rsp__epoch_2;
     wire alu_a_dma__read_rsp__ready;
+    wire alu_b_dma__read_rsp__ready;
     wire alu_a_dma__write_req__valid;
     wire [31:0] alu_a_dma__write_req__addr;
     wire [127:0] alu_a_dma__write_req__data;
@@ -157,12 +139,12 @@ module vector_system(
     wire [127:0] alu_c_dma__read_req__data;
     wire [3:0] alu_c_dma__read_req__tag;
     wire [3:0] alu_c_dma__read_req__epoch;
-    wire bram_arbiter_c__read_req__ready_1;
-    wire bram_arbiter_c__read_rsp__valid_1;
-    wire [31:0] bram_arbiter_c__read_rsp__addr_1;
-    wire [127:0] bram_arbiter_c__read_rsp__data_1;
-    wire [3:0] bram_arbiter_c__read_rsp__tag_1;
-    wire [3:0] bram_arbiter_c__read_rsp__epoch_1;
+    wire scratchpad_c__read_req__ready_1;
+    wire scratchpad_c__read_rsp__valid_1;
+    wire [31:0] scratchpad_c__read_rsp__addr_1;
+    wire [127:0] scratchpad_c__read_rsp__data_1;
+    wire [3:0] scratchpad_c__read_rsp__tag_1;
+    wire [3:0] scratchpad_c__read_rsp__epoch_1;
     wire alu_c_dma__read_rsp__ready;
     wire alu_c_dma__write_req__valid;
     wire [31:0] alu_c_dma__write_req__addr;
@@ -176,36 +158,12 @@ module vector_system(
     wire [31:0] sch_0__dma_ctrl__addr_src_2;
     wire [31:0] sch_0__dma_ctrl__addr_dst_2;
     wire alu_c_dma__ctrl__ready;
-    wire bram_arbiter_c__slave_read_req__valid;
-    wire [31:0] bram_arbiter_c__slave_read_req__addr;
-    wire [127:0] bram_arbiter_c__slave_read_req__data;
-    wire [3:0] bram_arbiter_c__slave_read_req__tag;
-    wire [3:0] bram_arbiter_c__slave_read_req__epoch;
-    wire scratchpad_c__read_req_a__ready;
-    wire scratchpad_c__read_rsp_a__valid;
-    wire [31:0] scratchpad_c__read_rsp_a__addr;
-    wire [127:0] scratchpad_c__read_rsp_a__data;
-    wire [3:0] scratchpad_c__read_rsp_a__tag;
-    wire [3:0] scratchpad_c__read_rsp_a__epoch;
-    wire bram_arbiter_c__slave_read_rsp__ready;
-    wire idle_scratchpad_c_read__read_req__valid;
-    wire [31:0] idle_scratchpad_c_read__read_req__addr;
-    wire [127:0] idle_scratchpad_c_read__read_req__data;
-    wire [3:0] idle_scratchpad_c_read__read_req__tag;
-    wire [3:0] idle_scratchpad_c_read__read_req__epoch;
-    wire scratchpad_c__read_req_b__ready;
-    wire scratchpad_c__read_rsp_b__valid;
-    wire [31:0] scratchpad_c__read_rsp_b__addr;
-    wire [127:0] scratchpad_c__read_rsp_b__data;
-    wire [3:0] scratchpad_c__read_rsp_b__tag;
-    wire [3:0] scratchpad_c__read_rsp_b__epoch;
-    wire idle_scratchpad_c_read__read_rsp__ready;
     wire vector_accumulate_0__out_ch__valid;
     wire [31:0] vector_accumulate_0__out_ch__addr;
     wire [127:0] vector_accumulate_0__out_ch__data;
     wire [3:0] vector_accumulate_0__out_ch__tag;
     wire [3:0] vector_accumulate_0__out_ch__epoch;
-    wire scratchpad_c__write_req_b__ready;
+    wire scratchpad_c__write_req__ready_1;
     wire handshake_join_0__out_ch__valid;
     wire [31:0] handshake_join_0__out_ch__addr;
     wire [511:0] handshake_join_0__out_ch__data;
@@ -230,21 +188,15 @@ module vector_system(
     wire [127:0] sch_0__mem_read_req__data;
     wire [3:0] sch_0__mem_read_req__tag;
     wire [3:0] sch_0__mem_read_req__epoch;
-    wire bram_dp_stream_0__read_req_a__ready;
-    wire bram_dp_stream_0__read_rsp_a__valid;
-    wire [31:0] bram_dp_stream_0__read_rsp_a__addr;
-    wire [31:0] bram_dp_stream_0__read_rsp_a__data;
-    wire [3:0] bram_dp_stream_0__read_rsp_a__tag;
-    wire [3:0] bram_dp_stream_0__read_rsp_a__epoch;
+    wire bram_dp_stream_0__read_req__ready_0;
+    wire bram_dp_stream_0__read_rsp__valid_0;
+    wire [31:0] bram_dp_stream_0__read_rsp__addr_0;
+    wire [31:0] bram_dp_stream_0__read_rsp__data_0;
+    wire [3:0] bram_dp_stream_0__read_rsp__tag_0;
+    wire [3:0] bram_dp_stream_0__read_rsp__epoch_0;
     wire sch_0__mem_read_rsp__ready;
     wire sch_0__running;
     wire sch_0__fault;
-    wire idle_instruction_write__write_req__valid;
-    wire [31:0] idle_instruction_write__write_req__addr;
-    wire [127:0] idle_instruction_write__write_req__data;
-    wire [3:0] idle_instruction_write__write_req__tag;
-    wire [3:0] idle_instruction_write__write_req__epoch;
-    wire bram_dp_stream_0__write_req_b__ready;
     wire [31:0] ixc_read_sel__addr_in__array[0:0];
     assign ixc_read_sel__addr_in__array[0] = vector_main_ixc__ixc_addr_out_0;
     wire [1:0] ixc_read_sel__sel_out__array[0:0];
@@ -284,13 +236,13 @@ module vector_system(
     assign vector_main_ixc__slave_read_req__data_0 = vector_main_ixc__slave_read_req__interface[0].data;
     assign vector_main_ixc__slave_read_req__tag_0 = vector_main_ixc__slave_read_req__interface[0].tag;
     assign vector_main_ixc__slave_read_req__epoch_0 = vector_main_ixc__slave_read_req__interface[0].epoch;
-    assign vector_main_ixc__slave_read_req__interface[0].ready = bram_arbiter_0__read_req__ready_0;
+    assign vector_main_ixc__slave_read_req__interface[0].ready = scratchpad_a__read_req__ready_0;
     assign vector_main_ixc__slave_read_req__valid_1 = vector_main_ixc__slave_read_req__interface[1].valid;
     assign vector_main_ixc__slave_read_req__addr_1 = vector_main_ixc__slave_read_req__interface[1].addr;
     assign vector_main_ixc__slave_read_req__data_1 = vector_main_ixc__slave_read_req__interface[1].data;
     assign vector_main_ixc__slave_read_req__tag_1 = vector_main_ixc__slave_read_req__interface[1].tag;
     assign vector_main_ixc__slave_read_req__epoch_1 = vector_main_ixc__slave_read_req__interface[1].epoch;
-    assign vector_main_ixc__slave_read_req__interface[1].ready = bram_dp_stream_0__read_req_b__ready;
+    assign vector_main_ixc__slave_read_req__interface[1].ready = bram_dp_stream_0__read_req__ready_1;
     assign vector_main_ixc__slave_read_req__valid_2 = vector_main_ixc__slave_read_req__interface[2].valid;
     assign vector_main_ixc__slave_read_req__addr_2 = vector_main_ixc__slave_read_req__interface[2].addr;
     assign vector_main_ixc__slave_read_req__data_2 = vector_main_ixc__slave_read_req__interface[2].data;
@@ -302,19 +254,19 @@ module vector_system(
     assign vector_main_ixc__slave_read_req__data_3 = vector_main_ixc__slave_read_req__interface[3].data;
     assign vector_main_ixc__slave_read_req__tag_3 = vector_main_ixc__slave_read_req__interface[3].tag;
     assign vector_main_ixc__slave_read_req__epoch_3 = vector_main_ixc__slave_read_req__interface[3].epoch;
-    assign vector_main_ixc__slave_read_req__interface[3].ready = bram_arbiter_c__read_req__ready_0;
+    assign vector_main_ixc__slave_read_req__interface[3].ready = scratchpad_c__read_req__ready_0;
     rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(128), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) vector_main_ixc__slave_read_rsp__interface[0:3]();
-    assign vector_main_ixc__slave_read_rsp__interface[0].valid = bram_arbiter_0__read_rsp__valid_0;
-    assign vector_main_ixc__slave_read_rsp__interface[0].addr = bram_arbiter_0__read_rsp__addr_0;
-    assign vector_main_ixc__slave_read_rsp__interface[0].data = bram_arbiter_0__read_rsp__data_0;
-    assign vector_main_ixc__slave_read_rsp__interface[0].tag = bram_arbiter_0__read_rsp__tag_0;
-    assign vector_main_ixc__slave_read_rsp__interface[0].epoch = bram_arbiter_0__read_rsp__epoch_0;
+    assign vector_main_ixc__slave_read_rsp__interface[0].valid = scratchpad_a__read_rsp__valid_0;
+    assign vector_main_ixc__slave_read_rsp__interface[0].addr = scratchpad_a__read_rsp__addr_0;
+    assign vector_main_ixc__slave_read_rsp__interface[0].data = scratchpad_a__read_rsp__data_0;
+    assign vector_main_ixc__slave_read_rsp__interface[0].tag = scratchpad_a__read_rsp__tag_0;
+    assign vector_main_ixc__slave_read_rsp__interface[0].epoch = scratchpad_a__read_rsp__epoch_0;
     assign vector_main_ixc__slave_read_rsp__ready_0 = vector_main_ixc__slave_read_rsp__interface[0].ready;
-    assign vector_main_ixc__slave_read_rsp__interface[1].valid = bram_dp_stream_0__read_rsp_b__valid;
-    assign vector_main_ixc__slave_read_rsp__interface[1].addr = bram_dp_stream_0__read_rsp_b__addr;
-    assign vector_main_ixc__slave_read_rsp__interface[1].data = bram_dp_stream_0__read_rsp_b__data;
-    assign vector_main_ixc__slave_read_rsp__interface[1].tag = bram_dp_stream_0__read_rsp_b__tag;
-    assign vector_main_ixc__slave_read_rsp__interface[1].epoch = bram_dp_stream_0__read_rsp_b__epoch;
+    assign vector_main_ixc__slave_read_rsp__interface[1].valid = bram_dp_stream_0__read_rsp__valid_1;
+    assign vector_main_ixc__slave_read_rsp__interface[1].addr = bram_dp_stream_0__read_rsp__addr_1;
+    assign vector_main_ixc__slave_read_rsp__interface[1].data = bram_dp_stream_0__read_rsp__data_1;
+    assign vector_main_ixc__slave_read_rsp__interface[1].tag = bram_dp_stream_0__read_rsp__tag_1;
+    assign vector_main_ixc__slave_read_rsp__interface[1].epoch = bram_dp_stream_0__read_rsp__epoch_1;
     assign vector_main_ixc__slave_read_rsp__ready_1 = vector_main_ixc__slave_read_rsp__interface[1].ready;
     assign vector_main_ixc__slave_read_rsp__interface[2].valid = scheduler_zero_read__read_rsp__valid;
     assign vector_main_ixc__slave_read_rsp__interface[2].addr = scheduler_zero_read__read_rsp__addr;
@@ -322,11 +274,11 @@ module vector_system(
     assign vector_main_ixc__slave_read_rsp__interface[2].tag = scheduler_zero_read__read_rsp__tag;
     assign vector_main_ixc__slave_read_rsp__interface[2].epoch = scheduler_zero_read__read_rsp__epoch;
     assign vector_main_ixc__slave_read_rsp__ready_2 = vector_main_ixc__slave_read_rsp__interface[2].ready;
-    assign vector_main_ixc__slave_read_rsp__interface[3].valid = bram_arbiter_c__read_rsp__valid_0;
-    assign vector_main_ixc__slave_read_rsp__interface[3].addr = bram_arbiter_c__read_rsp__addr_0;
-    assign vector_main_ixc__slave_read_rsp__interface[3].data = bram_arbiter_c__read_rsp__data_0;
-    assign vector_main_ixc__slave_read_rsp__interface[3].tag = bram_arbiter_c__read_rsp__tag_0;
-    assign vector_main_ixc__slave_read_rsp__interface[3].epoch = bram_arbiter_c__read_rsp__epoch_0;
+    assign vector_main_ixc__slave_read_rsp__interface[3].valid = scratchpad_c__read_rsp__valid_0;
+    assign vector_main_ixc__slave_read_rsp__interface[3].addr = scratchpad_c__read_rsp__addr_0;
+    assign vector_main_ixc__slave_read_rsp__interface[3].data = scratchpad_c__read_rsp__data_0;
+    assign vector_main_ixc__slave_read_rsp__interface[3].tag = scratchpad_c__read_rsp__tag_0;
+    assign vector_main_ixc__slave_read_rsp__interface[3].epoch = scratchpad_c__read_rsp__epoch_0;
     assign vector_main_ixc__slave_read_rsp__ready_3 = vector_main_ixc__slave_read_rsp__interface[3].ready;
     rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(128), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) vector_main_ixc__slave_write_req__interface[0:3]();
     assign vector_main_ixc__slave_write_req__valid_0 = vector_main_ixc__slave_write_req__interface[0].valid;
@@ -334,13 +286,13 @@ module vector_system(
     assign vector_main_ixc__slave_write_req__data_0 = vector_main_ixc__slave_write_req__interface[0].data;
     assign vector_main_ixc__slave_write_req__tag_0 = vector_main_ixc__slave_write_req__interface[0].tag;
     assign vector_main_ixc__slave_write_req__epoch_0 = vector_main_ixc__slave_write_req__interface[0].epoch;
-    assign vector_main_ixc__slave_write_req__interface[0].ready = scratchpad_a__write_req_a__ready;
+    assign vector_main_ixc__slave_write_req__interface[0].ready = scratchpad_a__write_req__ready_0;
     assign vector_main_ixc__slave_write_req__valid_1 = vector_main_ixc__slave_write_req__interface[1].valid;
     assign vector_main_ixc__slave_write_req__addr_1 = vector_main_ixc__slave_write_req__interface[1].addr;
     assign vector_main_ixc__slave_write_req__data_1 = vector_main_ixc__slave_write_req__interface[1].data;
     assign vector_main_ixc__slave_write_req__tag_1 = vector_main_ixc__slave_write_req__interface[1].tag;
     assign vector_main_ixc__slave_write_req__epoch_1 = vector_main_ixc__slave_write_req__interface[1].epoch;
-    assign vector_main_ixc__slave_write_req__interface[1].ready = bram_dp_stream_0__write_req_a__ready;
+    assign vector_main_ixc__slave_write_req__interface[1].ready = bram_dp_stream_0__write_req__ready_0;
     assign vector_main_ixc__slave_write_req__valid_2 = vector_main_ixc__slave_write_req__interface[2].valid;
     assign vector_main_ixc__slave_write_req__addr_2 = vector_main_ixc__slave_write_req__interface[2].addr;
     assign vector_main_ixc__slave_write_req__data_2 = vector_main_ixc__slave_write_req__interface[2].data;
@@ -352,106 +304,69 @@ module vector_system(
     assign vector_main_ixc__slave_write_req__data_3 = vector_main_ixc__slave_write_req__interface[3].data;
     assign vector_main_ixc__slave_write_req__tag_3 = vector_main_ixc__slave_write_req__interface[3].tag;
     assign vector_main_ixc__slave_write_req__epoch_3 = vector_main_ixc__slave_write_req__interface[3].epoch;
-    assign vector_main_ixc__slave_write_req__interface[3].ready = scratchpad_c__write_req_a__ready;
+    assign vector_main_ixc__slave_write_req__interface[3].ready = scratchpad_c__write_req__ready_0;
     wire [31:0] ixc_write_sel__addr_in__array[0:0];
     assign ixc_write_sel__addr_in__array[0] = vector_main_ixc__ixc_write_addr_out_0;
     wire [1:0] ixc_write_sel__sel_out__array[0:0];
     assign ixc_write_sel__sel_out_0 = ixc_write_sel__sel_out__array[0];
-    rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(128), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) scratchpad_a__read_req_a__interface();
-    assign scratchpad_a__read_req_a__interface.valid = bram_arbiter_0__slave_read_req__valid;
-    assign scratchpad_a__read_req_a__interface.addr = bram_arbiter_0__slave_read_req__addr;
-    assign scratchpad_a__read_req_a__interface.data = bram_arbiter_0__slave_read_req__data;
-    assign scratchpad_a__read_req_a__interface.tag = bram_arbiter_0__slave_read_req__tag;
-    assign scratchpad_a__read_req_a__interface.epoch = bram_arbiter_0__slave_read_req__epoch;
-    assign scratchpad_a__read_req_a__ready = scratchpad_a__read_req_a__interface.ready;
-    rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(128), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) scratchpad_a__read_rsp_a__interface();
-    assign scratchpad_a__read_rsp_a__valid = scratchpad_a__read_rsp_a__interface.valid;
-    assign scratchpad_a__read_rsp_a__addr = scratchpad_a__read_rsp_a__interface.addr;
-    assign scratchpad_a__read_rsp_a__data = scratchpad_a__read_rsp_a__interface.data;
-    assign scratchpad_a__read_rsp_a__tag = scratchpad_a__read_rsp_a__interface.tag;
-    assign scratchpad_a__read_rsp_a__epoch = scratchpad_a__read_rsp_a__interface.epoch;
-    assign scratchpad_a__read_rsp_a__interface.ready = bram_arbiter_0__slave_read_rsp__ready;
-    rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(128), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) scratchpad_a__write_req_a__interface();
-    assign scratchpad_a__write_req_a__interface.valid = vector_main_ixc__slave_write_req__valid_0;
-    assign scratchpad_a__write_req_a__interface.addr = vector_main_ixc__slave_write_req__addr_0;
-    assign scratchpad_a__write_req_a__interface.data = vector_main_ixc__slave_write_req__data_0;
-    assign scratchpad_a__write_req_a__interface.tag = vector_main_ixc__slave_write_req__tag_0;
-    assign scratchpad_a__write_req_a__interface.epoch = vector_main_ixc__slave_write_req__epoch_0;
-    assign scratchpad_a__write_req_a__ready = scratchpad_a__write_req_a__interface.ready;
-    rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(128), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) scratchpad_a__read_req_b__interface();
-    assign scratchpad_a__read_req_b__interface.valid = alu_b_dma__read_req__valid;
-    assign scratchpad_a__read_req_b__interface.addr = alu_b_dma__read_req__addr;
-    assign scratchpad_a__read_req_b__interface.data = alu_b_dma__read_req__data;
-    assign scratchpad_a__read_req_b__interface.tag = alu_b_dma__read_req__tag;
-    assign scratchpad_a__read_req_b__interface.epoch = alu_b_dma__read_req__epoch;
-    assign scratchpad_a__read_req_b__ready = scratchpad_a__read_req_b__interface.ready;
-    rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(128), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) scratchpad_a__read_rsp_b__interface();
-    assign scratchpad_a__read_rsp_b__valid = scratchpad_a__read_rsp_b__interface.valid;
-    assign scratchpad_a__read_rsp_b__addr = scratchpad_a__read_rsp_b__interface.addr;
-    assign scratchpad_a__read_rsp_b__data = scratchpad_a__read_rsp_b__interface.data;
-    assign scratchpad_a__read_rsp_b__tag = scratchpad_a__read_rsp_b__interface.tag;
-    assign scratchpad_a__read_rsp_b__epoch = scratchpad_a__read_rsp_b__interface.epoch;
-    assign scratchpad_a__read_rsp_b__interface.ready = alu_b_dma__read_rsp__ready;
-    rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(128), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) scratchpad_a__write_req_b__interface();
-    assign scratchpad_a__write_req_b__interface.valid = idle_scratchpad_a_write__write_req__valid;
-    assign scratchpad_a__write_req_b__interface.addr = idle_scratchpad_a_write__write_req__addr;
-    assign scratchpad_a__write_req_b__interface.data = idle_scratchpad_a_write__write_req__data;
-    assign scratchpad_a__write_req_b__interface.tag = idle_scratchpad_a_write__write_req__tag;
-    assign scratchpad_a__write_req_b__interface.epoch = idle_scratchpad_a_write__write_req__epoch;
-    assign scratchpad_a__write_req_b__ready = scratchpad_a__write_req_b__interface.ready;
-    rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(128), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) bram_arbiter_0__read_req__interface[0:1]();
-    assign bram_arbiter_0__read_req__interface[0].valid = vector_main_ixc__slave_read_req__valid_0;
-    assign bram_arbiter_0__read_req__interface[0].addr = vector_main_ixc__slave_read_req__addr_0;
-    assign bram_arbiter_0__read_req__interface[0].data = vector_main_ixc__slave_read_req__data_0;
-    assign bram_arbiter_0__read_req__interface[0].tag = vector_main_ixc__slave_read_req__tag_0;
-    assign bram_arbiter_0__read_req__interface[0].epoch = vector_main_ixc__slave_read_req__epoch_0;
-    assign bram_arbiter_0__read_req__ready_0 = bram_arbiter_0__read_req__interface[0].ready;
-    assign bram_arbiter_0__read_req__interface[1].valid = alu_a_dma__read_req__valid;
-    assign bram_arbiter_0__read_req__interface[1].addr = alu_a_dma__read_req__addr;
-    assign bram_arbiter_0__read_req__interface[1].data = alu_a_dma__read_req__data;
-    assign bram_arbiter_0__read_req__interface[1].tag = alu_a_dma__read_req__tag;
-    assign bram_arbiter_0__read_req__interface[1].epoch = alu_a_dma__read_req__epoch;
-    assign bram_arbiter_0__read_req__ready_1 = bram_arbiter_0__read_req__interface[1].ready;
-    rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(128), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) bram_arbiter_0__read_rsp__interface[0:1]();
-    assign bram_arbiter_0__read_rsp__valid_0 = bram_arbiter_0__read_rsp__interface[0].valid;
-    assign bram_arbiter_0__read_rsp__addr_0 = bram_arbiter_0__read_rsp__interface[0].addr;
-    assign bram_arbiter_0__read_rsp__data_0 = bram_arbiter_0__read_rsp__interface[0].data;
-    assign bram_arbiter_0__read_rsp__tag_0 = bram_arbiter_0__read_rsp__interface[0].tag;
-    assign bram_arbiter_0__read_rsp__epoch_0 = bram_arbiter_0__read_rsp__interface[0].epoch;
-    assign bram_arbiter_0__read_rsp__interface[0].ready = vector_main_ixc__slave_read_rsp__ready_0;
-    assign bram_arbiter_0__read_rsp__valid_1 = bram_arbiter_0__read_rsp__interface[1].valid;
-    assign bram_arbiter_0__read_rsp__addr_1 = bram_arbiter_0__read_rsp__interface[1].addr;
-    assign bram_arbiter_0__read_rsp__data_1 = bram_arbiter_0__read_rsp__interface[1].data;
-    assign bram_arbiter_0__read_rsp__tag_1 = bram_arbiter_0__read_rsp__interface[1].tag;
-    assign bram_arbiter_0__read_rsp__epoch_1 = bram_arbiter_0__read_rsp__interface[1].epoch;
-    assign bram_arbiter_0__read_rsp__interface[1].ready = alu_a_dma__read_rsp__ready;
-    rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(128), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) bram_arbiter_0__slave_read_req__interface();
-    assign bram_arbiter_0__slave_read_req__valid = bram_arbiter_0__slave_read_req__interface.valid;
-    assign bram_arbiter_0__slave_read_req__addr = bram_arbiter_0__slave_read_req__interface.addr;
-    assign bram_arbiter_0__slave_read_req__data = bram_arbiter_0__slave_read_req__interface.data;
-    assign bram_arbiter_0__slave_read_req__tag = bram_arbiter_0__slave_read_req__interface.tag;
-    assign bram_arbiter_0__slave_read_req__epoch = bram_arbiter_0__slave_read_req__interface.epoch;
-    assign bram_arbiter_0__slave_read_req__interface.ready = scratchpad_a__read_req_a__ready;
-    rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(128), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) bram_arbiter_0__slave_read_rsp__interface();
-    assign bram_arbiter_0__slave_read_rsp__interface.valid = scratchpad_a__read_rsp_a__valid;
-    assign bram_arbiter_0__slave_read_rsp__interface.addr = scratchpad_a__read_rsp_a__addr;
-    assign bram_arbiter_0__slave_read_rsp__interface.data = scratchpad_a__read_rsp_a__data;
-    assign bram_arbiter_0__slave_read_rsp__interface.tag = scratchpad_a__read_rsp_a__tag;
-    assign bram_arbiter_0__slave_read_rsp__interface.epoch = scratchpad_a__read_rsp_a__epoch;
-    assign bram_arbiter_0__slave_read_rsp__ready = bram_arbiter_0__slave_read_rsp__interface.ready;
+    rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(128), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) scratchpad_a__read_req__interface[0:2]();
+    assign scratchpad_a__read_req__interface[0].valid = vector_main_ixc__slave_read_req__valid_0;
+    assign scratchpad_a__read_req__interface[0].addr = vector_main_ixc__slave_read_req__addr_0;
+    assign scratchpad_a__read_req__interface[0].data = vector_main_ixc__slave_read_req__data_0;
+    assign scratchpad_a__read_req__interface[0].tag = vector_main_ixc__slave_read_req__tag_0;
+    assign scratchpad_a__read_req__interface[0].epoch = vector_main_ixc__slave_read_req__epoch_0;
+    assign scratchpad_a__read_req__ready_0 = scratchpad_a__read_req__interface[0].ready;
+    assign scratchpad_a__read_req__interface[1].valid = alu_a_dma__read_req__valid;
+    assign scratchpad_a__read_req__interface[1].addr = alu_a_dma__read_req__addr;
+    assign scratchpad_a__read_req__interface[1].data = alu_a_dma__read_req__data;
+    assign scratchpad_a__read_req__interface[1].tag = alu_a_dma__read_req__tag;
+    assign scratchpad_a__read_req__interface[1].epoch = alu_a_dma__read_req__epoch;
+    assign scratchpad_a__read_req__ready_1 = scratchpad_a__read_req__interface[1].ready;
+    assign scratchpad_a__read_req__interface[2].valid = alu_b_dma__read_req__valid;
+    assign scratchpad_a__read_req__interface[2].addr = alu_b_dma__read_req__addr;
+    assign scratchpad_a__read_req__interface[2].data = alu_b_dma__read_req__data;
+    assign scratchpad_a__read_req__interface[2].tag = alu_b_dma__read_req__tag;
+    assign scratchpad_a__read_req__interface[2].epoch = alu_b_dma__read_req__epoch;
+    assign scratchpad_a__read_req__ready_2 = scratchpad_a__read_req__interface[2].ready;
+    rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(128), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) scratchpad_a__read_rsp__interface[0:2]();
+    assign scratchpad_a__read_rsp__valid_0 = scratchpad_a__read_rsp__interface[0].valid;
+    assign scratchpad_a__read_rsp__addr_0 = scratchpad_a__read_rsp__interface[0].addr;
+    assign scratchpad_a__read_rsp__data_0 = scratchpad_a__read_rsp__interface[0].data;
+    assign scratchpad_a__read_rsp__tag_0 = scratchpad_a__read_rsp__interface[0].tag;
+    assign scratchpad_a__read_rsp__epoch_0 = scratchpad_a__read_rsp__interface[0].epoch;
+    assign scratchpad_a__read_rsp__interface[0].ready = vector_main_ixc__slave_read_rsp__ready_0;
+    assign scratchpad_a__read_rsp__valid_1 = scratchpad_a__read_rsp__interface[1].valid;
+    assign scratchpad_a__read_rsp__addr_1 = scratchpad_a__read_rsp__interface[1].addr;
+    assign scratchpad_a__read_rsp__data_1 = scratchpad_a__read_rsp__interface[1].data;
+    assign scratchpad_a__read_rsp__tag_1 = scratchpad_a__read_rsp__interface[1].tag;
+    assign scratchpad_a__read_rsp__epoch_1 = scratchpad_a__read_rsp__interface[1].epoch;
+    assign scratchpad_a__read_rsp__interface[1].ready = alu_a_dma__read_rsp__ready;
+    assign scratchpad_a__read_rsp__valid_2 = scratchpad_a__read_rsp__interface[2].valid;
+    assign scratchpad_a__read_rsp__addr_2 = scratchpad_a__read_rsp__interface[2].addr;
+    assign scratchpad_a__read_rsp__data_2 = scratchpad_a__read_rsp__interface[2].data;
+    assign scratchpad_a__read_rsp__tag_2 = scratchpad_a__read_rsp__interface[2].tag;
+    assign scratchpad_a__read_rsp__epoch_2 = scratchpad_a__read_rsp__interface[2].epoch;
+    assign scratchpad_a__read_rsp__interface[2].ready = alu_b_dma__read_rsp__ready;
+    rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(128), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) scratchpad_a__write_req__interface[0:0]();
+    assign scratchpad_a__write_req__interface[0].valid = vector_main_ixc__slave_write_req__valid_0;
+    assign scratchpad_a__write_req__interface[0].addr = vector_main_ixc__slave_write_req__addr_0;
+    assign scratchpad_a__write_req__interface[0].data = vector_main_ixc__slave_write_req__data_0;
+    assign scratchpad_a__write_req__interface[0].tag = vector_main_ixc__slave_write_req__tag_0;
+    assign scratchpad_a__write_req__interface[0].epoch = vector_main_ixc__slave_write_req__epoch_0;
+    assign scratchpad_a__write_req__ready_0 = scratchpad_a__write_req__interface[0].ready;
     rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(128), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) alu_a_dma__read_req__interface();
     assign alu_a_dma__read_req__valid = alu_a_dma__read_req__interface.valid;
     assign alu_a_dma__read_req__addr = alu_a_dma__read_req__interface.addr;
     assign alu_a_dma__read_req__data = alu_a_dma__read_req__interface.data;
     assign alu_a_dma__read_req__tag = alu_a_dma__read_req__interface.tag;
     assign alu_a_dma__read_req__epoch = alu_a_dma__read_req__interface.epoch;
-    assign alu_a_dma__read_req__interface.ready = bram_arbiter_0__read_req__ready_1;
+    assign alu_a_dma__read_req__interface.ready = scratchpad_a__read_req__ready_1;
     rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(128), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) alu_a_dma__read_rsp__interface();
-    assign alu_a_dma__read_rsp__interface.valid = bram_arbiter_0__read_rsp__valid_1;
-    assign alu_a_dma__read_rsp__interface.addr = bram_arbiter_0__read_rsp__addr_1;
-    assign alu_a_dma__read_rsp__interface.data = bram_arbiter_0__read_rsp__data_1;
-    assign alu_a_dma__read_rsp__interface.tag = bram_arbiter_0__read_rsp__tag_1;
-    assign alu_a_dma__read_rsp__interface.epoch = bram_arbiter_0__read_rsp__epoch_1;
+    assign alu_a_dma__read_rsp__interface.valid = scratchpad_a__read_rsp__valid_1;
+    assign alu_a_dma__read_rsp__interface.addr = scratchpad_a__read_rsp__addr_1;
+    assign alu_a_dma__read_rsp__interface.data = scratchpad_a__read_rsp__data_1;
+    assign alu_a_dma__read_rsp__interface.tag = scratchpad_a__read_rsp__tag_1;
+    assign alu_a_dma__read_rsp__interface.epoch = scratchpad_a__read_rsp__epoch_1;
     assign alu_a_dma__read_rsp__ready = alu_a_dma__read_rsp__interface.ready;
     rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(128), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) alu_a_dma__write_req__interface();
     assign alu_a_dma__write_req__valid = alu_a_dma__write_req__interface.valid;
@@ -473,13 +388,13 @@ module vector_system(
     assign alu_b_dma__read_req__data = alu_b_dma__read_req__interface.data;
     assign alu_b_dma__read_req__tag = alu_b_dma__read_req__interface.tag;
     assign alu_b_dma__read_req__epoch = alu_b_dma__read_req__interface.epoch;
-    assign alu_b_dma__read_req__interface.ready = scratchpad_a__read_req_b__ready;
+    assign alu_b_dma__read_req__interface.ready = scratchpad_a__read_req__ready_2;
     rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(128), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) alu_b_dma__read_rsp__interface();
-    assign alu_b_dma__read_rsp__interface.valid = scratchpad_a__read_rsp_b__valid;
-    assign alu_b_dma__read_rsp__interface.addr = scratchpad_a__read_rsp_b__addr;
-    assign alu_b_dma__read_rsp__interface.data = scratchpad_a__read_rsp_b__data;
-    assign alu_b_dma__read_rsp__interface.tag = scratchpad_a__read_rsp_b__tag;
-    assign alu_b_dma__read_rsp__interface.epoch = scratchpad_a__read_rsp_b__epoch;
+    assign alu_b_dma__read_rsp__interface.valid = scratchpad_a__read_rsp__valid_2;
+    assign alu_b_dma__read_rsp__interface.addr = scratchpad_a__read_rsp__addr_2;
+    assign alu_b_dma__read_rsp__interface.data = scratchpad_a__read_rsp__data_2;
+    assign alu_b_dma__read_rsp__interface.tag = scratchpad_a__read_rsp__tag_2;
+    assign alu_b_dma__read_rsp__interface.epoch = scratchpad_a__read_rsp__epoch_2;
     assign alu_b_dma__read_rsp__ready = alu_b_dma__read_rsp__interface.ready;
     rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(128), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) alu_b_dma__write_req__interface();
     assign alu_b_dma__write_req__valid = alu_b_dma__write_req__interface.valid;
@@ -501,13 +416,13 @@ module vector_system(
     assign alu_c_dma__read_req__data = alu_c_dma__read_req__interface.data;
     assign alu_c_dma__read_req__tag = alu_c_dma__read_req__interface.tag;
     assign alu_c_dma__read_req__epoch = alu_c_dma__read_req__interface.epoch;
-    assign alu_c_dma__read_req__interface.ready = bram_arbiter_c__read_req__ready_1;
+    assign alu_c_dma__read_req__interface.ready = scratchpad_c__read_req__ready_1;
     rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(128), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) alu_c_dma__read_rsp__interface();
-    assign alu_c_dma__read_rsp__interface.valid = bram_arbiter_c__read_rsp__valid_1;
-    assign alu_c_dma__read_rsp__interface.addr = bram_arbiter_c__read_rsp__addr_1;
-    assign alu_c_dma__read_rsp__interface.data = bram_arbiter_c__read_rsp__data_1;
-    assign alu_c_dma__read_rsp__interface.tag = bram_arbiter_c__read_rsp__tag_1;
-    assign alu_c_dma__read_rsp__interface.epoch = bram_arbiter_c__read_rsp__epoch_1;
+    assign alu_c_dma__read_rsp__interface.valid = scratchpad_c__read_rsp__valid_1;
+    assign alu_c_dma__read_rsp__interface.addr = scratchpad_c__read_rsp__addr_1;
+    assign alu_c_dma__read_rsp__interface.data = scratchpad_c__read_rsp__data_1;
+    assign alu_c_dma__read_rsp__interface.tag = scratchpad_c__read_rsp__tag_1;
+    assign alu_c_dma__read_rsp__interface.epoch = scratchpad_c__read_rsp__epoch_1;
     assign alu_c_dma__read_rsp__ready = alu_c_dma__read_rsp__interface.ready;
     rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(128), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) alu_c_dma__write_req__interface();
     assign alu_c_dma__write_req__valid = alu_c_dma__write_req__interface.valid;
@@ -523,88 +438,45 @@ module vector_system(
     assign alu_c_dma__ctrl__interface.addr_src = sch_0__dma_ctrl__addr_src_2;
     assign alu_c_dma__ctrl__interface.addr_dst = sch_0__dma_ctrl__addr_dst_2;
     assign alu_c_dma__ctrl__ready = alu_c_dma__ctrl__interface.ready;
-    rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(128), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) scratchpad_c__read_req_a__interface();
-    assign scratchpad_c__read_req_a__interface.valid = bram_arbiter_c__slave_read_req__valid;
-    assign scratchpad_c__read_req_a__interface.addr = bram_arbiter_c__slave_read_req__addr;
-    assign scratchpad_c__read_req_a__interface.data = bram_arbiter_c__slave_read_req__data;
-    assign scratchpad_c__read_req_a__interface.tag = bram_arbiter_c__slave_read_req__tag;
-    assign scratchpad_c__read_req_a__interface.epoch = bram_arbiter_c__slave_read_req__epoch;
-    assign scratchpad_c__read_req_a__ready = scratchpad_c__read_req_a__interface.ready;
-    rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(128), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) scratchpad_c__read_rsp_a__interface();
-    assign scratchpad_c__read_rsp_a__valid = scratchpad_c__read_rsp_a__interface.valid;
-    assign scratchpad_c__read_rsp_a__addr = scratchpad_c__read_rsp_a__interface.addr;
-    assign scratchpad_c__read_rsp_a__data = scratchpad_c__read_rsp_a__interface.data;
-    assign scratchpad_c__read_rsp_a__tag = scratchpad_c__read_rsp_a__interface.tag;
-    assign scratchpad_c__read_rsp_a__epoch = scratchpad_c__read_rsp_a__interface.epoch;
-    assign scratchpad_c__read_rsp_a__interface.ready = bram_arbiter_c__slave_read_rsp__ready;
-    rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(128), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) scratchpad_c__write_req_a__interface();
-    assign scratchpad_c__write_req_a__interface.valid = vector_main_ixc__slave_write_req__valid_3;
-    assign scratchpad_c__write_req_a__interface.addr = vector_main_ixc__slave_write_req__addr_3;
-    assign scratchpad_c__write_req_a__interface.data = vector_main_ixc__slave_write_req__data_3;
-    assign scratchpad_c__write_req_a__interface.tag = vector_main_ixc__slave_write_req__tag_3;
-    assign scratchpad_c__write_req_a__interface.epoch = vector_main_ixc__slave_write_req__epoch_3;
-    assign scratchpad_c__write_req_a__ready = scratchpad_c__write_req_a__interface.ready;
-    rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(128), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) scratchpad_c__read_req_b__interface();
-    assign scratchpad_c__read_req_b__interface.valid = idle_scratchpad_c_read__read_req__valid;
-    assign scratchpad_c__read_req_b__interface.addr = idle_scratchpad_c_read__read_req__addr;
-    assign scratchpad_c__read_req_b__interface.data = idle_scratchpad_c_read__read_req__data;
-    assign scratchpad_c__read_req_b__interface.tag = idle_scratchpad_c_read__read_req__tag;
-    assign scratchpad_c__read_req_b__interface.epoch = idle_scratchpad_c_read__read_req__epoch;
-    assign scratchpad_c__read_req_b__ready = scratchpad_c__read_req_b__interface.ready;
-    rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(128), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) scratchpad_c__read_rsp_b__interface();
-    assign scratchpad_c__read_rsp_b__valid = scratchpad_c__read_rsp_b__interface.valid;
-    assign scratchpad_c__read_rsp_b__addr = scratchpad_c__read_rsp_b__interface.addr;
-    assign scratchpad_c__read_rsp_b__data = scratchpad_c__read_rsp_b__interface.data;
-    assign scratchpad_c__read_rsp_b__tag = scratchpad_c__read_rsp_b__interface.tag;
-    assign scratchpad_c__read_rsp_b__epoch = scratchpad_c__read_rsp_b__interface.epoch;
-    assign scratchpad_c__read_rsp_b__interface.ready = idle_scratchpad_c_read__read_rsp__ready;
-    rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(128), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) scratchpad_c__write_req_b__interface();
-    assign scratchpad_c__write_req_b__interface.valid = vector_accumulate_0__out_ch__valid;
-    assign scratchpad_c__write_req_b__interface.addr = vector_accumulate_0__out_ch__addr;
-    assign scratchpad_c__write_req_b__interface.data = vector_accumulate_0__out_ch__data;
-    assign scratchpad_c__write_req_b__interface.tag = vector_accumulate_0__out_ch__tag;
-    assign scratchpad_c__write_req_b__interface.epoch = vector_accumulate_0__out_ch__epoch;
-    assign scratchpad_c__write_req_b__ready = scratchpad_c__write_req_b__interface.ready;
-    rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(128), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) bram_arbiter_c__read_req__interface[0:1]();
-    assign bram_arbiter_c__read_req__interface[0].valid = vector_main_ixc__slave_read_req__valid_3;
-    assign bram_arbiter_c__read_req__interface[0].addr = vector_main_ixc__slave_read_req__addr_3;
-    assign bram_arbiter_c__read_req__interface[0].data = vector_main_ixc__slave_read_req__data_3;
-    assign bram_arbiter_c__read_req__interface[0].tag = vector_main_ixc__slave_read_req__tag_3;
-    assign bram_arbiter_c__read_req__interface[0].epoch = vector_main_ixc__slave_read_req__epoch_3;
-    assign bram_arbiter_c__read_req__ready_0 = bram_arbiter_c__read_req__interface[0].ready;
-    assign bram_arbiter_c__read_req__interface[1].valid = alu_c_dma__read_req__valid;
-    assign bram_arbiter_c__read_req__interface[1].addr = alu_c_dma__read_req__addr;
-    assign bram_arbiter_c__read_req__interface[1].data = alu_c_dma__read_req__data;
-    assign bram_arbiter_c__read_req__interface[1].tag = alu_c_dma__read_req__tag;
-    assign bram_arbiter_c__read_req__interface[1].epoch = alu_c_dma__read_req__epoch;
-    assign bram_arbiter_c__read_req__ready_1 = bram_arbiter_c__read_req__interface[1].ready;
-    rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(128), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) bram_arbiter_c__read_rsp__interface[0:1]();
-    assign bram_arbiter_c__read_rsp__valid_0 = bram_arbiter_c__read_rsp__interface[0].valid;
-    assign bram_arbiter_c__read_rsp__addr_0 = bram_arbiter_c__read_rsp__interface[0].addr;
-    assign bram_arbiter_c__read_rsp__data_0 = bram_arbiter_c__read_rsp__interface[0].data;
-    assign bram_arbiter_c__read_rsp__tag_0 = bram_arbiter_c__read_rsp__interface[0].tag;
-    assign bram_arbiter_c__read_rsp__epoch_0 = bram_arbiter_c__read_rsp__interface[0].epoch;
-    assign bram_arbiter_c__read_rsp__interface[0].ready = vector_main_ixc__slave_read_rsp__ready_3;
-    assign bram_arbiter_c__read_rsp__valid_1 = bram_arbiter_c__read_rsp__interface[1].valid;
-    assign bram_arbiter_c__read_rsp__addr_1 = bram_arbiter_c__read_rsp__interface[1].addr;
-    assign bram_arbiter_c__read_rsp__data_1 = bram_arbiter_c__read_rsp__interface[1].data;
-    assign bram_arbiter_c__read_rsp__tag_1 = bram_arbiter_c__read_rsp__interface[1].tag;
-    assign bram_arbiter_c__read_rsp__epoch_1 = bram_arbiter_c__read_rsp__interface[1].epoch;
-    assign bram_arbiter_c__read_rsp__interface[1].ready = alu_c_dma__read_rsp__ready;
-    rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(128), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) bram_arbiter_c__slave_read_req__interface();
-    assign bram_arbiter_c__slave_read_req__valid = bram_arbiter_c__slave_read_req__interface.valid;
-    assign bram_arbiter_c__slave_read_req__addr = bram_arbiter_c__slave_read_req__interface.addr;
-    assign bram_arbiter_c__slave_read_req__data = bram_arbiter_c__slave_read_req__interface.data;
-    assign bram_arbiter_c__slave_read_req__tag = bram_arbiter_c__slave_read_req__interface.tag;
-    assign bram_arbiter_c__slave_read_req__epoch = bram_arbiter_c__slave_read_req__interface.epoch;
-    assign bram_arbiter_c__slave_read_req__interface.ready = scratchpad_c__read_req_a__ready;
-    rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(128), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) bram_arbiter_c__slave_read_rsp__interface();
-    assign bram_arbiter_c__slave_read_rsp__interface.valid = scratchpad_c__read_rsp_a__valid;
-    assign bram_arbiter_c__slave_read_rsp__interface.addr = scratchpad_c__read_rsp_a__addr;
-    assign bram_arbiter_c__slave_read_rsp__interface.data = scratchpad_c__read_rsp_a__data;
-    assign bram_arbiter_c__slave_read_rsp__interface.tag = scratchpad_c__read_rsp_a__tag;
-    assign bram_arbiter_c__slave_read_rsp__interface.epoch = scratchpad_c__read_rsp_a__epoch;
-    assign bram_arbiter_c__slave_read_rsp__ready = bram_arbiter_c__slave_read_rsp__interface.ready;
+    rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(128), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) scratchpad_c__read_req__interface[0:1]();
+    assign scratchpad_c__read_req__interface[0].valid = vector_main_ixc__slave_read_req__valid_3;
+    assign scratchpad_c__read_req__interface[0].addr = vector_main_ixc__slave_read_req__addr_3;
+    assign scratchpad_c__read_req__interface[0].data = vector_main_ixc__slave_read_req__data_3;
+    assign scratchpad_c__read_req__interface[0].tag = vector_main_ixc__slave_read_req__tag_3;
+    assign scratchpad_c__read_req__interface[0].epoch = vector_main_ixc__slave_read_req__epoch_3;
+    assign scratchpad_c__read_req__ready_0 = scratchpad_c__read_req__interface[0].ready;
+    assign scratchpad_c__read_req__interface[1].valid = alu_c_dma__read_req__valid;
+    assign scratchpad_c__read_req__interface[1].addr = alu_c_dma__read_req__addr;
+    assign scratchpad_c__read_req__interface[1].data = alu_c_dma__read_req__data;
+    assign scratchpad_c__read_req__interface[1].tag = alu_c_dma__read_req__tag;
+    assign scratchpad_c__read_req__interface[1].epoch = alu_c_dma__read_req__epoch;
+    assign scratchpad_c__read_req__ready_1 = scratchpad_c__read_req__interface[1].ready;
+    rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(128), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) scratchpad_c__read_rsp__interface[0:1]();
+    assign scratchpad_c__read_rsp__valid_0 = scratchpad_c__read_rsp__interface[0].valid;
+    assign scratchpad_c__read_rsp__addr_0 = scratchpad_c__read_rsp__interface[0].addr;
+    assign scratchpad_c__read_rsp__data_0 = scratchpad_c__read_rsp__interface[0].data;
+    assign scratchpad_c__read_rsp__tag_0 = scratchpad_c__read_rsp__interface[0].tag;
+    assign scratchpad_c__read_rsp__epoch_0 = scratchpad_c__read_rsp__interface[0].epoch;
+    assign scratchpad_c__read_rsp__interface[0].ready = vector_main_ixc__slave_read_rsp__ready_3;
+    assign scratchpad_c__read_rsp__valid_1 = scratchpad_c__read_rsp__interface[1].valid;
+    assign scratchpad_c__read_rsp__addr_1 = scratchpad_c__read_rsp__interface[1].addr;
+    assign scratchpad_c__read_rsp__data_1 = scratchpad_c__read_rsp__interface[1].data;
+    assign scratchpad_c__read_rsp__tag_1 = scratchpad_c__read_rsp__interface[1].tag;
+    assign scratchpad_c__read_rsp__epoch_1 = scratchpad_c__read_rsp__interface[1].epoch;
+    assign scratchpad_c__read_rsp__interface[1].ready = alu_c_dma__read_rsp__ready;
+    rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(128), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) scratchpad_c__write_req__interface[0:1]();
+    assign scratchpad_c__write_req__interface[0].valid = vector_main_ixc__slave_write_req__valid_3;
+    assign scratchpad_c__write_req__interface[0].addr = vector_main_ixc__slave_write_req__addr_3;
+    assign scratchpad_c__write_req__interface[0].data = vector_main_ixc__slave_write_req__data_3;
+    assign scratchpad_c__write_req__interface[0].tag = vector_main_ixc__slave_write_req__tag_3;
+    assign scratchpad_c__write_req__interface[0].epoch = vector_main_ixc__slave_write_req__epoch_3;
+    assign scratchpad_c__write_req__ready_0 = scratchpad_c__write_req__interface[0].ready;
+    assign scratchpad_c__write_req__interface[1].valid = vector_accumulate_0__out_ch__valid;
+    assign scratchpad_c__write_req__interface[1].addr = vector_accumulate_0__out_ch__addr;
+    assign scratchpad_c__write_req__interface[1].data = vector_accumulate_0__out_ch__data;
+    assign scratchpad_c__write_req__interface[1].tag = vector_accumulate_0__out_ch__tag;
+    assign scratchpad_c__write_req__interface[1].epoch = vector_accumulate_0__out_ch__epoch;
+    assign scratchpad_c__write_req__ready_1 = scratchpad_c__write_req__interface[1].ready;
     rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(512), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) vector_alu_0__in_ch__interface();
     assign vector_alu_0__in_ch__interface.valid = handshake_join_0__out_ch__valid;
     assign vector_alu_0__in_ch__interface.addr = handshake_join_0__out_ch__addr;
@@ -632,7 +504,7 @@ module vector_system(
     assign vector_accumulate_0__out_ch__data = vector_accumulate_0__out_ch__interface.data;
     assign vector_accumulate_0__out_ch__tag = vector_accumulate_0__out_ch__interface.tag;
     assign vector_accumulate_0__out_ch__epoch = vector_accumulate_0__out_ch__interface.epoch;
-    assign vector_accumulate_0__out_ch__interface.ready = scratchpad_c__write_req_b__ready;
+    assign vector_accumulate_0__out_ch__interface.ready = scratchpad_c__write_req__ready_1;
     rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(128), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) handshake_join_0__in_ch__interface[0:3]();
     assign handshake_join_0__in_ch__interface[0].valid = alu_a_dma__write_req__valid;
     assign handshake_join_0__in_ch__interface[0].addr = alu_a_dma__write_req__addr;
@@ -678,13 +550,13 @@ module vector_system(
     assign sch_0__mem_read_req__data = sch_0__mem_read_req__interface.data;
     assign sch_0__mem_read_req__tag = sch_0__mem_read_req__interface.tag;
     assign sch_0__mem_read_req__epoch = sch_0__mem_read_req__interface.epoch;
-    assign sch_0__mem_read_req__interface.ready = bram_dp_stream_0__read_req_a__ready;
+    assign sch_0__mem_read_req__interface.ready = bram_dp_stream_0__read_req__ready_0;
     rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(128), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) sch_0__mem_read_rsp__interface();
-    assign sch_0__mem_read_rsp__interface.valid = bram_dp_stream_0__read_rsp_a__valid;
-    assign sch_0__mem_read_rsp__interface.addr = bram_dp_stream_0__read_rsp_a__addr;
-    assign sch_0__mem_read_rsp__interface.data = bram_dp_stream_0__read_rsp_a__data;
-    assign sch_0__mem_read_rsp__interface.tag = bram_dp_stream_0__read_rsp_a__tag;
-    assign sch_0__mem_read_rsp__interface.epoch = bram_dp_stream_0__read_rsp_a__epoch;
+    assign sch_0__mem_read_rsp__interface.valid = bram_dp_stream_0__read_rsp__valid_0;
+    assign sch_0__mem_read_rsp__interface.addr = bram_dp_stream_0__read_rsp__addr_0;
+    assign sch_0__mem_read_rsp__interface.data = bram_dp_stream_0__read_rsp__data_0;
+    assign sch_0__mem_read_rsp__interface.tag = bram_dp_stream_0__read_rsp__tag_0;
+    assign sch_0__mem_read_rsp__interface.epoch = bram_dp_stream_0__read_rsp__epoch_0;
     assign sch_0__mem_read_rsp__ready = sch_0__mem_read_rsp__interface.ready;
     dma_ctrl_if #(.ADDR_WIDTH(32)) sch_0__dma_ctrl__interface[0:2]();
     assign sch_0__dma_ctrl__valid_0 = sch_0__dma_ctrl__interface[0].valid;
@@ -712,76 +584,39 @@ module vector_system(
     assign sch_0__vector_control_req__tag = sch_0__vector_control_req__interface.tag;
     assign sch_0__vector_control_req__epoch = sch_0__vector_control_req__interface.epoch;
     assign sch_0__vector_control_req__interface.ready = handshake_join_0__in_ch__ready_3;
-    rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(32), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) bram_dp_stream_0__read_req_a__interface();
-    assign bram_dp_stream_0__read_req_a__interface.valid = sch_0__mem_read_req__valid;
-    assign bram_dp_stream_0__read_req_a__interface.addr = sch_0__mem_read_req__addr;
-    assign bram_dp_stream_0__read_req_a__interface.data = sch_0__mem_read_req__data;
-    assign bram_dp_stream_0__read_req_a__interface.tag = sch_0__mem_read_req__tag;
-    assign bram_dp_stream_0__read_req_a__interface.epoch = sch_0__mem_read_req__epoch;
-    assign bram_dp_stream_0__read_req_a__ready = bram_dp_stream_0__read_req_a__interface.ready;
-    rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(32), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) bram_dp_stream_0__read_rsp_a__interface();
-    assign bram_dp_stream_0__read_rsp_a__valid = bram_dp_stream_0__read_rsp_a__interface.valid;
-    assign bram_dp_stream_0__read_rsp_a__addr = bram_dp_stream_0__read_rsp_a__interface.addr;
-    assign bram_dp_stream_0__read_rsp_a__data = bram_dp_stream_0__read_rsp_a__interface.data;
-    assign bram_dp_stream_0__read_rsp_a__tag = bram_dp_stream_0__read_rsp_a__interface.tag;
-    assign bram_dp_stream_0__read_rsp_a__epoch = bram_dp_stream_0__read_rsp_a__interface.epoch;
-    assign bram_dp_stream_0__read_rsp_a__interface.ready = sch_0__mem_read_rsp__ready;
-    rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(32), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) bram_dp_stream_0__write_req_a__interface();
-    assign bram_dp_stream_0__write_req_a__interface.valid = vector_main_ixc__slave_write_req__valid_1;
-    assign bram_dp_stream_0__write_req_a__interface.addr = vector_main_ixc__slave_write_req__addr_1;
-    assign bram_dp_stream_0__write_req_a__interface.data = vector_main_ixc__slave_write_req__data_1;
-    assign bram_dp_stream_0__write_req_a__interface.tag = vector_main_ixc__slave_write_req__tag_1;
-    assign bram_dp_stream_0__write_req_a__interface.epoch = vector_main_ixc__slave_write_req__epoch_1;
-    assign bram_dp_stream_0__write_req_a__ready = bram_dp_stream_0__write_req_a__interface.ready;
-    rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(32), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) bram_dp_stream_0__read_req_b__interface();
-    assign bram_dp_stream_0__read_req_b__interface.valid = vector_main_ixc__slave_read_req__valid_1;
-    assign bram_dp_stream_0__read_req_b__interface.addr = vector_main_ixc__slave_read_req__addr_1;
-    assign bram_dp_stream_0__read_req_b__interface.data = vector_main_ixc__slave_read_req__data_1;
-    assign bram_dp_stream_0__read_req_b__interface.tag = vector_main_ixc__slave_read_req__tag_1;
-    assign bram_dp_stream_0__read_req_b__interface.epoch = vector_main_ixc__slave_read_req__epoch_1;
-    assign bram_dp_stream_0__read_req_b__ready = bram_dp_stream_0__read_req_b__interface.ready;
-    rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(32), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) bram_dp_stream_0__read_rsp_b__interface();
-    assign bram_dp_stream_0__read_rsp_b__valid = bram_dp_stream_0__read_rsp_b__interface.valid;
-    assign bram_dp_stream_0__read_rsp_b__addr = bram_dp_stream_0__read_rsp_b__interface.addr;
-    assign bram_dp_stream_0__read_rsp_b__data = bram_dp_stream_0__read_rsp_b__interface.data;
-    assign bram_dp_stream_0__read_rsp_b__tag = bram_dp_stream_0__read_rsp_b__interface.tag;
-    assign bram_dp_stream_0__read_rsp_b__epoch = bram_dp_stream_0__read_rsp_b__interface.epoch;
-    assign bram_dp_stream_0__read_rsp_b__interface.ready = vector_main_ixc__slave_read_rsp__ready_1;
-    rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(32), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) bram_dp_stream_0__write_req_b__interface();
-    assign bram_dp_stream_0__write_req_b__interface.valid = idle_instruction_write__write_req__valid;
-    assign bram_dp_stream_0__write_req_b__interface.addr = idle_instruction_write__write_req__addr;
-    assign bram_dp_stream_0__write_req_b__interface.data = idle_instruction_write__write_req__data;
-    assign bram_dp_stream_0__write_req_b__interface.tag = idle_instruction_write__write_req__tag;
-    assign bram_dp_stream_0__write_req_b__interface.epoch = idle_instruction_write__write_req__epoch;
-    assign bram_dp_stream_0__write_req_b__ready = bram_dp_stream_0__write_req_b__interface.ready;
-    rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(128), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) idle_scratchpad_a_write__write_req__interface();
-    assign idle_scratchpad_a_write__write_req__valid = idle_scratchpad_a_write__write_req__interface.valid;
-    assign idle_scratchpad_a_write__write_req__addr = idle_scratchpad_a_write__write_req__interface.addr;
-    assign idle_scratchpad_a_write__write_req__data = idle_scratchpad_a_write__write_req__interface.data;
-    assign idle_scratchpad_a_write__write_req__tag = idle_scratchpad_a_write__write_req__interface.tag;
-    assign idle_scratchpad_a_write__write_req__epoch = idle_scratchpad_a_write__write_req__interface.epoch;
-    assign idle_scratchpad_a_write__write_req__interface.ready = scratchpad_a__write_req_b__ready;
-    rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(128), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) idle_instruction_write__write_req__interface();
-    assign idle_instruction_write__write_req__valid = idle_instruction_write__write_req__interface.valid;
-    assign idle_instruction_write__write_req__addr = idle_instruction_write__write_req__interface.addr;
-    assign idle_instruction_write__write_req__data = idle_instruction_write__write_req__interface.data;
-    assign idle_instruction_write__write_req__tag = idle_instruction_write__write_req__interface.tag;
-    assign idle_instruction_write__write_req__epoch = idle_instruction_write__write_req__interface.epoch;
-    assign idle_instruction_write__write_req__interface.ready = bram_dp_stream_0__write_req_b__ready;
-    rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(128), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) idle_scratchpad_c_read__read_req__interface();
-    assign idle_scratchpad_c_read__read_req__valid = idle_scratchpad_c_read__read_req__interface.valid;
-    assign idle_scratchpad_c_read__read_req__addr = idle_scratchpad_c_read__read_req__interface.addr;
-    assign idle_scratchpad_c_read__read_req__data = idle_scratchpad_c_read__read_req__interface.data;
-    assign idle_scratchpad_c_read__read_req__tag = idle_scratchpad_c_read__read_req__interface.tag;
-    assign idle_scratchpad_c_read__read_req__epoch = idle_scratchpad_c_read__read_req__interface.epoch;
-    assign idle_scratchpad_c_read__read_req__interface.ready = scratchpad_c__read_req_b__ready;
-    rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(128), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) idle_scratchpad_c_read__read_rsp__interface();
-    assign idle_scratchpad_c_read__read_rsp__interface.valid = scratchpad_c__read_rsp_b__valid;
-    assign idle_scratchpad_c_read__read_rsp__interface.addr = scratchpad_c__read_rsp_b__addr;
-    assign idle_scratchpad_c_read__read_rsp__interface.data = scratchpad_c__read_rsp_b__data;
-    assign idle_scratchpad_c_read__read_rsp__interface.tag = scratchpad_c__read_rsp_b__tag;
-    assign idle_scratchpad_c_read__read_rsp__interface.epoch = scratchpad_c__read_rsp_b__epoch;
-    assign idle_scratchpad_c_read__read_rsp__ready = idle_scratchpad_c_read__read_rsp__interface.ready;
+    rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(32), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) bram_dp_stream_0__read_req__interface[0:1]();
+    assign bram_dp_stream_0__read_req__interface[0].valid = sch_0__mem_read_req__valid;
+    assign bram_dp_stream_0__read_req__interface[0].addr = sch_0__mem_read_req__addr;
+    assign bram_dp_stream_0__read_req__interface[0].data = sch_0__mem_read_req__data;
+    assign bram_dp_stream_0__read_req__interface[0].tag = sch_0__mem_read_req__tag;
+    assign bram_dp_stream_0__read_req__interface[0].epoch = sch_0__mem_read_req__epoch;
+    assign bram_dp_stream_0__read_req__ready_0 = bram_dp_stream_0__read_req__interface[0].ready;
+    assign bram_dp_stream_0__read_req__interface[1].valid = vector_main_ixc__slave_read_req__valid_1;
+    assign bram_dp_stream_0__read_req__interface[1].addr = vector_main_ixc__slave_read_req__addr_1;
+    assign bram_dp_stream_0__read_req__interface[1].data = vector_main_ixc__slave_read_req__data_1;
+    assign bram_dp_stream_0__read_req__interface[1].tag = vector_main_ixc__slave_read_req__tag_1;
+    assign bram_dp_stream_0__read_req__interface[1].epoch = vector_main_ixc__slave_read_req__epoch_1;
+    assign bram_dp_stream_0__read_req__ready_1 = bram_dp_stream_0__read_req__interface[1].ready;
+    rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(32), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) bram_dp_stream_0__read_rsp__interface[0:1]();
+    assign bram_dp_stream_0__read_rsp__valid_0 = bram_dp_stream_0__read_rsp__interface[0].valid;
+    assign bram_dp_stream_0__read_rsp__addr_0 = bram_dp_stream_0__read_rsp__interface[0].addr;
+    assign bram_dp_stream_0__read_rsp__data_0 = bram_dp_stream_0__read_rsp__interface[0].data;
+    assign bram_dp_stream_0__read_rsp__tag_0 = bram_dp_stream_0__read_rsp__interface[0].tag;
+    assign bram_dp_stream_0__read_rsp__epoch_0 = bram_dp_stream_0__read_rsp__interface[0].epoch;
+    assign bram_dp_stream_0__read_rsp__interface[0].ready = sch_0__mem_read_rsp__ready;
+    assign bram_dp_stream_0__read_rsp__valid_1 = bram_dp_stream_0__read_rsp__interface[1].valid;
+    assign bram_dp_stream_0__read_rsp__addr_1 = bram_dp_stream_0__read_rsp__interface[1].addr;
+    assign bram_dp_stream_0__read_rsp__data_1 = bram_dp_stream_0__read_rsp__interface[1].data;
+    assign bram_dp_stream_0__read_rsp__tag_1 = bram_dp_stream_0__read_rsp__interface[1].tag;
+    assign bram_dp_stream_0__read_rsp__epoch_1 = bram_dp_stream_0__read_rsp__interface[1].epoch;
+    assign bram_dp_stream_0__read_rsp__interface[1].ready = vector_main_ixc__slave_read_rsp__ready_1;
+    rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(32), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) bram_dp_stream_0__write_req__interface[0:0]();
+    assign bram_dp_stream_0__write_req__interface[0].valid = vector_main_ixc__slave_write_req__valid_1;
+    assign bram_dp_stream_0__write_req__interface[0].addr = vector_main_ixc__slave_write_req__addr_1;
+    assign bram_dp_stream_0__write_req__interface[0].data = vector_main_ixc__slave_write_req__data_1;
+    assign bram_dp_stream_0__write_req__interface[0].tag = vector_main_ixc__slave_write_req__tag_1;
+    assign bram_dp_stream_0__write_req__interface[0].epoch = vector_main_ixc__slave_write_req__epoch_1;
+    assign bram_dp_stream_0__write_req__ready_0 = bram_dp_stream_0__write_req__interface[0].ready;
     rv_if #(.ADDR_WIDTH(32), .DATA_WIDTH(128), .TAG_WIDTH(4), .EPOCH_WIDTH(4)) scheduler_zero_read__read_req__interface();
     assign scheduler_zero_read__read_req__interface.valid = vector_main_ixc__slave_read_req__valid_2;
     assign scheduler_zero_read__read_req__interface.addr = vector_main_ixc__slave_read_req__addr_2;
@@ -842,36 +677,22 @@ module vector_system(
         .sel_out(ixc_write_sel__sel_out__array)
     );
 
-    bram_dp_stream #(
-        .ADDR_WIDTH(32),
+    banked_bram_stream #(
+        .BANKS(2),
+        .READ_PORTS(3),
+        .WRITE_PORTS(1),
         .DATA_WIDTH(128),
+        .WORDS_PER_BANK(512),
+        .ADDR_WIDTH(32),
         .TAG_WIDTH(4),
         .EPOCH_WIDTH(4),
-        .DATA_DEPTH(1024)
+        .RESPONSE_DEPTH(4)
     ) scratchpad_a (
         .clk(clk),
         .rst_n(rst_n),
-        .read_req_a(scratchpad_a__read_req_a__interface),
-        .read_rsp_a(scratchpad_a__read_rsp_a__interface),
-        .write_req_a(scratchpad_a__write_req_a__interface),
-        .read_req_b(scratchpad_a__read_req_b__interface),
-        .read_rsp_b(scratchpad_a__read_rsp_b__interface),
-        .write_req_b(scratchpad_a__write_req_b__interface)
-    );
-
-    bram_arbiter #(
-        .N(2),
-        .DATA_WIDTH(128),
-        .ADDR_WIDTH(32),
-        .TAG_WIDTH(4),
-        .EPOCH_WIDTH(4)
-    ) bram_arbiter_0 (
-        .clk(clk),
-        .rst_n(rst_n),
-        .read_req(bram_arbiter_0__read_req__interface),
-        .read_rsp(bram_arbiter_0__read_rsp__interface),
-        .slave_read_req(bram_arbiter_0__slave_read_req__interface),
-        .slave_read_rsp(bram_arbiter_0__slave_read_rsp__interface)
+        .read_req(scratchpad_a__read_req__interface),
+        .read_rsp(scratchpad_a__read_rsp__interface),
+        .write_req(scratchpad_a__write_req__interface)
     );
 
     dma #(
@@ -910,36 +731,22 @@ module vector_system(
         .ctrl(alu_c_dma__ctrl__interface)
     );
 
-    bram_dp_stream #(
-        .ADDR_WIDTH(32),
+    banked_bram_stream #(
+        .BANKS(2),
+        .READ_PORTS(2),
+        .WRITE_PORTS(2),
         .DATA_WIDTH(128),
+        .WORDS_PER_BANK(512),
+        .ADDR_WIDTH(32),
         .TAG_WIDTH(4),
         .EPOCH_WIDTH(4),
-        .DATA_DEPTH(1024)
+        .RESPONSE_DEPTH(4)
     ) scratchpad_c (
         .clk(clk),
         .rst_n(rst_n),
-        .read_req_a(scratchpad_c__read_req_a__interface),
-        .read_rsp_a(scratchpad_c__read_rsp_a__interface),
-        .write_req_a(scratchpad_c__write_req_a__interface),
-        .read_req_b(scratchpad_c__read_req_b__interface),
-        .read_rsp_b(scratchpad_c__read_rsp_b__interface),
-        .write_req_b(scratchpad_c__write_req_b__interface)
-    );
-
-    bram_arbiter #(
-        .N(2),
-        .DATA_WIDTH(128),
-        .ADDR_WIDTH(32),
-        .TAG_WIDTH(4),
-        .EPOCH_WIDTH(4)
-    ) bram_arbiter_c (
-        .clk(clk),
-        .rst_n(rst_n),
-        .read_req(bram_arbiter_c__read_req__interface),
-        .read_rsp(bram_arbiter_c__read_rsp__interface),
-        .slave_read_req(bram_arbiter_c__slave_read_req__interface),
-        .slave_read_rsp(bram_arbiter_c__slave_read_rsp__interface)
+        .read_req(scratchpad_c__read_req__interface),
+        .read_rsp(scratchpad_c__read_rsp__interface),
+        .write_req(scratchpad_c__write_req__interface)
     );
 
     vector_alu #(
@@ -994,34 +801,22 @@ module vector_system(
         .vector_control_req(sch_0__vector_control_req__interface)
     );
 
-    bram_dp_stream #(
-        .ADDR_WIDTH(32),
+    banked_bram_stream #(
+        .BANKS(2),
+        .READ_PORTS(2),
+        .WRITE_PORTS(1),
         .DATA_WIDTH(32),
+        .WORDS_PER_BANK(512),
+        .ADDR_WIDTH(32),
         .TAG_WIDTH(4),
         .EPOCH_WIDTH(4),
-        .DATA_DEPTH(1024)
+        .RESPONSE_DEPTH(4)
     ) bram_dp_stream_0 (
         .clk(clk),
         .rst_n(rst_n),
-        .read_req_a(bram_dp_stream_0__read_req_a__interface),
-        .read_rsp_a(bram_dp_stream_0__read_rsp_a__interface),
-        .write_req_a(bram_dp_stream_0__write_req_a__interface),
-        .read_req_b(bram_dp_stream_0__read_req_b__interface),
-        .read_rsp_b(bram_dp_stream_0__read_rsp_b__interface),
-        .write_req_b(bram_dp_stream_0__write_req_b__interface)
-    );
-
-    rv_idle_write idle_scratchpad_a_write (
-        .write_req(idle_scratchpad_a_write__write_req__interface)
-    );
-
-    rv_idle_write idle_instruction_write (
-        .write_req(idle_instruction_write__write_req__interface)
-    );
-
-    rv_idle_read idle_scratchpad_c_read (
-        .read_req(idle_scratchpad_c_read__read_req__interface),
-        .read_rsp(idle_scratchpad_c_read__read_rsp__interface)
+        .read_req(bram_dp_stream_0__read_req__interface),
+        .read_rsp(bram_dp_stream_0__read_rsp__interface),
+        .write_req(bram_dp_stream_0__write_req__interface)
     );
 
     rv_zero_read scheduler_zero_read (

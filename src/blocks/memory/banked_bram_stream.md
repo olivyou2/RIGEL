@@ -11,19 +11,19 @@ Parameters: `BANKS`, `READ_PORTS`, `WRITE_PORTS`, `DATA_WIDTH`,
 `WORDS_PER_BANK`, `ADDR_WIDTH`, `TAG_WIDTH`, `EPOCH_WIDTH`, and
 `RESPONSE_DEPTH` (default 4). Banks, words per
 bank, and data width must be powers of two; port counts must be positive.
-`ADDR_WIDTH` is the **local byte-address width**, exactly
+`ADDR_WIDTH` is at least the local byte-address width,
 `log2(BANKS)+log2(WORDS_PER_BANK)+log2(DATA_WIDTH/8)` (omit the bank bits for
-one bank). Addresses have this format:
+one bank). The low local-address bits have this format:
 
 ```
-{bank index (MSBs), word index, byte offset (LSBs)}
+{bank index (local MSBs), word index, byte offset (LSBs)}
 ```
 
 For example, `BANKS=4`, `WORDS_PER_BANK=1024`, `DATA_WIDTH=128` uses a 16-bit
 local address: `[15:14]` selects the bank, `[13:4]` the word, and `[3:0]` the
-byte offset. A 32-bit system bus should select the memory region and pass its
-16-bit local address to this primitive; it does not silently alias unused
-upper bits.
+byte offset. A wider system address may be passed directly: high bits are
+ignored for memory selection but preserved in read-response metadata. The
+upstream interconnect must route addresses to the correct memory region.
 
 Read responses preserve `addr`, `tag`, and `epoch` and remain stable under
 backpressure. Each logical read port may have up to `RESPONSE_DEPTH`
@@ -33,7 +33,7 @@ word are allowed only when **both are reads**. Any same-word write/read or
 write/write pair is serialized because FPGA collision behavior is not portable.
 Byte enables and partial-word writes are not supported.
 
-This is a reusable primitive, not yet connected to `vector_system`. Run the
+This primitive is used by `vector_system`. Run the
 directed test with:
 
 ```sh

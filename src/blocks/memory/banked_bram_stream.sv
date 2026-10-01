@@ -7,7 +7,8 @@ module banked_bram_stream #(
     parameter int WRITE_PORTS = 2,
     parameter int DATA_WIDTH = 128,
     parameter int WORDS_PER_BANK = 1024,
-    // Address is a byte address: {bank MSBs, word index, byte offset}.
+    // Byte address. Bank bits are the MSBs of the local memory window;
+    // optional higher system-address bits are ignored for memory selection.
     parameter int ADDR_WIDTH = $clog2(BANKS) + $clog2(WORDS_PER_BANK)
                              + $clog2(DATA_WIDTH/8),
     parameter int TAG_WIDTH = 4,
@@ -23,6 +24,7 @@ module banked_bram_stream #(
     localparam int BANK_BITS = BANKS > 1 ? $clog2(BANKS) : 1;
     localparam int WORD_BITS = $clog2(WORDS_PER_BANK);
     localparam int BYTE_BITS = $clog2(DATA_WIDTH/8);
+    localparam int LOCAL_ADDR_WIDTH = WORD_BITS + BYTE_BITS + (BANKS > 1 ? BANK_BITS : 0);
     localparam int CLIENTS = READ_PORTS + WRITE_PORTS;
     localparam int CLIENT_BITS = CLIENTS > 1 ? $clog2(CLIENTS) : 1;
     localparam int READ_ID_BITS = READ_PORTS > 1 ? $clog2(READ_PORTS) : 1;
@@ -33,15 +35,15 @@ module banked_bram_stream #(
             READ_PORTS < 1 || WRITE_PORTS < 1 || RESPONSE_DEPTH < 2 ||
             WORDS_PER_BANK < 2 || (WORDS_PER_BANK & (WORDS_PER_BANK-1)) != 0 ||
             DATA_WIDTH < 8 || (DATA_WIDTH & (DATA_WIDTH-1)) != 0 ||
-            ADDR_WIDTH != WORD_BITS + BYTE_BITS + (BANKS > 1 ? BANK_BITS : 0))
-            $fatal(1, "banked_bram_stream requires power-of-two banks/words/width and exact address width");
+            ADDR_WIDTH < LOCAL_ADDR_WIDTH)
+            $fatal(1, "banked_bram_stream requires power-of-two banks/words/width and sufficient address width");
     end
 
     function automatic logic [BANK_BITS-1:0] bank_of(
         input logic [ADDR_WIDTH-1:0] address
     );
         if (BANKS == 1) return '0;
-        return address[ADDR_WIDTH-1-:BANK_BITS];
+        return address[LOCAL_ADDR_WIDTH-1-:BANK_BITS];
     endfunction
 
     logic [READ_PORTS-1:0] rd_valid, rd_ready, rsp_ready;

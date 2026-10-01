@@ -35,7 +35,7 @@ module vector_system_throughput_tb;
             last_fire = cycle;
             fire_count++;
         end
-        if (dut.vector_accumulate_0__out_ch__valid && dut.scratchpad_c__write_req_b__ready) begin
+        if (dut.vector_accumulate_0__out_ch__valid && dut.scratchpad_c__write_req__ready_1) begin
             if (last_write >= 0 && cycle != last_write + 1)
                 $fatal(1, "result write bubble: cycle %0d after %0d", cycle, last_write);
             last_write = cycle;
