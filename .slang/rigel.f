@@ -16,6 +16,7 @@ src/blocks/memory/bram.sv
 src/blocks/memory/bram_dp.sv
 src/blocks/memory/bram_stream.sv
 src/blocks/memory/bram_dp_stream.sv
+src/blocks/memory/banked_bram_stream.sv
 src/blocks/memory/bram_arbiter.sv
 
 src/blocks/interconnect/ixc/ixc_rr_arbiter.sv
