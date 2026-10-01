@@ -3,9 +3,13 @@
 `banked_bram_stream.sv` provides parameterized ready/valid logical read and
 write ports over `BANKS` independent true dual-port BRAMs. Each bank has **two
 physical ports**, and each port can read or write in a cycle. Therefore each
-bank can accept at most two operations per cycle: 2R, 1R+1W, or 2W. Different
-banks run in parallel. The module round-robins contending logical clients;
-unaccepted requests must hold their payload while `ready=0`.
+bank can execute at most two operations per cycle: 2R, 1R+1W, or 2W. Different
+banks run in parallel. Each logical input has a two-entry request FIFO, so
+`ready` acknowledges enqueueing rather than immediate access to a physical
+port. The module round-robins queued clients; producers must hold a request
+while `ready=0`. An uncongested stream sustains one beat per clock.
+Per-bank arbitration decodes clients in parallel and uses one-hot grants for
+the two physical ports. Same-word pairs containing a write are serialized.
 
 Parameters: `BANKS`, `READ_PORTS`, `WRITE_PORTS`, `DATA_WIDTH`,
 `WORDS_PER_BANK`, `ADDR_WIDTH`, `TAG_WIDTH`, `EPOCH_WIDTH`, and
@@ -27,8 +31,12 @@ upstream interconnect must route addresses to the correct memory region.
 
 Read responses preserve `addr`, `tag`, and `epoch` and remain stable under
 backpressure. Each logical read port may have up to `RESPONSE_DEPTH`
-outstanding requests, allowing one read beat per clock when uncongested. Writes have
-no response; acceptance is `valid && ready`. Simultaneous accesses to the same
+granted requests plus two queued requests. A full response reservation stalls
+physical grants until a response is consumed on a later clock; it never makes
+input `ready` depend combinationally on response `ready`. An uncongested port
+can still issue and receive one read beat per clock. Writes have no response;
+acceptance into the request FIFO is `valid && ready`. The response FIFO uses
+head/tail pointers and does not reset unused payload storage. Simultaneous accesses to the same
 word are allowed only when **both are reads**. Any same-word write/read or
 write/write pair is serialized because FPGA collision behavior is not portable.
 Byte enables and partial-word writes are not supported.

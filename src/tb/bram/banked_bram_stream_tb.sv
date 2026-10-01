@@ -12,11 +12,13 @@ module banked_bram_stream_tb;
     logic [7:0] r_addr[N], q_addr[N], w_addr[N];
     logic [31:0] q_data[N], w_data[N];
     logic [3:0] r_tag[N], q_tag[N], r_epoch[N], q_epoch[N];
-    logic [N-1:0] first_ready;
     bit stream_check = 0;
     int stream_received = 0;
     int stream_cycle = 0;
     int last_response_cycle = -1;
+    bit stall_check = 0;
+    int stall_accepted = 0;
+    int stall_received = 0;
 
     always @(posedge clk) if (stream_check) begin
         if (q_valid[0] && q_ready[0]) begin
@@ -28,6 +30,24 @@ module banked_bram_stream_tb;
             last_response_cycle = stream_cycle;
         end
         stream_cycle++;
+    end
+
+    always @(posedge clk) if (stall_check) begin
+        if (r_valid[0] && r_ready[0]) stall_accepted++;
+        if (q_valid[0] && q_ready[0]) begin
+            if (q_data[0] !== 32'h4444 || q_addr[0] !== 8'h04)
+                $fatal(1, "backpressure response mismatch");
+            stall_received++;
+        end
+    end
+
+    always @(posedge clk) if (rst_n) begin
+        for (int b = 0; b < 4; b++) begin
+            if (dut.slot_valid[b][0] && dut.slot_valid[b][1] &&
+                (dut.slot_write[b][0] || dut.slot_write[b][1]) &&
+                dut.slot_addr[b][0][5:2] == dut.slot_addr[b][1][5:2])
+                $fatal(1, "same-word bank collision");
+        end
     end
 
     for (genvar p = 0; p < N; p++) begin : clients
@@ -107,22 +127,14 @@ module banked_bram_stream_tb;
         @(posedge clk);
         @(negedge clk) q_ready = '0;
 
-        // A single bank has two physical ports, allowing two writes but not
-        // three. The third request waits and is accepted on the next clock.
+        // All three requests enter independent input FIFOs. The bank drains
+        // at most two of them per cycle.
         w_valid = 3'b111;
         w_addr[0] = 8'h04; w_data[0] = 32'h4444;
         w_addr[1] = 8'h08; w_data[1] = 32'h5555;
         w_addr[2] = 8'h0c; w_data[2] = 32'h6666;
         #1;
-        if ($countones(w_ready) != 2) $fatal(1, "bank did not admit two writes");
-        first_ready = w_ready;
-        @(posedge clk);
-        @(negedge clk) begin
-            for (int p = 0; p < N; p++) if (first_ready[p]) w_valid[p] = 0;
-        end
-        #1;
-        if ($countones(w_ready & w_valid) != 1)
-            $fatal(1, "third write did not resume");
+        if (w_ready !== 3'b111) $fatal(1, "write input FIFO stalled");
         @(posedge clk);
         @(negedge clk) w_valid = '0;
 
@@ -132,7 +144,7 @@ module banked_bram_stream_tb;
         r_addr[0] = 8'h04;
         r_addr[1] = 8'h08;
         #1;
-        if (r_ready[1:0] !== 2'b11) $fatal(1, "bank did not admit two reads");
+        if (r_ready[1:0] !== 2'b11) $fatal(1, "read input FIFO stalled");
         @(posedge clk);
         @(negedge clk) r_valid = '0;
         wait (q_valid[0] && q_valid[1]);
@@ -142,22 +154,14 @@ module banked_bram_stream_tb;
         @(posedge clk);
         @(negedge clk) q_ready = '0;
 
-        // A third read to the same bank waits for one of the two physical
+        // A third read to the same bank queues behind the two physical
         // ports. All three responses must remain stable under backpressure.
         r_valid = 3'b111;
         r_addr[0] = 8'h04;
         r_addr[1] = 8'h08;
         r_addr[2] = 8'h0c;
         #1;
-        if ($countones(r_ready) != 2) $fatal(1, "bank admitted more than two reads");
-        first_ready = r_ready;
-        @(posedge clk);
-        @(negedge clk) begin
-            for (int p = 0; p < N; p++) if (first_ready[p]) r_valid[p] = 0;
-        end
-        #1;
-        if ($countones(r_ready & r_valid) != 1)
-            $fatal(1, "third read did not resume");
+        if (r_ready !== 3'b111) $fatal(1, "read input FIFO stalled");
         @(posedge clk);
         @(negedge clk) r_valid = '0;
         wait (&q_valid);
@@ -205,12 +209,35 @@ module banked_bram_stream_tb;
             q_ready = '0;
         end
 
-        // Same-word writes cannot use both physical ports at once.
+        // A stalled response fills the reservations and then the two-entry
+        // input queue. Releasing backpressure must return every accepted beat.
+        stall_accepted = 0;
+        stall_received = 0;
+        stall_check = 1;
+        r_valid[0] = 1;
+        r_addr[0] = 8'h04;
+        repeat (12) @(posedge clk);
+        @(negedge clk);
+        if (r_ready[0]) $fatal(1, "read input FIFO failed to backpressure");
+        if (stall_accepted != 6) $fatal(1, "unexpected reservation count %0d", stall_accepted);
+        r_valid[0] = 0;
+        q_ready[0] = 1;
+        wait (stall_received == stall_accepted);
+        @(negedge clk) begin
+            stall_check = 0;
+            q_ready = '0;
+        end
+
+        // Same-word writes both enter input FIFOs; arbitration must serialize
+        // them before they reach the two physical ports.
         w_valid = 3'b011;
         w_addr[0] = 8'h14;
         w_addr[1] = 8'h14;
         #1;
-        if ($countones(w_ready) != 1) $fatal(1, "same-word write collision accepted");
+        if (w_ready[1:0] !== 2'b11) $fatal(1, "same-word writes not queued");
+        @(posedge clk);
+        @(negedge clk) w_valid = '0;
+        repeat (3) @(posedge clk);
         $display("[BANKED_BRAM_STREAM_TB] PASS");
         $finish;
     end

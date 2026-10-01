@@ -1,7 +1,7 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2026 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2026.1 (win64) Build 6511674 Tue Jun 16 11:02:23 MDT 2026
-| Date         : Wed Sep 30 21:59:10 2026
+| Date         : Thu Oct  1 13:29:55 2026
 | Host         : DESKTOP-2MR89AG running 64-bit major release  (build 9200)
 | Command      : report_utilization -hierarchical -hierarchical_depth 10 -file reports/post_place_hierarchical_utilization.rpt
 | Design       : vector_system
@@ -19,65 +19,57 @@ Table of Contents
 1. Utilization by Hierarchy
 ---------------------------
 
-+-----------------------------------+----------------------------------------+------------+------------+---------+------+-------+--------+--------+------------+
-|              Instance             |                 Module                 | Total LUTs | Logic LUTs | LUTRAMs | SRLs |  FFs  | RAMB36 | RAMB18 | DSP Blocks |
-+-----------------------------------+----------------------------------------+------------+------------+---------+------+-------+--------+--------+------------+
-| vector_system                     |                                  (top) |      13338 |      13084 |     254 |    0 | 16121 |      9 |      0 |          0 |
-|   (vector_system)                 |                                  (top) |          0 |          0 |       0 |    0 |     0 |      0 |      0 |          0 |
-|   alu_a_dma                       |                                    dma |        751 |        751 |       0 |    0 |  1967 |      0 |      0 |          0 |
-|     dma_control_dut               |                         dma_control_26 |        102 |        102 |       0 |    0 |   189 |      0 |      0 |          0 |
-|     dma_dst_addr_dut              |                        dma_dst_addr_27 |        195 |        195 |       0 |    0 |   258 |      0 |      0 |          0 |
-|     dma_src_addr_dut              |                        dma_src_addr_28 |         52 |         52 |       0 |    0 |    99 |      0 |      0 |          0 |
-|     fifo_dut                      |                fifo__parameterized0_29 |        402 |        402 |       0 |    0 |  1421 |      0 |      0 |          0 |
-|   alu_b_dma                       |                                  dma_0 |        691 |        691 |       0 |    0 |  1858 |      0 |      0 |          0 |
-|     dma_control_dut               |                         dma_control_22 |         84 |         84 |       0 |    0 |   145 |      0 |      0 |          0 |
-|     dma_dst_addr_dut              |                        dma_dst_addr_23 |        196 |        196 |       0 |    0 |   259 |      0 |      0 |          0 |
-|     fifo_dut                      |                fifo__parameterized0_25 |        404 |        404 |       0 |    0 |  1421 |      0 |      0 |          0 |
-|   alu_c_dma                       |                                  dma_1 |        720 |        720 |       0 |    0 |  1967 |      0 |      0 |          0 |
-|     dma_control_dut               |                            dma_control |        104 |        104 |       0 |    0 |   189 |      0 |      0 |          0 |
-|     dma_dst_addr_dut              |                           dma_dst_addr |        195 |        195 |       0 |    0 |   258 |      0 |      0 |          0 |
-|     dma_src_addr_dut              |                           dma_src_addr |         18 |         18 |       0 |    0 |    99 |      0 |      0 |          0 |
-|     fifo_dut                      |                   fifo__parameterized0 |        403 |        403 |       0 |    0 |  1421 |      0 |      0 |          0 |
-|   bram_arbiter_0                  |                           bram_arbiter |        174 |        174 |       0 |    0 |  1132 |      0 |      0 |          0 |
-|     (bram_arbiter_0)              |                           bram_arbiter |          4 |          4 |       0 |    0 |   300 |      0 |      0 |          0 |
-|     arbiter                       |                        arbiter_skid_14 |         50 |         50 |       0 |    0 |   128 |      0 |      0 |          0 |
-|       skid                        |                                skid_21 |          7 |          7 |       0 |    0 |    85 |      0 |      0 |          0 |
-|     resp_join                     |                      handshake_join_15 |        101 |        101 |       0 |    0 |   687 |      0 |      0 |          0 |
-|       input_buffers[1].input_skid |                skid__parameterized0_18 |         89 |         89 |       0 |    0 |   341 |      0 |      0 |          0 |
-|       output_skid                 |                skid__parameterized1_19 |          5 |          5 |       0 |    0 |   341 |      0 |      0 |          0 |
-|   bram_arbiter_c                  |                         bram_arbiter_2 |        180 |        180 |       0 |    0 |  1134 |      0 |      0 |          0 |
-|     (bram_arbiter_c)              |                         bram_arbiter_2 |          0 |          0 |       0 |    0 |   300 |      0 |      0 |          0 |
-|     arbiter                       |                           arbiter_skid |         54 |         54 |       0 |    0 |   128 |      0 |      0 |          0 |
-|       skid                        |                                   skid |          8 |          8 |       0 |    0 |    85 |      0 |      0 |          0 |
-|     resp_join                     |                         handshake_join |        107 |        107 |       0 |    0 |   689 |      0 |      0 |          0 |
-|       input_buffers[1].input_skid |                skid__parameterized0_13 |         91 |         91 |       0 |    0 |   343 |      0 |      0 |          0 |
-|       output_skid                 |                   skid__parameterized1 |          9 |          9 |       0 |    0 |   341 |      0 |      0 |          0 |
-|   bram_dp_stream_0                |         bram_dp_stream__parameterized1 |        317 |        317 |       0 |    0 |   639 |      1 |      0 |          0 |
-|     port_b                        | bram_dp_stream_port__parameterized3_11 |        187 |        187 |       0 |    0 |   373 |      0 |      0 |          0 |
-|     port_a                        |    bram_dp_stream_port__parameterized3 |        125 |        125 |       0 |    0 |   266 |      0 |      0 |          0 |
-|   handshake_join_0                |         handshake_join__parameterized0 |       4688 |       4688 |       0 |    0 |  1660 |      0 |      0 |          0 |
-|     input_buffers[0].input_skid   |                   skid__parameterized0 |         68 |         68 |       0 |    0 |   259 |      0 |      0 |          0 |
-|     input_buffers[1].input_skid   |                 skid__parameterized0_8 |         68 |         68 |       0 |    0 |   259 |      0 |      0 |          0 |
-|     input_buffers[2].input_skid   |                 skid__parameterized0_9 |         69 |         69 |       0 |    0 |   259 |      0 |      0 |          0 |
-|     output_skid                   |                   skid__parameterized3 |       4460 |       4460 |       0 |    0 |   842 |      0 |      0 |          0 |
-|   sch_0                           |                                    sch |        990 |        990 |       0 |    0 |   894 |      0 |      0 |          0 |
-|     execute                       |                            sch_execute |        482 |        482 |       0 |    0 |   764 |      0 |      0 |          0 |
-|     epoch_filter                  |                       sch_epoch_filter |        509 |        509 |       0 |    0 |    97 |      0 |      0 |          0 |
-|   scratchpad_a                    |                         bram_dp_stream |        918 |        918 |       0 |    0 |  1439 |      4 |      0 |          0 |
-|     port_b                        |                  bram_dp_stream_port_7 |        398 |        398 |       0 |    0 |   537 |      0 |      0 |          0 |
-|     port_a                        |                  bram_dp_stream_port_6 |        515 |        515 |       0 |    0 |   902 |      0 |      0 |          0 |
-|   scratchpad_c                    |                       bram_dp_stream_3 |        610 |        610 |       0 |    0 |  1043 |      4 |      0 |          0 |
-|     port_b                        |                  bram_dp_stream_port_4 |          5 |          5 |       0 |    0 |   139 |      0 |      0 |          0 |
-|     port_a                        |                    bram_dp_stream_port |        600 |        600 |       0 |    0 |   904 |      0 |      0 |          0 |
-|   vector_accumulate_0             |                 vector_accumulate_slot |       1252 |       1252 |       0 |    0 |   651 |      0 |      0 |          0 |
-|   vector_alu_0                    |                             vector_alu |        661 |        661 |       0 |    0 |   541 |      0 |      0 |          0 |
-|     (vector_alu_0)                |                             vector_alu |        549 |        549 |       0 |    0 |   541 |      0 |      0 |          0 |
-|     vector_exp                    |                             vector_exp |        112 |        112 |       0 |    0 |     0 |      0 |      0 |          0 |
-|   vector_main_ixc                 |                                    ixc |       1388 |       1134 |     254 |    0 |  1155 |      0 |      0 |          0 |
-|     (vector_main_ixc)             |                                    ixc |          0 |          0 |       0 |    0 |  1032 |      0 |      0 |          0 |
-|     control                       |                            ixc_control |        784 |        784 |       0 |    0 |    32 |      0 |      0 |          0 |
-|     read_path                     |                               ixc_read |        604 |        350 |     254 |    0 |    91 |      0 |      0 |          0 |
-+-----------------------------------+----------------------------------------+------------+------------+---------+------+-------+--------+--------+------------+
++---------------------------------+------------------------------------+------------+------------+---------+------+-------+--------+--------+------------+
+|             Instance            |               Module               | Total LUTs | Logic LUTs | LUTRAMs | SRLs |  FFs  | RAMB36 | RAMB18 | DSP Blocks |
++---------------------------------+------------------------------------+------------+------------+---------+------+-------+--------+--------+------------+
+| vector_system                   |                              (top) |      18699 |      18445 |     254 |    0 | 15349 |     18 |      0 |         35 |
+|   (vector_system)               |                              (top) |          0 |          0 |       0 |    0 |     0 |      0 |      0 |          0 |
+|   alu_a_dma                     |                                dma |        597 |        597 |       0 |    0 |  1967 |      0 |      0 |          0 |
+|     dma_control_dut             |                     dma_control_13 |        102 |        102 |       0 |    0 |   189 |      0 |      0 |          0 |
+|     dma_dst_addr_dut            |                    dma_dst_addr_14 |         67 |         67 |       0 |    0 |   258 |      0 |      0 |          0 |
+|     dma_src_addr_dut            |                    dma_src_addr_15 |         19 |         19 |       0 |    0 |    99 |      0 |      0 |          0 |
+|     fifo_dut                    |                            fifo_16 |        409 |        409 |       0 |    0 |  1421 |      0 |      0 |          0 |
+|   alu_b_dma                     |                              dma_0 |        604 |        604 |       0 |    0 |  1975 |      0 |      0 |          0 |
+|     dma_control_dut             |                      dma_control_9 |        110 |        110 |       0 |    0 |   197 |      0 |      0 |          0 |
+|     dma_dst_addr_dut            |                    dma_dst_addr_10 |         67 |         67 |       0 |    0 |   258 |      0 |      0 |          0 |
+|     dma_src_addr_dut            |                    dma_src_addr_11 |         19 |         19 |       0 |    0 |    99 |      0 |      0 |          0 |
+|     fifo_dut                    |                            fifo_12 |        408 |        408 |       0 |    0 |  1421 |      0 |      0 |          0 |
+|   alu_c_dma                     |                              dma_1 |        607 |        607 |       0 |    0 |  1975 |      0 |      0 |          0 |
+|     dma_control_dut             |                        dma_control |        110 |        110 |       0 |    0 |   197 |      0 |      0 |          0 |
+|     dma_dst_addr_dut            |                       dma_dst_addr |         67 |         67 |       0 |    0 |   258 |      0 |      0 |          0 |
+|     dma_src_addr_dut            |                       dma_src_addr |         24 |         24 |       0 |    0 |    99 |      0 |      0 |          0 |
+|     fifo_dut                    |                               fifo |        406 |        406 |       0 |    0 |  1421 |      0 |      0 |          0 |
+|   bram_dp_stream_0              | banked_bram_stream__parameterized1 |        920 |        920 |       0 |    0 |   742 |      2 |      0 |          0 |
+|     (bram_dp_stream_0)          | banked_bram_stream__parameterized1 |        479 |        479 |       0 |    0 |   742 |      0 |      0 |          0 |
+|     banks[0].ram                |            bram_dp__parameterized0 |        168 |        168 |       0 |    0 |     0 |      1 |      0 |          0 |
+|     banks[1].ram                |          bram_dp__parameterized0_8 |        274 |        274 |       0 |    0 |     0 |      1 |      0 |          0 |
+|   handshake_join_0              |                     handshake_join |       3309 |       3309 |       0 |    0 |  1612 |      0 |      0 |          0 |
+|     input_buffers[0].input_skid |                               skid |        224 |        224 |       0 |    0 |   259 |      0 |      0 |          0 |
+|     input_buffers[1].input_skid |                             skid_5 |        234 |        234 |       0 |    0 |   259 |      0 |      0 |          0 |
+|     input_buffers[2].input_skid |                             skid_6 |        227 |        227 |       0 |    0 |   259 |      0 |      0 |          0 |
+|     input_buffers[3].input_skid |                             skid_7 |         68 |         68 |       0 |    0 |    85 |      0 |      0 |          0 |
+|     output_skid                 |               skid__parameterized0 |       2657 |       2657 |       0 |    0 |   750 |      0 |      0 |          0 |
+|   sch_0                         |                                sch |       1212 |       1212 |       0 |    0 |  1184 |      0 |      0 |          3 |
+|     fetch                       |                          sch_fetch |          5 |          5 |       0 |    0 |    73 |      0 |      0 |          0 |
+|     epoch_filter                |                   sch_epoch_filter |        374 |        374 |       0 |    0 |   139 |      0 |      0 |          0 |
+|     execute                     |                        sch_execute |        829 |        829 |       0 |    0 |   970 |      0 |      0 |          3 |
+|   scratchpad_a                  |                 banked_bram_stream |       4415 |       4415 |       0 |    0 |  1905 |      8 |      0 |          0 |
+|     (scratchpad_a)              |                 banked_bram_stream |        706 |        706 |       0 |    0 |  1905 |      0 |      0 |          0 |
+|     banks[0].ram                |                          bram_dp_3 |       1221 |       1221 |       0 |    0 |     0 |      4 |      0 |          0 |
+|     banks[1].ram                |                          bram_dp_4 |       2490 |       2490 |       0 |    0 |     0 |      4 |      0 |          0 |
+|   scratchpad_c                  | banked_bram_stream__parameterized0 |       2666 |       2666 |       0 |    0 |  1380 |      8 |      0 |          0 |
+|     (scratchpad_c)              | banked_bram_stream__parameterized0 |        360 |        360 |       0 |    0 |  1380 |      0 |      0 |          0 |
+|     banks[0].ram                |                            bram_dp |       1001 |       1001 |       0 |    0 |     0 |      4 |      0 |          0 |
+|     banks[1].ram                |                          bram_dp_2 |       1306 |       1306 |       0 |    0 |     0 |      4 |      0 |          0 |
+|   vector_accumulate_0           |             vector_accumulate_slot |       1308 |       1308 |       0 |    0 |   673 |      0 |      0 |          0 |
+|   vector_alu_0                  |                         vector_alu |        773 |        773 |       0 |    0 |   585 |      0 |      0 |         32 |
+|     (vector_alu_0)              |                         vector_alu |        679 |        679 |       0 |    0 |   585 |      0 |      0 |         32 |
+|     vector_exp                  |                         vector_exp |         94 |         94 |       0 |    0 |     0 |      0 |      0 |          0 |
+|   vector_main_ixc               |                                ixc |       2291 |       2037 |     254 |    0 |  1310 |      0 |      0 |          0 |
+|     (vector_main_ixc)           |                                ixc |        282 |        282 |       0 |    0 |  1188 |      0 |      0 |          0 |
+|     control                     |                        ixc_control |       1064 |       1064 |       0 |    0 |    28 |      0 |      0 |          0 |
+|     read_path                   |                           ixc_read |        968 |        714 |     254 |    0 |    94 |      0 |      0 |          0 |
++---------------------------------+------------------------------------+------------+------------+---------+------+-------+--------+--------+------------+
 * Note: The sum of lower-level cells may be larger than their parent cells total, due to cross-hierarchy LUT combining
 
 

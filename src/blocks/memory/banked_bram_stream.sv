@@ -29,6 +29,8 @@ module banked_bram_stream #(
     localparam int CLIENT_BITS = CLIENTS > 1 ? $clog2(CLIENTS) : 1;
     localparam int READ_ID_BITS = READ_PORTS > 1 ? $clog2(READ_PORTS) : 1;
     localparam int COUNT_BITS = $clog2(RESPONSE_DEPTH + 1);
+    localparam int RESPONSE_INDEX_BITS = $clog2(RESPONSE_DEPTH);
+    localparam int REQUEST_DEPTH = 2;
 
     initial begin
         if (BANKS < 1 || (BANKS & (BANKS-1)) != 0 ||
@@ -54,6 +56,17 @@ module banked_bram_stream #(
     logic [ADDR_WIDTH-1:0] wr_addr[WRITE_PORTS];
     logic [DATA_WIDTH-1:0] wr_data[WRITE_PORTS];
 
+    // The external ready signals depend only on registered occupancy. Bank
+    // arbitration and downstream backpressure cannot propagate through them.
+    logic [1:0] rd_request_count[READ_PORTS], wr_request_count[WRITE_PORTS];
+    logic rd_request_head[READ_PORTS], rd_request_tail[READ_PORTS];
+    logic wr_request_head[WRITE_PORTS], wr_request_tail[WRITE_PORTS];
+    logic [ADDR_WIDTH-1:0] rd_request_addr[READ_PORTS][REQUEST_DEPTH];
+    logic [TAG_WIDTH-1:0] rd_request_tag[READ_PORTS][REQUEST_DEPTH];
+    logic [EPOCH_WIDTH-1:0] rd_request_epoch[READ_PORTS][REQUEST_DEPTH];
+    logic [ADDR_WIDTH-1:0] wr_request_addr[WRITE_PORTS][REQUEST_DEPTH];
+    logic [DATA_WIDTH-1:0] wr_request_data[WRITE_PORTS][REQUEST_DEPTH];
+
     logic [READ_PORTS-1:0] rsp_valid;
     logic [DATA_WIDTH-1:0] rsp_data[READ_PORTS];
     logic [ADDR_WIDTH-1:0] rsp_addr[READ_PORTS];
@@ -65,18 +78,20 @@ module banked_bram_stream #(
     logic [ADDR_WIDTH-1:0] response_addr[READ_PORTS][RESPONSE_DEPTH];
     logic [TAG_WIDTH-1:0] response_tag[READ_PORTS][RESPONSE_DEPTH];
     logic [EPOCH_WIDTH-1:0] response_epoch[READ_PORTS][RESPONSE_DEPTH];
+    logic [RESPONSE_INDEX_BITS-1:0] response_head[READ_PORTS];
+    logic [RESPONSE_INDEX_BITS-1:0] response_tail[READ_PORTS];
 
     for (genvar p = 0; p < READ_PORTS; p++) begin : read_client
-        assign rd_valid[p] = read_req[p].valid;
-        assign rd_addr[p] = ADDR_WIDTH'(read_req[p].addr);
-        assign rd_tag[p] = read_req[p].tag;
-        assign rd_epoch[p] = read_req[p].epoch;
-        assign read_req[p].ready = rd_ready[p];
+        assign rd_valid[p] = rd_request_count[p] != 0;
+        assign rd_addr[p] = rd_request_addr[p][rd_request_head[p]];
+        assign rd_tag[p] = rd_request_tag[p][rd_request_head[p]];
+        assign rd_epoch[p] = rd_request_epoch[p][rd_request_head[p]];
+        assign read_req[p].ready = rst_n && rd_request_count[p] < REQUEST_DEPTH;
         assign rsp_valid[p] = response_count[p] != 0;
-        assign rsp_data[p] = response_data[p][0];
-        assign rsp_addr[p] = response_addr[p][0];
-        assign rsp_tag[p] = response_tag[p][0];
-        assign rsp_epoch[p] = response_epoch[p][0];
+        assign rsp_data[p] = response_data[p][response_head[p]];
+        assign rsp_addr[p] = response_addr[p][response_head[p]];
+        assign rsp_tag[p] = response_tag[p][response_head[p]];
+        assign rsp_epoch[p] = response_epoch[p][response_head[p]];
         assign read_rsp[p].valid = rsp_valid[p];
         assign read_rsp[p].data = $bits(read_rsp[p].data)'(rsp_data[p]);
         assign read_rsp[p].addr = $bits(read_rsp[p].addr)'(rsp_addr[p]);
@@ -85,13 +100,18 @@ module banked_bram_stream #(
         assign rsp_ready[p] = read_rsp[p].ready;
     end
     for (genvar p = 0; p < WRITE_PORTS; p++) begin : write_client
-        assign wr_valid[p] = write_req[p].valid;
-        assign wr_addr[p] = ADDR_WIDTH'(write_req[p].addr);
-        assign wr_data[p] = DATA_WIDTH'(write_req[p].data);
-        assign write_req[p].ready = wr_ready[p];
+        assign wr_valid[p] = wr_request_count[p] != 0;
+        assign wr_addr[p] = wr_request_addr[p][wr_request_head[p]];
+        assign wr_data[p] = wr_request_data[p][wr_request_head[p]];
+        assign write_req[p].ready = rst_n && wr_request_count[p] < REQUEST_DEPTH;
     end
 
     logic [CLIENT_BITS-1:0] rr[BANKS];
+    logic [CLIENTS-1:0] client_valid[BANKS];
+    logic [CLIENTS-1:0] first_grant[BANKS], second_eligible[BANKS], second_grant[BANKS];
+    logic [ADDR_WIDTH-1:0] client_addr[BANKS][CLIENTS];
+    logic [DATA_WIDTH-1:0] client_data[BANKS][CLIENTS];
+    logic client_write[CLIENTS];
     logic slot_valid[BANKS][2], slot_write[BANKS][2];
     logic [CLIENT_BITS-1:0] slot_client[BANKS][2];
     logic [ADDR_WIDTH-1:0] slot_addr[BANKS][2];
@@ -102,64 +122,85 @@ module banked_bram_stream #(
     logic [TAG_WIDTH-1:0] pending_tag[BANKS][2];
     logic [EPOCH_WIDTH-1:0] pending_epoch[BANKS][2];
 
-    // Round-robin over all logical clients. A same-word pair is permitted
-    // only when both accesses are reads; writes serialize to avoid BRAM
-    // cross-port collision semantics varying by device.
+    // Decode each client once. In particular, the arbiter does not use a
+    // variable client index to select a 128-bit payload on every priority step.
+    for (genvar c = 0; c < CLIENTS; c++) begin : client_decode
+        if (c < READ_PORTS) begin : read_port
+            assign client_write[c] = 1'b0;
+            for (genvar b = 0; b < BANKS; b++) begin : bank
+                assign client_addr[b][c] = rd_addr[c];
+                assign client_data[b][c] = '0;
+                assign client_valid[b][c] = rd_valid[c] &&
+                    bank_of(rd_addr[c]) == BANK_BITS'(b) &&
+                    outstanding_count[c] < COUNT_BITS'(RESPONSE_DEPTH);
+            end
+        end else begin : write_port
+            assign client_write[c] = 1'b1;
+            for (genvar b = 0; b < BANKS; b++) begin : bank
+                assign client_addr[b][c] = wr_addr[c-READ_PORTS];
+                assign client_data[b][c] = wr_data[c-READ_PORTS];
+                assign client_valid[b][c] = wr_valid[c-READ_PORTS] &&
+                    bank_of(wr_addr[c-READ_PORTS]) == BANK_BITS'(b);
+            end
+        end
+    end
+
+    // Select both ports with one-hot grants. Every client tests its priority
+    // against the other clients in parallel, avoiding a serial data mux at
+    // each step of the round-robin search.
     always_comb begin
         rd_ready = '0;
         wr_ready = '0;
         for (int b = 0; b < BANKS; b++) begin
+            for (int c = 0; c < CLIENTS; c++) begin
+                first_grant[b][c] = client_valid[b][c] && rst_n;
+                for (int k = 0; k < CLIENTS; k++) begin
+                    if (k != c &&
+                        ((CLIENT_BITS'(k) >= rr[b] && CLIENT_BITS'(c) < rr[b]) ||
+                         ((CLIENT_BITS'(k) >= rr[b]) == (CLIENT_BITS'(c) >= rr[b]) && k < c)))
+                        first_grant[b][c] &= !client_valid[b][k];
+                end
+            end
+            for (int c = 0; c < CLIENTS; c++) begin
+                second_eligible[b][c] = client_valid[b][c] && !first_grant[b][c] && rst_n;
+                for (int k = 0; k < CLIENTS; k++) begin
+                    if (k != c &&
+                        client_addr[b][k][BYTE_BITS+:WORD_BITS] ==
+                        client_addr[b][c][BYTE_BITS+:WORD_BITS] &&
+                        (client_write[k] || client_write[c])) begin
+                        second_eligible[b][c] &= !first_grant[b][k];
+                    end
+                end
+            end
+            for (int c = 0; c < CLIENTS; c++) begin
+                second_grant[b][c] = second_eligible[b][c];
+                for (int k = 0; k < CLIENTS; k++) begin
+                    if (k != c &&
+                        ((CLIENT_BITS'(k) >= rr[b] && CLIENT_BITS'(c) < rr[b]) ||
+                         ((CLIENT_BITS'(k) >= rr[b]) == (CLIENT_BITS'(c) >= rr[b]) && k < c)))
+                        second_grant[b][c] &= !second_eligible[b][k];
+                end
+            end
             for (int s = 0; s < 2; s++) begin
                 slot_valid[b][s] = 1'b0;
                 slot_write[b][s] = 1'b0;
                 slot_client[b][s] = '0;
                 slot_addr[b][s] = '0;
                 slot_data[b][s] = '0;
-                for (int offset = 0; offset < CLIENTS; offset++) begin
-                    int candidate;
-                    int write_index;
-                    logic eligible;
-                    logic is_write;
-                    logic [ADDR_WIDTH-1:0] candidate_addr;
-                    logic [DATA_WIDTH-1:0] candidate_data;
-                    candidate = int'(rr[b]) + offset;
-                    if (candidate >= CLIENTS) candidate -= CLIENTS;
-                    is_write = candidate >= READ_PORTS;
-                    write_index = candidate - READ_PORTS;
-                    candidate_addr = '0;
-                    candidate_data = '0;
-                    eligible = 1'b0;
-                    if (is_write) begin
-                        candidate_addr = wr_addr[write_index];
-                        candidate_data = wr_data[write_index];
-                        eligible = wr_valid[write_index] &&
-                                   bank_of(candidate_addr) == BANK_BITS'(b);
-                    end else begin
-                        candidate_addr = rd_addr[candidate];
-                        eligible = rd_valid[candidate] &&
-                                   bank_of(candidate_addr) == BANK_BITS'(b) &&
-                                   (outstanding_count[candidate] <
-                                    COUNT_BITS'(RESPONSE_DEPTH) ||
-                                    (rsp_valid[candidate] && rsp_ready[candidate]));
-                    end
-                    if (s == 1 && slot_valid[b][0]) begin
-                        if (slot_client[b][0] == CLIENT_BITS'(candidate))
-                            eligible = 1'b0;
-                        if (slot_addr[b][0][BYTE_BITS+:WORD_BITS] ==
-                            candidate_addr[BYTE_BITS+:WORD_BITS] &&
-                            (slot_write[b][0] || is_write))
-                            eligible = 1'b0;
-                    end
-                    if (!slot_valid[b][s] && eligible && rst_n) begin
+                for (int c = 0; c < CLIENTS; c++) begin
+                    if ((s == 0 && first_grant[b][c]) ||
+                        (s == 1 && second_grant[b][c])) begin
                         slot_valid[b][s] = 1'b1;
-                        slot_write[b][s] = is_write;
-                        slot_client[b][s] = CLIENT_BITS'(candidate);
-                        slot_addr[b][s] = candidate_addr;
-                        slot_data[b][s] = candidate_data;
-                        if (is_write) wr_ready[write_index] = 1'b1;
-                        else rd_ready[candidate] = 1'b1;
+                        slot_write[b][s] |= client_write[c];
+                        slot_client[b][s] |= CLIENT_BITS'(c);
+                        slot_addr[b][s] |= client_addr[b][c];
+                        slot_data[b][s] |= client_data[b][c];
                     end
                 end
+            end
+            for (int c = 0; c < CLIENTS; c++) begin
+                if (c < READ_PORTS) rd_ready[c] |= first_grant[b][c] || second_grant[b][c];
+                else wr_ready[c-READ_PORTS] |= first_grant[b][c] || second_grant[b][c];
             end
         end
     end
@@ -212,18 +253,84 @@ module banked_bram_stream #(
         end
     end
 
-    always_ff @(posedge clk) begin
-        if (!rst_n) begin
-            for (int p = 0; p < READ_PORTS; p++) begin
+    for (genvar p = 0; p < READ_PORTS; p++) begin : read_state
+        wire consume = rsp_valid[p] && rsp_ready[p];
+        wire grant = rd_valid[p] && rd_ready[p];
+        wire enqueue = read_req[p].valid && read_req[p].ready;
+        always_ff @(posedge clk) begin
+            if (!rst_n) begin
+                rd_request_count[p] <= '0;
+                rd_request_head[p] <= 1'b0;
+                rd_request_tail[p] <= 1'b0;
                 response_count[p] <= '0;
                 outstanding_count[p] <= '0;
-                for (int q = 0; q < RESPONSE_DEPTH; q++) begin
-                    response_data[p][q] <= '0;
-                    response_addr[p][q] <= '0;
-                    response_tag[p][q] <= '0;
-                    response_epoch[p][q] <= '0;
+                response_head[p] <= '0;
+                response_tail[p] <= '0;
+            end else begin
+                if (enqueue) begin
+                    rd_request_addr[p][rd_request_tail[p]] <= ADDR_WIDTH'(read_req[p].addr);
+                    rd_request_tag[p][rd_request_tail[p]] <= read_req[p].tag;
+                    rd_request_epoch[p][rd_request_tail[p]] <= read_req[p].epoch;
+                    rd_request_tail[p] <= ~rd_request_tail[p];
                 end
+                if (grant) rd_request_head[p] <= ~rd_request_head[p];
+                case ({enqueue, grant})
+                    2'b10: rd_request_count[p] <= rd_request_count[p] + 1'b1;
+                    2'b01: rd_request_count[p] <= rd_request_count[p] - 1'b1;
+                    default: ;
+                endcase
+                if (consume) begin
+                    response_head[p] <= response_head[p] == RESPONSE_INDEX_BITS'(RESPONSE_DEPTH-1)
+                                      ? '0 : response_head[p] + 1'b1;
+                end
+                if (incoming_valid[p]) begin
+                    response_data[p][response_tail[p]] <= incoming_data[p];
+                    response_addr[p][response_tail[p]] <= incoming_addr[p];
+                    response_tag[p][response_tail[p]] <= incoming_tag[p];
+                    response_epoch[p][response_tail[p]] <= incoming_epoch[p];
+                    response_tail[p] <= response_tail[p] == RESPONSE_INDEX_BITS'(RESPONSE_DEPTH-1)
+                                      ? '0 : response_tail[p] + 1'b1;
+                end
+                case ({incoming_valid[p], consume})
+                    2'b10: response_count[p] <= response_count[p] + 1'b1;
+                    2'b01: response_count[p] <= response_count[p] - 1'b1;
+                    default: ;
+                endcase
+                case ({grant, consume})
+                    2'b10: outstanding_count[p] <= outstanding_count[p] + 1'b1;
+                    2'b01: outstanding_count[p] <= outstanding_count[p] - 1'b1;
+                    default: ;
+                endcase
             end
+        end
+    end
+
+    for (genvar p = 0; p < WRITE_PORTS; p++) begin : write_state
+        wire enqueue = write_req[p].valid && write_req[p].ready;
+        wire grant = wr_valid[p] && wr_ready[p];
+        always_ff @(posedge clk) begin
+            if (!rst_n) begin
+                wr_request_count[p] <= '0;
+                wr_request_head[p] <= 1'b0;
+                wr_request_tail[p] <= 1'b0;
+            end else begin
+                if (enqueue) begin
+                    wr_request_addr[p][wr_request_tail[p]] <= ADDR_WIDTH'(write_req[p].addr);
+                    wr_request_data[p][wr_request_tail[p]] <= DATA_WIDTH'(write_req[p].data);
+                    wr_request_tail[p] <= ~wr_request_tail[p];
+                end
+                if (grant) wr_request_head[p] <= ~wr_request_head[p];
+                case ({enqueue, grant})
+                    2'b10: wr_request_count[p] <= wr_request_count[p] + 1'b1;
+                    2'b01: wr_request_count[p] <= wr_request_count[p] - 1'b1;
+                    default: ;
+                endcase
+            end
+        end
+    end
+
+    always_ff @(posedge clk) begin
+        if (!rst_n) begin
             for (int b = 0; b < BANKS; b++) begin
                 rr[b] <= '0;
                 for (int s = 0; s < 2; s++) begin
@@ -235,38 +342,6 @@ module banked_bram_stream #(
                 end
             end
         end else begin
-            for (int p = 0; p < READ_PORTS; p++) begin
-                logic consume;
-                logic accept;
-                int append_index;
-                consume = rsp_valid[p] && rsp_ready[p];
-                accept = rd_valid[p] && rd_ready[p];
-                append_index = int'(response_count[p]) - int'(consume);
-                if (consume) begin
-                    for (int q = 0; q < RESPONSE_DEPTH-1; q++) begin
-                        response_data[p][q] <= response_data[p][q+1];
-                        response_addr[p][q] <= response_addr[p][q+1];
-                        response_tag[p][q] <= response_tag[p][q+1];
-                        response_epoch[p][q] <= response_epoch[p][q+1];
-                    end
-                end
-                if (incoming_valid[p]) begin
-                    response_data[p][append_index] <= incoming_data[p];
-                    response_addr[p][append_index] <= incoming_addr[p];
-                    response_tag[p][append_index] <= incoming_tag[p];
-                    response_epoch[p][append_index] <= incoming_epoch[p];
-                end
-                case ({incoming_valid[p], consume})
-                    2'b10: response_count[p] <= response_count[p] + 1'b1;
-                    2'b01: response_count[p] <= response_count[p] - 1'b1;
-                    default: ;
-                endcase
-                case ({accept, consume})
-                    2'b10: outstanding_count[p] <= outstanding_count[p] + 1'b1;
-                    2'b01: outstanding_count[p] <= outstanding_count[p] - 1'b1;
-                    default: ;
-                endcase
-            end
             for (int b = 0; b < BANKS; b++) begin
                 if (slot_valid[b][0]) begin
                     rr[b] <= slot_client[b][0] == CLIENT_BITS'(CLIENTS-1)
