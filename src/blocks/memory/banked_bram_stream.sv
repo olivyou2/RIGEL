@@ -9,8 +9,7 @@ module banked_bram_stream #(
     parameter int WORDS_PER_BANK = 1024,
     // Byte address. Bank bits are the MSBs of the local memory window;
     // optional higher system-address bits are ignored for memory selection.
-    parameter int ADDR_WIDTH = $clog2(BANKS) + $clog2(WORDS_PER_BANK)
-                             + $clog2(DATA_WIDTH/8),
+    parameter int ADDR_WIDTH = $clog2(BANKS) + $clog2(WORDS_PER_BANK) + $clog2(DATA_WIDTH/8),
     parameter int TAG_WIDTH = 4,
     parameter int EPOCH_WIDTH = 4,
     parameter int RESPONSE_DEPTH = 4
