@@ -1,7 +1,7 @@
 // Banked BRAM with an arbitrary number of logical read/write clients.
 // Each bank is one physical true dual-port RAM. Either physical port can read
 // or write, so a bank can accept 2R, 1R+1W, or 2W per cycle.
-module banked_bram_stream #(
+module banked_bram_stream_core #(
     parameter int BANKS = 4,
     parameter int READ_PORTS = 2,
     parameter int WRITE_PORTS = 2,
@@ -18,7 +18,8 @@ module banked_bram_stream #(
     input logic rst_n,
     rv_if.sink read_req[READ_PORTS],
     rv_if.source read_rsp[READ_PORTS],
-    rv_if.sink write_req[WRITE_PORTS]
+    rv_if.sink write_req[WRITE_PORTS],
+    output logic [WRITE_PORTS-1:0] write_commit
 );
     localparam int BANK_BITS = BANKS > 1 ? $clog2(BANKS) : 1;
     localparam int WORD_BITS = $clog2(WORDS_PER_BANK);
@@ -85,7 +86,7 @@ module banked_bram_stream #(
         assign rd_addr[p] = rd_request_addr[p][rd_request_head[p]];
         assign rd_tag[p] = rd_request_tag[p][rd_request_head[p]];
         assign rd_epoch[p] = rd_request_epoch[p][rd_request_head[p]];
-        assign read_req[p].ready = rst_n && rd_request_count[p] < REQUEST_DEPTH;
+        assign read_req[p].ready = rst_n && rd_request_count[p] < 2'(REQUEST_DEPTH);
         assign rsp_valid[p] = response_count[p] != 0;
         assign rsp_data[p] = response_data[p][response_head[p]];
         assign rsp_addr[p] = response_addr[p][response_head[p]];
@@ -102,7 +103,7 @@ module banked_bram_stream #(
         assign wr_valid[p] = wr_request_count[p] != 0;
         assign wr_addr[p] = wr_request_addr[p][wr_request_head[p]];
         assign wr_data[p] = wr_request_data[p][wr_request_head[p]];
-        assign write_req[p].ready = rst_n && wr_request_count[p] < REQUEST_DEPTH;
+        assign write_req[p].ready = rst_n && wr_request_count[p] < 2'(REQUEST_DEPTH);
     end
 
     logic [CLIENT_BITS-1:0] rr[BANKS];
@@ -309,10 +310,13 @@ module banked_bram_stream #(
         wire grant = wr_valid[p] && wr_ready[p];
         always_ff @(posedge clk) begin
             if (!rst_n) begin
+                write_commit[p] <= 1'b0;
                 wr_request_count[p] <= '0;
                 wr_request_head[p] <= 1'b0;
                 wr_request_tail[p] <= 1'b0;
             end else begin
+                // BRAM write enable and grant are sampled on this edge.
+                write_commit[p] <= grant;
                 if (enqueue) begin
                     wr_request_addr[p][wr_request_tail[p]] <= ADDR_WIDTH'(write_req[p].addr);
                     wr_request_data[p][wr_request_tail[p]] <= DATA_WIDTH'(write_req[p].data);
@@ -362,4 +366,20 @@ module banked_bram_stream #(
             end
         end
     end
+endmodule
+
+// Compatibility wrapper: posted writes retain their existing interface/behavior.
+module banked_bram_stream #(
+    parameter int BANKS=4, READ_PORTS=2, WRITE_PORTS=2, DATA_WIDTH=128,
+    WORDS_PER_BANK=1024,
+    ADDR_WIDTH=$clog2(BANKS)+$clog2(WORDS_PER_BANK)+$clog2(DATA_WIDTH/8),
+    TAG_WIDTH=4, EPOCH_WIDTH=4, RESPONSE_DEPTH=4
+)(input logic clk, rst_n, rv_if.sink read_req[READ_PORTS],
+  rv_if.source read_rsp[READ_PORTS], rv_if.sink write_req[WRITE_PORTS]);
+    banked_bram_stream_core #(.BANKS(BANKS),.READ_PORTS(READ_PORTS),
+        .WRITE_PORTS(WRITE_PORTS),.DATA_WIDTH(DATA_WIDTH),.WORDS_PER_BANK(WORDS_PER_BANK),
+        .ADDR_WIDTH(ADDR_WIDTH),.TAG_WIDTH(TAG_WIDTH),.EPOCH_WIDTH(EPOCH_WIDTH),
+        .RESPONSE_DEPTH(RESPONSE_DEPTH)) core(
+        .clk(clk),.rst_n(rst_n),.read_req(read_req),.read_rsp(read_rsp),
+        .write_req(write_req),.write_commit());
 endmodule

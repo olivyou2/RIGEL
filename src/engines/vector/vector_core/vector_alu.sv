@@ -73,9 +73,9 @@ module vector_alu #(
     logic signed [RESULT_WIDTH-1:0] signed_c[LANE_SIZE];
     (* use_dsp = "yes" *) logic signed [RESULT_WIDTH-1:0] lane_product[LANE_SIZE];
     for (genvar lane = 0; lane < LANE_SIZE; lane++) begin : widen_operands
-        assign signed_a[lane] = $signed(lane_in_a[lane]);
-        assign signed_b[lane] = $signed(lane_in_b[lane]);
-        assign signed_c[lane] = $signed(lane_in_c[lane]);
+        assign signed_a[lane] = RESULT_WIDTH'($signed(lane_in_a[lane]));
+        assign signed_b[lane] = RESULT_WIDTH'($signed(lane_in_b[lane]));
+        assign signed_c[lane] = RESULT_WIDTH'($signed(lane_in_c[lane]));
         assign lane_product[lane] = signed_b[lane] * signed_c[lane];
     end
     logic [DATA_WIDTH-1:0] lane_exp_out[LANE_SIZE];
@@ -137,8 +137,8 @@ module vector_alu #(
                 ALU_RS:   lane_alu_out[i] = signed_b[i] >>> lane_in_c[i];
                 ALU_MAX:  lane_alu_out[i] = lane_b_bigger[i] ? signed_b[i] : signed_c[i];
                 ALU_MIN:  lane_alu_out[i] = lane_b_bigger[i] ? signed_c[i] : signed_b[i];
-                ALU_EXP:  lane_alu_out[i] = lane_exp_out[i];
-                ALU_SQRT: lane_alu_out[i] = lane_sqrt_out[i];
+                ALU_EXP:  lane_alu_out[i] = RESULT_WIDTH'(lane_exp_out[i]);
+                ALU_SQRT: lane_alu_out[i] = RESULT_WIDTH'(lane_sqrt_out[i]);
                 ALU_FMA:  lane_alu_out[i] = signed_a[i] + lane_product[i];
 
                 default: lane_alu_out[i] = 0;

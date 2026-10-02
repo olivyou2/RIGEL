@@ -43,9 +43,9 @@ module banked_bram_stream_tb;
 
     always @(posedge clk) if (rst_n) begin
         for (int b = 0; b < 4; b++) begin
-            if (dut.slot_valid[b][0] && dut.slot_valid[b][1] &&
-                (dut.slot_write[b][0] || dut.slot_write[b][1]) &&
-                dut.slot_addr[b][0][5:2] == dut.slot_addr[b][1][5:2])
+            if (dut.core.slot_valid[b][0] && dut.core.slot_valid[b][1] &&
+                (dut.core.slot_write[b][0] || dut.core.slot_write[b][1]) &&
+                dut.core.slot_addr[b][0][5:2] == dut.core.slot_addr[b][1][5:2])
                 $fatal(1, "same-word bank collision");
         end
     end

@@ -48,7 +48,7 @@ module vector_accumulate_slot #(
     assign data.ready = acc || !out_ch.valid || out_ch.ready;
     for (genvar lane = 0; lane < LANE_SIZE; lane++) begin : sum_lanes
         assign next_sum[lane] = accumulator[lane]
-            + $signed(data.data[DATA_WIDTH*lane+:DATA_WIDTH]);
+            + ACC_WIDTH'($signed(data.data[DATA_WIDTH*lane+:DATA_WIDTH]));
     end
 
     always @(posedge clk) begin

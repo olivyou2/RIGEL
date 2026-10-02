@@ -6,6 +6,7 @@
 - `blocks/memory/`: BRAM-backed storage blocks and memory adapters
 - `blocks/interconnect/`: IXC and mesh interconnect blocks
 - `engines/`: compute, DMA, scheduler, SGE, and vector engines
+- `system/`: 4x4 mesh/vector integration and flat-pin synthesis top (see `system/README.md`)
 - `generated/`: generated RTL artifacts
 - `tb/`: testbenches, grouped by the block they verify
 - `top.sv`: top-level integration
